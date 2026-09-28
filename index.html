@@ -8,6 +8,7 @@
 </head>
 <body>
 <header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">☰</button>
   <div class="brand">
     <img class="crest" src="logos/tigres.png" alt="Tigres">
 
@@ -16,7 +17,12 @@
       <p class="sub">Análise de Jogos</p>
     </div>
   </div>
-  <nav class="tabs">
+  <nav class="tabs" id="nav">
+    <div class="nav-head">
+      <img class="crest" src="logos/tigres.png" alt="Tigres">
+      <span>Tigres</span>
+      <button class="nav-close" id="navClose" aria-label="Fechar menu">✕</button>
+    </div>
     <button data-view="epoca" class="tab active">Época</button>
     <button data-view="jornadas" class="tab">Jornadas</button>
     <button data-view="jogadores" class="tab">Jogadores</button>
@@ -24,6 +30,7 @@
   </nav>
   <div class="status" id="syncStatus" title="Estado dos dados"></div>
 </header>
+<div class="nav-backdrop" id="navBackdrop" hidden></div>
 
 <main id="app">
   <div class="loading" id="loading">A carregar dados…</div>

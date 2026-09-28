@@ -6,9 +6,9 @@
 /* ---------- CONFIG: preenche depois de criares o repositório ---------- */
 const CONFIG = {
   // Ex: "franciscobranco"  (o teu utilizador GitHub)
-  githubOwner: "fbpgb-iscteiulpt",
+  githubOwner: "",
   // Ex: "tigres-jogos"     (nome do repositório)
-  githubRepo: "tigres-jogos",
+  githubRepo: "",
   // Ramo (normalmente "main")
   githubBranch: "main",
   // Caminho do ficheiro de dados dentro do repo
@@ -627,6 +627,10 @@ function selectFrom(arr, ph, val = "") {
 function showModal() { $("#modalBackdrop").hidden = false; }
 function closeModal() { $("#modalBackdrop").hidden = true; }
 
+/* menu lateral (mobile) */
+function openNav() { $("#nav").classList.add("open"); $("#navBackdrop").hidden = false; }
+function closeNav() { $("#nav").classList.remove("open"); $("#navBackdrop").hidden = true; }
+
 /* ================= boot ================= */
 async function boot() {
   try {
@@ -635,9 +639,12 @@ async function boot() {
     $("#app").innerHTML = `<div class="empty">Erro ao carregar dados: ${e.message}</div>`;
     return;
   }
-  $$(".tab").forEach((t) => t.addEventListener("click", () => { state.view = t.dataset.view; render(); }));
+  $$(".tab").forEach((t) => t.addEventListener("click", () => { state.view = t.dataset.view; closeNav(); render(); }));
   $("#modalClose").addEventListener("click", closeModal);
   $("#modalBackdrop").addEventListener("click", (e) => { if (e.target.id === "modalBackdrop") closeModal(); });
+  $("#menuBtn").addEventListener("click", openNav);
+  $("#navClose").addEventListener("click", closeNav);
+  $("#navBackdrop").addEventListener("click", closeNav);
   render();
 }
 boot();
