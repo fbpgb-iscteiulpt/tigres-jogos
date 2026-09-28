@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-09-28T21:36:17.616Z",
+    "atualizado": "2026-09-28T23:28:14.313Z",
     "versao": 1
   },
   "listas": {
@@ -136,8 +136,8 @@
           "adversario": 5
         },
         "Fora de jogo": {
-          "tigres": null,
-          "adversario": null
+          "tigres": 2,
+          "adversario": 4
         },
         "Posse de bola": {
           "tigres": 0.35,
