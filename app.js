@@ -6,9 +6,9 @@
 /* ---------- CONFIG: preenche depois de criares o repositório ---------- */
 const CONFIG = {
   // Ex: "franciscobranco"  (o teu utilizador GitHub)
-  githubOwner: "",
+  githubOwner: "fbpgb-iscteiulpt",
   // Ex: "tigres-jogos"     (nome do repositório)
-  githubRepo: "",
+  githubRepo: "tigres-jogos",
   // Ramo (normalmente "main")
   githubBranch: "main",
   // Caminho do ficheiro de dados dentro do repo
