@@ -125,6 +125,23 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -2px}
 .table-scroll .pstat-table{min-width:520px}
 
+/* Prémios ("kings") */
+.grid.kings{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card.king{display:flex;flex-direction:column;gap:8px;border-top:3px solid var(--navy)}
+.king-title{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:16px}
+.king-icon{font-size:20px;line-height:1}
+.king-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:-4px}
+.king-leader{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:var(--surface2);border:1px solid var(--line);border-left:4px solid var(--draw);border-radius:10px;padding:10px 12px;cursor:pointer}
+.king-leader:hover{background:#e6ecf5}
+.king-name{font-weight:800;color:var(--navy);font-size:17px}
+.king-val{font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+.king-rest{display:flex;flex-direction:column;gap:2px}
+.king-rest-row{display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;cursor:pointer;font-size:14px}
+.king-rest-row:hover{background:var(--surface2)}
+.king-rank{color:var(--muted);font-weight:700}
+.king-rname{color:var(--navy)}
+.king-rval{color:var(--muted);font-variant-numeric:tabular-nums;font-weight:600}
+
 @media(max-width:640px){
   .topbar{gap:10px;padding:10px 12px}
   .menu-btn{display:block}

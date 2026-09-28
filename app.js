@@ -6,9 +6,9 @@
 /* ---------- CONFIG: preenche depois de criares o repositório ---------- */
 const CONFIG = {
   // Ex: "franciscobranco"  (o teu utilizador GitHub)
-  githubOwner: "fbpgb-iscteiulpt",
+  githubOwner: "",
   // Ex: "tigres-jogos"     (nome do repositório)
-  githubRepo: "tigres-jogos",
+  githubRepo: "",
   // Ramo (normalmente "main")
   githubBranch: "main",
   // Caminho do ficheiro de dados dentro do repo
@@ -236,6 +236,36 @@ function seasonAgg(data) {
   return out;
 }
 
+/* Prémios por jogo ("kings") — médias por jogo com base nas participações */
+function computeKings(data) {
+  const P = {};
+  for (const j of data.jornadas) {
+    for (const p of j.players) (P[p.nome] ||= []).push(p);
+  }
+  const players = Object.entries(P).map(([nome, games]) => ({ nome, games }));
+  // metric = stat key; dir 'max'|'min'; filter = quais jogos contam
+  function ranking(metric, dir, filter) {
+    const rows = players.map((pl) => {
+      const gs = pl.games.filter(filter);
+      if (!gs.length) return null;
+      const total = gs.reduce((s, g) => s + (+g[metric] || 0), 0);
+      return { nome: pl.nome, avg: total / gs.length, jogos: gs.length };
+    }).filter(Boolean);
+    rows.sort((a, b) => dir === "max" ? b.avg - a.avg || a.nome.localeCompare(b.nome) : a.avg - b.avg || a.nome.localeCompare(b.nome));
+    return rows.slice(0, 3);
+  }
+  const jogou = (g) => (+g.minutos || 0) > 0;       // participou
+  const min40 = (g) => (+g.minutos || 0) >= 40;     // ≥40 minutos
+  return {
+    consistency: ranking("passesErrados", "min", min40),
+    keyPass: ranking("passeFinalizacao", "max", jogou),
+    recovery: ranking("desarmes", "max", jogou),
+    shooting: ranking("remates", "max", jogou),
+    noX: ranking("perdasBola", "max", jogou),
+    blindPasser: ranking("passesErrados", "max", jogou),
+  };
+}
+
 /* ================= VIEWS ================= */
 function render() {
   $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.view === state.view));
@@ -276,6 +306,42 @@ function viewEpoca(app) {
 
   app.append(el("div", { class: "section-title" }, "Mais minutos"));
   app.append(topTable(A.playersArr, "minutos", ["minutos", "jogos", "titular"], ["Minutos", "Jogos", "Titular"]));
+
+  // Prémios da época ("kings")
+  const K = computeKings(state.data);
+  app.append(el("div", { class: "section-title" }, "Prémios da época"));
+  const kings = el("div", { class: "grid kings" });
+  kings.append(
+    kingCard("👑", "Consistency King", "Menos passes falhados por jogo", K.consistency, "unidade", "(mín. 40 min por jogo)"),
+    kingCard("🎯", "Key Pass King", "Mais passes p/ finalização por jogo", K.keyPass, "unidade"),
+    kingCard("🛡️", "Recovery King", "Mais desarmes por jogo", K.recovery, "unidade"),
+    kingCard("🥅", "Shooting King", "Mais remates por jogo", K.shooting, "unidade"),
+    kingCard("🧱", 'No "X" King', "Mais perdas de bola por jogo", K.noX, "unidade"),
+    kingCard("🙈", "The Blind Passer", "Mais passes falhados por jogo", K.blindPasser, "unidade"),
+  );
+  app.append(kings);
+}
+
+function kingCard(icon, title, subtitle, top3, unit, note) {
+  const card = el("div", { class: "card king" });
+  card.append(el("div", { class: "king-title" }, el("span", { class: "king-icon" }, icon), el("span", {}, title)));
+  card.append(el("div", { class: "king-sub" }, subtitle + (note ? " " + note : "")));
+  if (!top3 || !top3.length) { card.append(el("div", { class: "empty" }, "Sem dados")); return card; }
+  const leader = top3[0];
+  const lead = el("div", { class: "king-leader", onclick: () => openPlayerModal(leader.nome) },
+    el("span", { class: "king-name" }, leader.nome),
+    el("span", { class: "king-val" }, `${leader.avg.toFixed(1)} / jogo`));
+  card.append(lead);
+  const rest = top3.slice(1);
+  if (rest.length) {
+    const list = el("div", { class: "king-rest" });
+    rest.forEach((r, i) => list.append(el("div", { class: "king-rest-row", onclick: () => openPlayerModal(r.nome) },
+      el("span", { class: "king-rank" }, (i + 2) + "."),
+      el("span", { class: "king-rname" }, r.nome),
+      el("span", { class: "king-rval" }, `${r.avg.toFixed(1)}`))));
+    card.append(list);
+  }
+  return card;
 }
 
 function statCard(big, lbl, sub) {
