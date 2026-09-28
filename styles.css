@@ -62,7 +62,11 @@ tr:hover td{background:var(--surface2)}
 .jlist{display:grid;gap:12px}
 .jrow{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;cursor:pointer;transition:.15s}
 .jrow:hover{border-color:var(--navy2);background:var(--surface2);transform:translateY(-1px)}
-.jrow .jnum{font-size:13px;color:var(--muted);width:60px}
+.jrow .jnum{font-size:13px;color:var(--muted);width:96px;display:flex;flex-direction:column;gap:2px;font-weight:700}
+.jrow .jnum .jdate{font-size:11px;font-weight:500;color:var(--muted)}
+.jrow.future{cursor:default}
+.jrow.future:hover{transform:none;border-color:var(--line);background:var(--surface)}
+.jrow .jscore.muted{color:var(--muted);font-size:18px}
 .jrow .jteams{flex:1;font-weight:600;display:flex;align-items:center;gap:10px}
 .jrow .jscore{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--navy)}
 .team{display:inline-flex;align-items:center;gap:8px}
@@ -75,6 +79,9 @@ tr:hover td{background:var(--surface2)}
 .badge.w{background:rgba(31,157,87,.12);color:var(--win)}
 .badge.d{background:rgba(201,154,6,.12);color:var(--draw)}
 .badge.l{background:rgba(192,57,43,.12);color:var(--loss)}
+.standings td.strong{font-weight:800;color:var(--navy)}
+.standings tr.me{background:rgba(18,41,77,.10)}
+.standings tr.me td{font-weight:700}
 
 /* Compare bars (match stats) */
 .cmp{display:grid;gap:14px;margin-top:8px}
@@ -163,7 +170,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
   .tabs .tab{text-align:left;padding:12px 14px;font-size:15px;border-radius:10px}
   main{padding:16px 12px 32px}
   .jrow{gap:10px;padding:12px 14px}
-  .jrow .jnum{display:none}
+  .jrow .jnum{width:80px;font-size:12px}
   .jrow .jteams{font-size:14px;gap:6px}
   .jrow .jscore{font-size:19px}
   .team-logo{width:22px;height:22px}

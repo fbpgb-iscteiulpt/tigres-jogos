@@ -271,7 +271,7 @@ function render() {
   $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.view === state.view));
   const app = $("#app");
   app.innerHTML = "";
-  ({ epoca: viewEpoca, jornadas: viewJornadas, jogadores: viewJogadores, nova: viewNova }[state.view])(app);
+  ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, nova: viewNova }[state.view])(app);
   const s = state.source;
   $("#syncStatus").className = "status " + (s === "github" ? "ok" : s === "seed" ? "err" : "local");
   $("#syncStatus").title = s === "github" ? "Ligado ao GitHub (dados partilhados)" : s === "seed" ? "Dados iniciais (não partilhado ainda)" : "Cache local";
@@ -371,12 +371,15 @@ function topTable(players, sortKey, cols, colLabels, limit = 8) {
 }
 
 function viewJornadas(app) {
-  app.append(el("div", { class: "section-title" }, "Jornadas"));
+  app.append(el("div", { class: "section-title" }, "Jornadas disputadas"));
+  const jogadas = [...state.data.jornadas].sort((a, b) => b.numero - a.numero);
   const list = el("div", { class: "jlist" });
-  [...state.data.jornadas].sort((a, b) => b.numero - a.numero).forEach((j) => {
+  if (!jogadas.length) list.append(el("div", { class: "empty" }, "Ainda sem jornadas registadas."));
+  jogadas.forEach((j) => {
     const { gf, ga, res } = resultOf(j);
+    const meta = [j.data, j.casa === false ? "fora" : j.casa === true ? "casa" : null].filter(Boolean).join(" · ");
     const row = el("div", { class: "jrow", onclick: () => openJornadaModal(j.numero) },
-      el("span", { class: "jnum" }, `Jornada ${j.numero}`),
+      el("span", { class: "jnum" }, `Jornada ${j.numero}`, meta ? el("span", { class: "jdate" }, meta) : null),
       el("span", { class: "jteams" }, teamTag(state.data.meta.clube), el("span", { class: "vs" }, "vs"), teamTag(j.adversario)),
       el("span", { class: "jscore" }, `${gf ?? "?"}–${ga ?? "?"}`),
       el("span", { class: "badge " + (res === "?" ? "" : res) }, res === "w" ? "V" : res === "d" ? "E" : res === "l" ? "D" : "?"),
@@ -384,6 +387,53 @@ function viewJornadas(app) {
     list.append(row);
   });
   app.append(list);
+
+  // Próximas jornadas (do calendário)
+  const cal = state.data.calendario || [];
+  const jogadasNums = new Set(state.data.jornadas.map((j) => j.numero));
+  const futuras = cal.filter((f) => !jogadasNums.has(f.numero)).sort((a, b) => a.numero - b.numero);
+  if (futuras.length) {
+    app.append(el("div", { class: "section-title" }, "Próximas jornadas"));
+    const fl = el("div", { class: "jlist" });
+    futuras.forEach((f) => {
+      const local = f.casa ? "casa" : "fora";
+      const meta = [f.data, f.hora, local].filter(Boolean).join(" · ");
+      fl.append(el("div", { class: "jrow future" },
+        el("span", { class: "jnum" }, `Jornada ${f.numero}`, el("span", { class: "jdate" }, meta)),
+        el("span", { class: "jteams" }, teamTag(state.data.meta.clube), el("span", { class: "vs" }, "vs"), teamTag(f.adversario)),
+        el("span", { class: "jscore muted" }, "–"),
+      ));
+    });
+    app.append(fl);
+  }
+}
+
+/* ================= CLASSIFICAÇÃO ================= */
+function viewClassificacao(app) {
+  const tabela = state.data.classificacao || [];
+  app.append(el("div", { class: "section-title" }, "Classificação"));
+  if (!tabela.length) { app.append(el("div", { class: "empty" }, "Sem classificação disponível.")); return; }
+  const clube = state.data.meta.clube;
+  const cols = [["pts", "Pts"], ["j", "J"], ["v", "V"], ["e", "E"], ["dd", "D"], ["gm", "GM"], ["gs", "GS"]];
+  const t = el("table", { class: "pstat-table standings" });
+  const h = el("tr", {}, el("th", { class: "rank" }, "#"), el("th", {}, "Equipa"));
+  cols.forEach((c) => h.append(el("th", { class: "num" }, c[1])));
+  h.append(el("th", { class: "num" }, "DIF"));
+  t.append(el("thead", {}, h));
+  const tb = el("tbody");
+  [...tabela].sort((a, b) => a.pos - b.pos).forEach((r) => {
+    const isClube = r.equipa === clube;
+    const tr = el("tr", isClube ? { class: "me" } : {},
+      el("td", { class: "rank" }, r.pos),
+      el("td", {}, teamTag(r.equipa)));
+    cols.forEach((c) => tr.append(el("td", { class: "num" + (c[0] === "pts" ? " strong" : "") }, fmt(r[c[0]]))));
+    const dif = (r.gm || 0) - (r.gs || 0);
+    tr.append(el("td", { class: "num" }, (dif > 0 ? "+" : "") + dif));
+    tb.append(tr);
+  });
+  t.append(tb);
+  app.append(tableScroll(t));
+  app.append(el("p", { class: "hint" }, "J=jogos, V=vitórias, E=empates, D=derrotas, GM=golos marcados, GS=golos sofridos, DIF=diferença. GM/GS a atualizar quando disponíveis."));
 }
 
 function openJornadaModal(numero) {
@@ -396,6 +446,7 @@ function openJornadaModal(numero) {
     el("span", {}, ` ${gf ?? "?"}–${ga ?? "?"} `),
     teamTag(j.adversario, true)));
   b.append(el("div", { class: "chips" },
+    j.data ? el("span", { class: "chip" }, `Data: ${j.data}${j.casa === false ? " (fora)" : j.casa === true ? " (casa)" : ""}`) : null,
     el("span", { class: "chip" }, `Tática: ${fmt(j.tatica)}`),
     el("span", { class: "chip" }, `Convocados: ${j.players.length}`)));
 

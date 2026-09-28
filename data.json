@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-09-28T23:28:14.313Z",
-    "versao": 1
+    "atualizado": "2026-09-28T23:52:46.623Z",
+    "versao": 2
   },
   "listas": {
     "jogadores": [
@@ -1043,7 +1043,10 @@
           "acao": "Passe errado",
           "jogador": "Branco"
         }
-      ]
+      ],
+      "data": "19 / 20 Setembro",
+      "hora": "10:30",
+      "casa": true
     },
     {
       "numero": 2,
@@ -2020,7 +2023,450 @@
           "acao": "Desarme",
           "jogador": "Francisco"
         }
-      ]
+      ],
+      "data": "26 / 27 Setembro",
+      "hora": "11:00",
+      "casa": false
+    }
+  ],
+  "calendario": [
+    {
+      "numero": 1,
+      "data": "19 / 20 Setembro",
+      "hora": "10:30",
+      "adversario": "CDUL",
+      "casa": true
+    },
+    {
+      "numero": 2,
+      "data": "26 / 27 Setembro",
+      "hora": "11:00",
+      "adversario": "Laranjada",
+      "casa": false
+    },
+    {
+      "numero": 3,
+      "data": "3 / 4 Outubro",
+      "hora": "10:30",
+      "adversario": "SD76",
+      "casa": true
+    },
+    {
+      "numero": 4,
+      "data": "10 / 11 Outubro",
+      "hora": "17:10",
+      "adversario": "Madeira",
+      "casa": false
+    },
+    {
+      "numero": 5,
+      "data": "17 / 18 Outubro",
+      "hora": "21:30",
+      "adversario": "Purrianos",
+      "casa": true
+    },
+    {
+      "numero": 6,
+      "data": "24 / 25 Outubro",
+      "hora": "18:50",
+      "adversario": "Milionários",
+      "casa": true
+    },
+    {
+      "numero": 7,
+      "data": "31 Outubro / 1 Novembro",
+      "hora": "18:50",
+      "adversario": "Olímpico",
+      "casa": true
+    },
+    {
+      "numero": 8,
+      "data": "7 / 8 Novembro",
+      "hora": "11:00",
+      "adversario": "Madeirinha",
+      "casa": false
+    },
+    {
+      "numero": 9,
+      "data": "14 / 15 Novembro",
+      "hora": "15:30",
+      "adversario": "Briosa",
+      "casa": true
+    },
+    {
+      "numero": 10,
+      "data": "21 / 22 Novembro",
+      "hora": "15:30",
+      "adversario": "Canarinhos",
+      "casa": true
+    },
+    {
+      "numero": 11,
+      "data": "28 / 29 Novembro",
+      "hora": "13:50",
+      "adversario": "Incríveis",
+      "casa": false
+    },
+    {
+      "numero": 12,
+      "data": "5 / 6 Dezembro",
+      "hora": "17:10",
+      "adversario": "Cosmos",
+      "casa": true
+    },
+    {
+      "numero": 13,
+      "data": "12 / 13 Dezembro",
+      "hora": "12:10",
+      "adversario": "Pé Leve",
+      "casa": true
+    },
+    {
+      "numero": 14,
+      "data": "19 / 20 Dezembro",
+      "hora": "12:10",
+      "adversario": "Leões",
+      "casa": false
+    },
+    {
+      "numero": 15,
+      "data": "9 / 10 Janeiro",
+      "hora": "12:40",
+      "adversario": "AQA",
+      "casa": true
+    },
+    {
+      "numero": 16,
+      "data": "16 / 17 Janeiro",
+      "hora": "13:50",
+      "adversario": "VDR",
+      "casa": false
+    },
+    {
+      "numero": 17,
+      "data": "23 / 24 Janeiro",
+      "hora": "12:40",
+      "adversario": "Vips",
+      "casa": false
+    },
+    {
+      "numero": 18,
+      "data": "6 / 7 Fevereiro",
+      "hora": "10:30",
+      "adversario": "CDUL",
+      "casa": false
+    },
+    {
+      "numero": 19,
+      "data": "13 / 14 Fevereiro",
+      "hora": "11:00",
+      "adversario": "Laranjada",
+      "casa": true
+    },
+    {
+      "numero": 20,
+      "data": "20 / 21 Fevereiro",
+      "hora": "10:30",
+      "adversario": "SD76",
+      "casa": false
+    },
+    {
+      "numero": 21,
+      "data": "27 / 28 Fevereiro",
+      "hora": "17:10",
+      "adversario": "Madeira",
+      "casa": true
+    },
+    {
+      "numero": 22,
+      "data": "6 / 7 Março",
+      "hora": "21:30",
+      "adversario": "Purrianos",
+      "casa": false
+    },
+    {
+      "numero": 23,
+      "data": "13 / 14 Março",
+      "hora": "18:50",
+      "adversario": "Milionários",
+      "casa": false
+    },
+    {
+      "numero": 24,
+      "data": "20 / 21 Março",
+      "hora": "18:50",
+      "adversario": "Olímpico",
+      "casa": false
+    },
+    {
+      "numero": 25,
+      "data": "3 / 4 Abril",
+      "hora": "11:00",
+      "adversario": "Madeirinha",
+      "casa": true
+    },
+    {
+      "numero": 26,
+      "data": "10 / 11 Abril",
+      "hora": "15:30",
+      "adversario": "Briosa",
+      "casa": false
+    },
+    {
+      "numero": 27,
+      "data": "17 / 18 Abril",
+      "hora": "15:30",
+      "adversario": "Canarinhos",
+      "casa": false
+    },
+    {
+      "numero": 28,
+      "data": "24 / 25 Abril",
+      "hora": "13:50",
+      "adversario": "Incríveis",
+      "casa": true
+    },
+    {
+      "numero": 29,
+      "data": "8 / 9 Maio",
+      "hora": "17:10",
+      "adversario": "Cosmos",
+      "casa": false
+    },
+    {
+      "numero": 30,
+      "data": "15 / 16 Maio",
+      "hora": "12:10",
+      "adversario": "Pé Leve",
+      "casa": false
+    },
+    {
+      "numero": 31,
+      "data": "22 / 23 Maio",
+      "hora": "12:10",
+      "adversario": "Leões",
+      "casa": true
+    },
+    {
+      "numero": 32,
+      "data": "29 / 30 Maio",
+      "hora": "12:40",
+      "adversario": "AQA",
+      "casa": false
+    },
+    {
+      "numero": 33,
+      "data": "5 / 6 Junho",
+      "hora": "13:50",
+      "adversario": "VDR",
+      "casa": true
+    },
+    {
+      "numero": 34,
+      "data": "12 / 13 Junho",
+      "hora": "12:40",
+      "adversario": "Vips",
+      "casa": true
+    }
+  ],
+  "classificacao": [
+    {
+      "pos": 1,
+      "equipa": "Leões",
+      "pts": 6,
+      "j": 2,
+      "v": 2,
+      "e": 0,
+      "dd": 0,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 2,
+      "equipa": "Vips",
+      "pts": 6,
+      "j": 2,
+      "v": 2,
+      "e": 0,
+      "dd": 0,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 3,
+      "equipa": "Pé Leve",
+      "pts": 6,
+      "j": 2,
+      "v": 2,
+      "e": 0,
+      "dd": 0,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 4,
+      "equipa": "CDUL",
+      "pts": 4,
+      "j": 2,
+      "v": 1,
+      "e": 1,
+      "dd": 0,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 5,
+      "equipa": "AQA",
+      "pts": 4,
+      "j": 2,
+      "v": 1,
+      "e": 1,
+      "dd": 0,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 6,
+      "equipa": "Madeira",
+      "pts": 4,
+      "j": 2,
+      "v": 1,
+      "e": 1,
+      "dd": 0,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 7,
+      "equipa": "Incríveis",
+      "pts": 4,
+      "j": 2,
+      "v": 1,
+      "e": 1,
+      "dd": 0,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 8,
+      "equipa": "Milionários",
+      "pts": 3,
+      "j": 2,
+      "v": 1,
+      "e": 0,
+      "dd": 1,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 9,
+      "equipa": "Laranjada",
+      "pts": 3,
+      "j": 2,
+      "v": 1,
+      "e": 0,
+      "dd": 1,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 10,
+      "equipa": "VDR",
+      "pts": 3,
+      "j": 2,
+      "v": 1,
+      "e": 0,
+      "dd": 1,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 11,
+      "equipa": "Cosmos",
+      "pts": 3,
+      "j": 2,
+      "v": 1,
+      "e": 0,
+      "dd": 1,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 12,
+      "equipa": "Purrianos",
+      "pts": 1,
+      "j": 2,
+      "v": 0,
+      "e": 1,
+      "dd": 1,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 13,
+      "equipa": "Olímpico",
+      "pts": 1,
+      "j": 2,
+      "v": 0,
+      "e": 1,
+      "dd": 1,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 14,
+      "equipa": "Madeirinha",
+      "pts": 0,
+      "j": 2,
+      "v": 0,
+      "e": 0,
+      "dd": 2,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 15,
+      "equipa": "Canarinhos",
+      "pts": 0,
+      "j": 2,
+      "v": 0,
+      "e": 0,
+      "dd": 2,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 16,
+      "equipa": "Tigres",
+      "pts": 0,
+      "j": 2,
+      "v": 0,
+      "e": 0,
+      "dd": 2,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 17,
+      "equipa": "SD76",
+      "pts": 0,
+      "j": 2,
+      "v": 0,
+      "e": 0,
+      "dd": 2,
+      "gm": 0,
+      "gs": 0
+    },
+    {
+      "pos": 18,
+      "equipa": "Briosa",
+      "pts": 0,
+      "j": 2,
+      "v": 0,
+      "e": 0,
+      "dd": 2,
+      "gm": 0,
+      "gs": 0
     }
   ]
 }
