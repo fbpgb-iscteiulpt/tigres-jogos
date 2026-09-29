@@ -419,6 +419,7 @@ function viewClassificacao(app) {
   const h = el("tr", {}, el("th", { class: "rank" }, "#"), el("th", {}, "Equipa"));
   cols.forEach((c) => h.append(el("th", { class: "num" }, c[1])));
   h.append(el("th", { class: "num" }, "DIF"));
+  h.append(el("th", { class: "num" }, "TD"));
   t.append(el("thead", {}, h));
   const tb = el("tbody");
   [...tabela].sort((a, b) => a.pos - b.pos).forEach((r) => {
@@ -429,11 +430,12 @@ function viewClassificacao(app) {
     cols.forEach((c) => tr.append(el("td", { class: "num" + (c[0] === "pts" ? " strong" : "") }, fmt(r[c[0]]))));
     const dif = (r.gm || 0) - (r.gs || 0);
     tr.append(el("td", { class: "num" }, (dif > 0 ? "+" : "") + dif));
+    tr.append(el("td", { class: "num" }, fmt(r.td)));
     tb.append(tr);
   });
   t.append(tb);
   app.append(tableScroll(t));
-  app.append(el("p", { class: "hint" }, "J=jogos, V=vitórias, E=empates, D=derrotas, GM=golos marcados, GS=golos sofridos, DIF=diferença. GM/GS a atualizar quando disponíveis."));
+  app.append(el("p", { class: "hint" }, "J=jogos, V=vitórias, E=empates, D=derrotas, GM=golos marcados, GS=golos sofridos, DIF=diferença de golos, TD=taça disciplina."));
 }
 
 function openJornadaModal(numero) {
