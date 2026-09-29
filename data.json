@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-09-29T11:07:34.529Z",
-    "versao": 4
+    "atualizado": "2026-09-29T12:27:25.873Z",
+    "versao": 5
   },
   "listas": {
     "jogadores": [
@@ -123,11 +123,11 @@
           "adversario": 3
         },
         "Remates": {
-          "tigres": 7,
+          "tigres": 8,
           "adversario": 8
         },
         "Remates à baliza": {
-          "tigres": 2,
+          "tigres": 3,
           "adversario": 4
         },
         "Cantos": {
@@ -309,7 +309,7 @@
           "nome": "Rodrigo",
           "titular": true,
           "minutos": 70,
-          "remates": 0,
+          "remates": 1,
           "desarmes": 5,
           "defesas": 0,
           "golos": 0,
@@ -849,6 +849,10 @@
         {
           "acao": "Remate à baliza",
           "jogador": "Tomas M"
+        },
+        {
+          "acao": "Remate à baliza",
+          "jogador": "Rodrigo"
         },
         {
           "acao": "Canto ofensivo",
