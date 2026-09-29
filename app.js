@@ -263,6 +263,7 @@ function computeKings(data) {
     shooting: ranking("remates", "max", jogou),
     noX: ranking("perdasBola", "max", jogou),
     blindPasser: ranking("passesErrados", "max", jogou),
+    foul: ranking("faltas", "max", jogou),
   };
 }
 
@@ -318,6 +319,7 @@ function viewEpoca(app) {
     kingCard("🥅", "Shooting King", "Mais remates por jogo", K.shooting, "unidade"),
     kingCard("🧱", 'No "X" King', "Mais perdas de bola por jogo", K.noX, "unidade"),
     kingCard("🙈", "The Blind Passer", "Mais passes falhados por jogo", K.blindPasser, "unidade"),
+    kingCard("🥊", "The Foul King", "Mais faltas por jogo", K.foul, "unidade"),
   );
   app.append(kings);
 }
