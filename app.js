@@ -178,13 +178,13 @@ function exportExcel() {
     const statKeys = Object.keys(j.matchStats || {});
     const maxLen = Math.max(j.eventos.length, j.players.length, statKeys.length);
     // Cabeçalho jogadores
-    const pHead = ["", "", "", "", "", "", "", "Convocado", "Titular", "Minutos", "Remates", "Desarmes", "Defesas", "Golos", "Assist.", "Passe fin.", "Faltas", "Passes err.", "Perdas"];
+    const pHead = ["", "", "", "", "", "", "", "Convocado", "Titular", "Minutos", "Remates", "Desarmes", "Defesas", "Golos", "Assist.", "Passe fin.", "Faltas", "Passes err.", "Perdas", "Dribles OK", "Dribles falh.", "Cruzamentos"];
     rows.push(pHead);
     for (let i = 0; i < maxLen; i++) {
       const ev = j.eventos[i] || {};
       const st = statKeys[i] ? [statKeys[i], j.matchStats[statKeys[i]].tigres, j.matchStats[statKeys[i]].adversario] : ["", "", ""];
       const p = j.players[i];
-      const prow = p ? [p.nome, p.titular ? "X" : "", p.minutos, p.remates, p.desarmes, p.defesas, p.golos, p.assistencias, p.passeFinalizacao, p.faltas, p.passesErrados, p.perdasBola] : [];
+      const prow = p ? [p.nome, p.titular ? "X" : "", p.minutos, p.remates, p.desarmes, p.defesas, p.golos, p.assistencias, p.passeFinalizacao, p.faltas, p.passesErrados, p.perdasBola, p.driblesBemSucedidos, p.driblesFalhados, p.cruzamentos] : [];
       rows.push([ev.acao || "", ev.jogador || "", "", st[0], st[1], st[2], "", ...prow]);
     }
     sheets.push({ name: `${j.numero}a Jornada`, rows });
@@ -227,9 +227,9 @@ function seasonAgg(data) {
     if (gf != null) { out.gf += gf; out.ga += ga; }
     out.results.push({ numero: j.numero, adversario: j.adversario, gf, ga, res });
     for (const p of j.players) {
-      const a = (out.players[p.nome] ||= { nome: p.nome, jogos: 0, titular: 0, minutos: 0, golos: 0, assistencias: 0, remates: 0, desarmes: 0, defesas: 0, passeFinalizacao: 0, faltas: 0, passesErrados: 0, perdasBola: 0 });
+      const a = (out.players[p.nome] ||= { nome: p.nome, jogos: 0, titular: 0, minutos: 0, golos: 0, assistencias: 0, remates: 0, desarmes: 0, defesas: 0, passeFinalizacao: 0, faltas: 0, passesErrados: 0, perdasBola: 0, driblesBemSucedidos: 0, driblesFalhados: 0, cruzamentos: 0 });
       a.jogos++; if (p.titular) a.titular++;
-      for (const k of ["minutos", "golos", "assistencias", "remates", "desarmes", "defesas", "passeFinalizacao", "faltas", "passesErrados", "perdasBola"]) a[k] += (+p[k] || 0);
+      for (const k of ["minutos", "golos", "assistencias", "remates", "desarmes", "defesas", "passeFinalizacao", "faltas", "passesErrados", "perdasBola", "driblesBemSucedidos", "driblesFalhados", "cruzamentos"]) a[k] += (+p[k] || 0);
     }
   }
   out.playersArr = Object.values(out.players);
@@ -256,6 +256,19 @@ function computeKings(data) {
   }
   const jogou = (g) => (+g.minutos || 0) > 0;       // participou
   const min40 = (g) => (+g.minutos || 0) >= 40;     // ≥40 minutos
+  // Ranking por rácio: soma de "num" a dividir pela soma de (num+den) em todos os jogos.
+  // Só conta jogadores com pelo menos 1 tentativa (num+den > 0).
+  function rankingRatio(numKey, denKey, dir) {
+    const rows = players.map((pl) => {
+      const bem = pl.games.reduce((s, g) => s + (+g[numKey] || 0), 0);
+      const fal = pl.games.reduce((s, g) => s + (+g[denKey] || 0), 0);
+      const tent = bem + fal;
+      if (tent <= 0) return null;
+      return { nome: pl.nome, avg: bem / tent, bem, tent };
+    }).filter(Boolean);
+    rows.sort((a, b) => dir === "max" ? b.avg - a.avg || b.tent - a.tent || a.nome.localeCompare(b.nome) : a.avg - b.avg || b.tent - a.tent || a.nome.localeCompare(b.nome));
+    return rows.slice(0, 3);
+  }
   return {
     consistency: ranking("passesErrados", "min", min40),
     keyPass: ranking("passeFinalizacao", "max", jogou),
@@ -264,6 +277,8 @@ function computeKings(data) {
     noX: ranking("perdasBola", "max", jogou),
     blindPasser: ranking("passesErrados", "max", jogou),
     foul: ranking("faltas", "max", jogou),
+    drible: rankingRatio("driblesBemSucedidos", "driblesFalhados", "max"),
+    peDeTijolo: rankingRatio("driblesBemSucedidos", "driblesFalhados", "min"),
   };
 }
 
@@ -320,11 +335,19 @@ function viewEpoca(app) {
     kingCard("🧱", 'No "X" King', "Mais perdas de bola por jogo", K.noX, "unidade"),
     kingCard("🙈", "The Blind Passer", "Mais passes falhados por jogo", K.blindPasser, "unidade"),
     kingCard("🥊", "The Foul King", "Mais faltas por jogo", K.foul, "unidade"),
+    kingCard("⚡", "Drible King", "Melhor % de dribles conseguidos", K.drible, "unidade", "(dribles bem sucedidos ÷ efetuados)", fmtRatio),
+    kingCard("🧿", "Pés de tijolo", "Pior % de dribles conseguidos", K.peDeTijolo, "unidade", "(mín. 1 drible efetuado)", fmtRatio),
   );
   app.append(kings);
 }
 
-function kingCard(icon, title, subtitle, top3, unit, note) {
+// Formatação de valor para os cartões de rácio (percentagem)
+function fmtRatio(r, isLeader) {
+  const p = Math.round(r.avg * 100);
+  return isLeader ? `${p}% (${r.bem}/${r.tent})` : `${p}%`;
+}
+
+function kingCard(icon, title, subtitle, top3, unit, note, valFmt) {
   const card = el("div", { class: "card king" });
   card.append(el("div", { class: "king-title" }, el("span", { class: "king-icon" }, icon), el("span", {}, title)));
   card.append(el("div", { class: "king-sub" }, subtitle + (note ? " " + note : "")));
@@ -332,7 +355,7 @@ function kingCard(icon, title, subtitle, top3, unit, note) {
   const leader = top3[0];
   const lead = el("div", { class: "king-leader", onclick: () => openPlayerModal(leader.nome) },
     el("span", { class: "king-name" }, leader.nome),
-    el("span", { class: "king-val" }, `${leader.avg.toFixed(1)} / jogo`));
+    el("span", { class: "king-val" }, valFmt ? valFmt(leader, true) : `${leader.avg.toFixed(1)} / jogo`));
   card.append(lead);
   const rest = top3.slice(1);
   if (rest.length) {
@@ -340,7 +363,7 @@ function kingCard(icon, title, subtitle, top3, unit, note) {
     rest.forEach((r, i) => list.append(el("div", { class: "king-rest-row", onclick: () => openPlayerModal(r.nome) },
       el("span", { class: "king-rank" }, (i + 2) + "."),
       el("span", { class: "king-rname" }, r.nome),
-      el("span", { class: "king-rval" }, `${r.avg.toFixed(1)}`))));
+      el("span", { class: "king-rval" }, valFmt ? valFmt(r, false) : `${r.avg.toFixed(1)}`))));
     card.append(list);
   }
   return card;
@@ -460,7 +483,7 @@ function openJornadaModal(numero) {
 
   // Player table
   b.append(el("div", { class: "section-title" }, "Jogadores"));
-  const cols = [["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["passeFinalizacao", "PF"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"]];
+  const cols = [["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["passeFinalizacao", "PF"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"], ["driblesBemSucedidos", "DB"], ["driblesFalhados", "DF"], ["cruzamentos", "Cru"]];
   const t = el("table", { class: "pstat-table" });
   const h = el("tr", {}, el("th", {}, "Jogador"), el("th", {}, "Tit"));
   cols.forEach((c) => h.append(el("th", { class: "num" }, c[1])));
@@ -473,7 +496,7 @@ function openJornadaModal(numero) {
       t.append(tr);
     });
   b.append(tableScroll(t));
-  b.append(el("p", { class: "hint" }, "Tit = titular (●) / suplente (○). PF=passe p/ finalização, PE=passes errados, PB=perdas de bola."));
+  b.append(el("p", { class: "hint" }, "Tit = titular (●) / suplente (○). PF=passe p/ finalização, PE=passes errados, PB=perdas de bola, DB=dribles bem sucedidos, DF=dribles falhados, Cru=cruzamentos."));
 
   // Events summary
   const evCount = {};
@@ -515,7 +538,7 @@ function compareBlock(ms, adversario) {
 function viewJogadores(app) {
   const A = seasonAgg(state.data);
   app.append(el("div", { class: "section-title" }, "Jogadores — totais da época"));
-  const cols = [["jogos", "J"], ["titular", "Tit"], ["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"]];
+  const cols = [["jogos", "J"], ["titular", "Tit"], ["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"], ["driblesBemSucedidos", "DB"], ["driblesFalhados", "DF"], ["cruzamentos", "Cru"]];
   let sortKey = "golos", desc = true;
   const t = el("table", { class: "pstat-table" });
   const build = () => {
@@ -537,7 +560,7 @@ function viewJogadores(app) {
   };
   build();
   app.append(tableScroll(t));
-  app.append(el("p", { class: "hint" }, "Clica num cabeçalho para ordenar · clica num jogador para detalhe. J=jogos, Tit=titular, PE=passes errados, PB=perdas de bola."));
+  app.append(el("p", { class: "hint" }, "Clica num cabeçalho para ordenar · clica num jogador para detalhe. J=jogos, Tit=titular, PE=passes errados, PB=perdas de bola, DB=dribles bem sucedidos, DF=dribles falhados, Cru=cruzamentos."));
 }
 
 function openPlayerModal(nome) {
@@ -551,7 +574,7 @@ function openPlayerModal(nome) {
     if (p) perJ.push({ numero: j.numero, adversario: j.adversario, ...p });
   });
   if (!perJ.length) { b.append(el("p", { class: "empty" }, "Sem participações registadas.")); showModal(); return; }
-  const cols = [["titular", "Tit"], ["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["passeFinalizacao", "PF"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"]];
+  const cols = [["titular", "Tit"], ["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["passeFinalizacao", "PF"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"], ["driblesBemSucedidos", "DB"], ["driblesFalhados", "DF"], ["cruzamentos", "Cru"]];
   const t = el("table", { class: "pstat-table" });
   const h = el("tr", {}, el("th", {}, "Jornada"));
   cols.forEach((c) => h.append(el("th", { class: "num" }, c[1])));
@@ -599,7 +622,7 @@ function viewNova(app) {
 
   // Match stats
   form.append(el("div", { class: "section-title" }, "Estatísticas do jogo"));
-  const statDefs = [["Resultado", "golos"], ["Remates", ""], ["Remates à baliza", ""], ["Cantos", ""], ["Faltas", ""], ["Fora de jogo", ""], ["Posse de bola", "%"]];
+  const statDefs = [["Resultado", "golos"], ["Remates", ""], ["Remates à baliza", ""], ["Cantos", ""], ["Faltas", ""], ["Fora de jogo", ""], ["Posse de bola", "%"], ["Cruzamentos", ""]];
   const statGrid = el("div", { class: "form-grid" });
   const statInputs = {};
   statDefs.forEach(([k, hint]) => {
@@ -616,7 +639,7 @@ function viewNova(app) {
 
   // Players
   form.append(el("div", { class: "section-title" }, "Jogadores (marca os que jogaram)"));
-  const pcols = [["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["passeFinalizacao", "PF"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"]];
+  const pcols = [["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["passeFinalizacao", "PF"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"], ["driblesBemSucedidos", "DB"], ["driblesFalhados", "DF"], ["cruzamentos", "Cru"]];
   const pt = el("table", { class: "pstat-table" });
   const ph = el("tr", {}, el("th", {}, "Conv."), el("th", {}, "Jogador"), el("th", {}, "Tit."));
   pcols.forEach((c) => ph.append(el("th", { class: "num" }, c[1])));

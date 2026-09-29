@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-09-29T00:04:27.208Z",
-    "versao": 3
+    "atualizado": "2026-09-29T11:07:34.529Z",
+    "versao": 4
   },
   "listas": {
     "jogadores": [
@@ -104,7 +104,10 @@
       "Defesa",
       "Assistência",
       "Remate sofrido",
-      "Remate sofrido à baliza"
+      "Remate sofrido à baliza",
+      "Cruzamento ofensivo",
+      "Drible bem sucedido",
+      "Drible falhado"
     ]
   },
   "jornadas": [
@@ -142,6 +145,10 @@
         "Posse de bola": {
           "tigres": 0.35,
           "adversario": 0.65
+        },
+        "Cruzamentos": {
+          "tigres": 8,
+          "adversario": null
         }
       },
       "players": [
@@ -157,7 +164,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 4,
-          "perdasBola": 0
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         },
         {
           "nome": "Miguel Cruz",
@@ -171,7 +181,10 @@
           "passeFinalizacao": 1,
           "faltas": 0,
           "passesErrados": 3,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 2,
+          "cruzamentos": 0
         },
         {
           "nome": "Dentes",
@@ -185,7 +198,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 5,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 1,
+          "cruzamentos": 0
         },
         {
           "nome": "Jacob",
@@ -199,7 +215,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 2,
-          "perdasBola": 0
+          "perdasBola": 0,
+          "driblesBemSucedidos": 2,
+          "driblesFalhados": 1,
+          "cruzamentos": 0
         },
         {
           "nome": "Paulinho",
@@ -213,7 +232,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 2,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 1,
+          "cruzamentos": 0
         },
         {
           "nome": "Simão",
@@ -227,7 +249,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 1,
-          "perdasBola": 4
+          "perdasBola": 4,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 2,
+          "cruzamentos": 0
         },
         {
           "nome": "Stijn",
@@ -241,7 +266,10 @@
           "passeFinalizacao": 0,
           "faltas": 2,
           "passesErrados": 2,
-          "perdasBola": 0
+          "perdasBola": 0,
+          "driblesBemSucedidos": 1,
+          "driblesFalhados": 0,
+          "cruzamentos": 1
         },
         {
           "nome": "Tigrão",
@@ -255,7 +283,10 @@
           "passeFinalizacao": 0,
           "faltas": 1,
           "passesErrados": 4,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 1,
+          "driblesFalhados": 1,
+          "cruzamentos": 0
         },
         {
           "nome": "Tomas M",
@@ -269,7 +300,10 @@
           "passeFinalizacao": 0,
           "faltas": 1,
           "passesErrados": 4,
-          "perdasBola": 4
+          "perdasBola": 4,
+          "driblesBemSucedidos": 2,
+          "driblesFalhados": 3,
+          "cruzamentos": 3
         },
         {
           "nome": "Rodrigo",
@@ -283,7 +317,10 @@
           "passeFinalizacao": 1,
           "faltas": 0,
           "passesErrados": 1,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 3,
+          "cruzamentos": 3
         },
         {
           "nome": "Sobral",
@@ -297,7 +334,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 0,
-          "perdasBola": 0
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         },
         {
           "nome": "Fonseca",
@@ -311,7 +351,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 0,
-          "perdasBola": 0
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         },
         {
           "nome": "Paiva",
@@ -325,7 +368,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 1,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 1,
+          "driblesFalhados": 1,
+          "cruzamentos": 0
         },
         {
           "nome": "Sergio",
@@ -339,7 +385,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 1,
-          "perdasBola": 0
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         },
         {
           "nome": "Leo",
@@ -353,7 +402,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 2,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 1,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         },
         {
           "nome": "Branco",
@@ -367,7 +419,10 @@
           "passeFinalizacao": 1,
           "faltas": 2,
           "passesErrados": 6,
-          "perdasBola": 0
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 1
         }
       ],
       "eventos": [
@@ -1042,6 +1097,130 @@
         {
           "acao": "Passe errado",
           "jogador": "Branco"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Tomas M"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Miguel Cruz"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Paiva"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Tomas M"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Tomas M"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Tomas M"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Paiva"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Miguel Cruz"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Tomas M"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Branco"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Tomas M"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Tomas M"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Tigrão"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Tomas M"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Jacob"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Jacob"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Jacob"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Tigrão"
         }
       ],
       "data": "19 / 20 Setembro",
@@ -1082,6 +1261,10 @@
         "Posse de bola": {
           "tigres": 0.34,
           "adversario": 0.66
+        },
+        "Cruzamentos": {
+          "tigres": 6,
+          "adversario": null
         }
       },
       "players": [
@@ -1097,7 +1280,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 2,
-          "perdasBola": 0
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         },
         {
           "nome": "Nuno G",
@@ -1111,7 +1297,10 @@
           "passeFinalizacao": 0,
           "faltas": 1,
           "passesErrados": 3,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         },
         {
           "nome": "Stijn",
@@ -1125,7 +1314,10 @@
           "passeFinalizacao": 0,
           "faltas": 3,
           "passesErrados": 1,
-          "perdasBola": 0
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         },
         {
           "nome": "Jacob",
@@ -1139,7 +1331,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 2,
-          "perdasBola": 1
+          "perdasBola": 1,
+          "driblesBemSucedidos": 3,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         },
         {
           "nome": "Paiva",
@@ -1153,7 +1348,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 2,
-          "perdasBola": 6
+          "perdasBola": 6,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 2,
+          "cruzamentos": 0
         },
         {
           "nome": "Dentes",
@@ -1167,7 +1365,10 @@
           "passeFinalizacao": 0,
           "faltas": 1,
           "passesErrados": 1,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 1
         },
         {
           "nome": "Fonseca",
@@ -1181,7 +1382,10 @@
           "passeFinalizacao": 0,
           "faltas": 1,
           "passesErrados": 1,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 1,
+          "cruzamentos": 0
         },
         {
           "nome": "Paulinho",
@@ -1195,7 +1399,10 @@
           "passeFinalizacao": 0,
           "faltas": 1,
           "passesErrados": 4,
-          "perdasBola": 1
+          "perdasBola": 1,
+          "driblesBemSucedidos": 2,
+          "driblesFalhados": 1,
+          "cruzamentos": 1
         },
         {
           "nome": "Leo",
@@ -1209,7 +1416,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 0,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 1,
+          "driblesFalhados": 0,
+          "cruzamentos": 1
         },
         {
           "nome": "Francisco",
@@ -1223,7 +1433,10 @@
           "passeFinalizacao": 1,
           "faltas": 0,
           "passesErrados": 7,
-          "perdasBola": 1
+          "perdasBola": 1,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         },
         {
           "nome": "Miguel Cruz",
@@ -1237,7 +1450,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 4,
-          "perdasBola": 1
+          "perdasBola": 1,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 1
         },
         {
           "nome": "Tomas M",
@@ -1251,7 +1467,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 4,
-          "perdasBola": 4
+          "perdasBola": 4,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 1,
+          "cruzamentos": 1
         },
         {
           "nome": "Rodrigo",
@@ -1265,7 +1484,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 2,
-          "perdasBola": 2
+          "perdasBola": 2,
+          "driblesBemSucedidos": 1,
+          "driblesFalhados": 2,
+          "cruzamentos": 1
         },
         {
           "nome": "Afonso",
@@ -1279,7 +1501,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 2,
-          "perdasBola": 1
+          "perdasBola": 1,
+          "driblesBemSucedidos": 1,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         },
         {
           "nome": "Tigrão",
@@ -1293,7 +1518,10 @@
           "passeFinalizacao": 0,
           "faltas": 1,
           "passesErrados": 3,
-          "perdasBola": 1
+          "perdasBola": 1,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 1,
+          "cruzamentos": 0
         },
         {
           "nome": "Ze Miguel",
@@ -1307,7 +1535,10 @@
           "passeFinalizacao": 0,
           "faltas": 0,
           "passesErrados": 0,
-          "perdasBola": 0
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentos": 0
         }
       ],
       "eventos": [
@@ -2022,6 +2253,94 @@
         {
           "acao": "Desarme",
           "jogador": "Francisco"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Fonseca"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Paiva"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Jacob"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Jacob"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Paiva"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Jacob"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Miguel Cruz"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Tomas M"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Tigrão"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Tomas M"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Cruzamento ofensivo",
+          "jogador": "Rodrigo"
         }
       ],
       "data": "26 / 27 Setembro",
