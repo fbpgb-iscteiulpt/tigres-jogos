@@ -344,7 +344,7 @@ function viewEpoca(app) {
 // Formatação de valor para os cartões de rácio (percentagem)
 function fmtRatio(r, isLeader) {
   const p = Math.round(r.avg * 100);
-  return isLeader ? `${p}% (${r.bem}/${r.tent})` : `${p}%`;
+  return `${p}% (${r.bem}/${r.tent})`;
 }
 
 function kingCard(icon, title, subtitle, top3, unit, note, valFmt) {
