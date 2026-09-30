@@ -542,7 +542,7 @@ function viewJogadores(app) {
   app.append(el("div", { class: "section-title" }, "Jogadores — totais da época"));
   const cols = [["jogos", "J"], ["titular", "Tit"], ["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"], ["driblesBemSucedidos", "DB"], ["driblesFalhados", "DF"], ["cruzamentosBemSucedidos", "CB"], ["cruzamentosFalhados", "CF"]];
   let sortKey = "golos", desc = true;
-  const t = el("table", { class: "pstat-table" });
+  const t = el("table", { class: "pstat-table sticky-first" });
   const build = () => {
     t.innerHTML = "";
     const h = el("tr", {}, el("th", {}, "Jogador"));

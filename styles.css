@@ -132,6 +132,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 /* Tabelas largas: scroll horizontal dentro da própria caixa */
 .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -2px}
 .table-scroll .pstat-table{min-width:520px}
+/* Coluna "Jogador" congelada (sticky) para scroll horizontal em mobile */
+.pstat-table.sticky-first th:first-child,
+.pstat-table.sticky-first td:first-child{position:sticky;left:0;z-index:2;background:var(--surface);box-shadow:2px 0 0 var(--line)}
+.pstat-table.sticky-first thead th:first-child{z-index:3}
+.pstat-table.sticky-first tr:hover td:first-child{background:var(--surface2)}
 
 /* Prémios ("kings") */
 .grid.kings{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
