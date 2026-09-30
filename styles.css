@@ -186,3 +186,20 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 @media(max-width:380px){
   .grid.cards{grid-template-columns:1fr}
 }
+
+/* Estatísticas da equipa */
+.grid.team-stats{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card.team-stat{display:flex;flex-direction:column;gap:8px;border-top:3px solid var(--navy)}
+.ts-title{font-weight:800;color:var(--navy);font-size:15px}
+.ts-avg{font-size:30px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1;display:flex;align-items:baseline;gap:8px}
+.ts-avg-lbl{font-size:11px;font-weight:600;color:var(--muted)}
+.ts-rows{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.ts-row{display:grid;grid-template-columns:32px 1fr 44px 18px;align-items:center;gap:8px}
+.ts-jn{font-size:12px;font-weight:700;color:var(--muted)}
+.ts-bar{background:var(--surface2);border-radius:999px;height:9px;overflow:hidden}
+.ts-fill{height:100%;background:var(--navy);border-radius:999px}
+.ts-val{font-size:13px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;color:var(--navy)}
+.ts-trend{font-size:11px;text-align:center}
+.ts-trend.up{color:var(--win)}
+.ts-trend.down{color:var(--loss)}
+.ts-trend.eq{color:var(--muted)}

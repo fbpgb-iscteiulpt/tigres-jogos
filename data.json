@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-09-29T12:27:25.873Z",
-    "versao": 5
+    "atualizado": "2026-09-30T11:53:44.713Z",
+    "versao": 6
   },
   "listas": {
     "jogadores": [
@@ -105,7 +105,8 @@
       "Assistência",
       "Remate sofrido",
       "Remate sofrido à baliza",
-      "Cruzamento ofensivo",
+      "Cruzamento falhado",
+      "Cruzamento bem sucedido",
       "Drible bem sucedido",
       "Drible falhado"
     ]
@@ -147,7 +148,7 @@
           "adversario": 0.65
         },
         "Cruzamentos": {
-          "tigres": 8,
+          "tigres": 9,
           "adversario": null
         }
       },
@@ -167,7 +168,8 @@
           "perdasBola": 0,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Miguel Cruz",
@@ -184,7 +186,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 2,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Dentes",
@@ -201,7 +204,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 1,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 1
         },
         {
           "nome": "Jacob",
@@ -218,7 +222,8 @@
           "perdasBola": 0,
           "driblesBemSucedidos": 2,
           "driblesFalhados": 1,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Paulinho",
@@ -235,7 +240,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 1,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Simão",
@@ -252,7 +258,8 @@
           "perdasBola": 4,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 2,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Stijn",
@@ -269,7 +276,8 @@
           "perdasBola": 0,
           "driblesBemSucedidos": 1,
           "driblesFalhados": 0,
-          "cruzamentos": 1
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 1
         },
         {
           "nome": "Tigrão",
@@ -286,7 +294,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 1,
           "driblesFalhados": 1,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Tomas M",
@@ -303,7 +312,8 @@
           "perdasBola": 4,
           "driblesBemSucedidos": 2,
           "driblesFalhados": 3,
-          "cruzamentos": 3
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 3
         },
         {
           "nome": "Rodrigo",
@@ -320,7 +330,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 3,
-          "cruzamentos": 3
+          "cruzamentosBemSucedidos": 1,
+          "cruzamentosFalhados": 2
         },
         {
           "nome": "Sobral",
@@ -337,7 +348,8 @@
           "perdasBola": 0,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Fonseca",
@@ -354,7 +366,8 @@
           "perdasBola": 0,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Paiva",
@@ -371,7 +384,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 1,
           "driblesFalhados": 1,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Sergio",
@@ -388,7 +402,8 @@
           "perdasBola": 0,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Leo",
@@ -405,7 +420,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 1,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Branco",
@@ -422,7 +438,8 @@
           "perdasBola": 0,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 1
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 1
         }
       ],
       "eventos": [
@@ -1107,11 +1124,11 @@
           "jogador": "Tomas M"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
           "jogador": "Rodrigo"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
           "jogador": "Rodrigo"
         },
         {
@@ -1135,7 +1152,7 @@
           "jogador": "Tomas M"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
           "jogador": "Tomas M"
         },
         {
@@ -1167,11 +1184,11 @@
           "jogador": "Tomas M"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
           "jogador": "Branco"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
           "jogador": "Tomas M"
         },
         {
@@ -1191,7 +1208,7 @@
           "jogador": "Simão"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento bem sucedido",
           "jogador": "Rodrigo"
         },
         {
@@ -1199,7 +1216,11 @@
           "jogador": "Tigrão"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Cruzamento falhado",
           "jogador": "Tomas M"
         },
         {
@@ -1211,7 +1232,7 @@
           "jogador": "Stijn"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
           "jogador": "Stijn"
         },
         {
@@ -1267,7 +1288,7 @@
           "adversario": 0.66
         },
         "Cruzamentos": {
-          "tigres": 6,
+          "tigres": 7,
           "adversario": null
         }
       },
@@ -1287,7 +1308,8 @@
           "perdasBola": 0,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Nuno G",
@@ -1304,7 +1326,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Stijn",
@@ -1321,7 +1344,8 @@
           "perdasBola": 0,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Jacob",
@@ -1338,7 +1362,8 @@
           "perdasBola": 1,
           "driblesBemSucedidos": 3,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Paiva",
@@ -1355,7 +1380,8 @@
           "perdasBola": 6,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 2,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Dentes",
@@ -1372,7 +1398,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 1
+          "cruzamentosBemSucedidos": 1,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Fonseca",
@@ -1389,7 +1416,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 1,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Paulinho",
@@ -1406,7 +1434,8 @@
           "perdasBola": 1,
           "driblesBemSucedidos": 2,
           "driblesFalhados": 1,
-          "cruzamentos": 1
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 2
         },
         {
           "nome": "Leo",
@@ -1423,7 +1452,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 1,
           "driblesFalhados": 0,
-          "cruzamentos": 1
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 1
         },
         {
           "nome": "Francisco",
@@ -1440,7 +1470,8 @@
           "perdasBola": 1,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Miguel Cruz",
@@ -1457,7 +1488,8 @@
           "perdasBola": 1,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 1
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 1
         },
         {
           "nome": "Tomas M",
@@ -1474,7 +1506,8 @@
           "perdasBola": 4,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 1,
-          "cruzamentos": 1
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 1
         },
         {
           "nome": "Rodrigo",
@@ -1491,7 +1524,8 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 1,
           "driblesFalhados": 2,
-          "cruzamentos": 1
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 1
         },
         {
           "nome": "Afonso",
@@ -1508,7 +1542,8 @@
           "perdasBola": 1,
           "driblesBemSucedidos": 1,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Tigrão",
@@ -1525,7 +1560,8 @@
           "perdasBola": 1,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 1,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         },
         {
           "nome": "Ze Miguel",
@@ -1542,7 +1578,8 @@
           "perdasBola": 0,
           "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
-          "cruzamentos": 0
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
         }
       ],
       "eventos": [
@@ -2283,11 +2320,11 @@
           "jogador": "Jacob"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento bem sucedido",
           "jogador": "Dentes"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
           "jogador": "Miguel Cruz"
         },
         {
@@ -2299,11 +2336,11 @@
           "jogador": "Paulinho"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
           "jogador": "Leo"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
           "jogador": "Tomas M"
         },
         {
@@ -2339,11 +2376,15 @@
           "jogador": "Tomas M"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
           "jogador": "Paulinho"
         },
         {
-          "acao": "Cruzamento ofensivo",
+          "acao": "Cruzamento falhado",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Cruzamento falhado",
           "jogador": "Rodrigo"
         }
       ],
