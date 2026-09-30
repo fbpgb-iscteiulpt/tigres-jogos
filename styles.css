@@ -208,3 +208,27 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 .ts-trend.up{color:var(--win)}
 .ts-trend.down{color:var(--loss)}
 .ts-trend.eq{color:var(--muted)}
+
+/* Dicas de treino */
+.dicas-intro{color:var(--muted);max-width:70ch;margin:4px 0 8px}
+.dicas-h{color:var(--navy);font-size:17px;font-weight:800;margin:22px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--line)}
+.dicas-table{margin-top:4px}
+.dicas-table th{font-size:11px}
+.dicas-table td{font-size:13px;vertical-align:top}
+.dicas-table td.sig{font-weight:700;color:var(--navy);white-space:nowrap}
+.dicas-table td.nums{font-variant-numeric:tabular-nums;color:var(--navy2)}
+.table-scroll .dicas-table{min-width:520px}
+.dicas-note,.dicas-foot{color:var(--muted);max-width:75ch;margin:10px 0;font-size:14px}
+.dicas-foot{margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}
+.dicas-session{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.sess-block{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.sess-time{flex:0 0 62px;font-weight:800;color:#fff;background:var(--navy);border-radius:8px;height:fit-content;padding:6px 8px;text-align:center;font-size:13px;font-variant-numeric:tabular-nums}
+.sess-body strong{color:var(--navy);display:block;margin-bottom:3px}
+.sess-body p{margin:0;color:var(--text);font-size:14px}
+.dicas-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:6px}
+.card.dica-card{border-top:3px solid var(--navy)}
+.card.dica-card strong{color:var(--navy);display:block;margin-bottom:6px}
+.card.dica-card p{margin:0;font-size:14px}
+.dica-highlight{background:var(--navy);color:#fff;border-radius:12px;padding:14px 16px;margin-top:6px}
+.dica-highlight p{margin:0}
+.dica-highlight strong{color:#fff}

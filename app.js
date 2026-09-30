@@ -288,7 +288,7 @@ function render() {
   $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.view === state.view));
   const app = $("#app");
   app.innerHTML = "";
-  ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, equipa: viewEquipa, nova: viewNova }[state.view])(app);
+  ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, equipa: viewEquipa, dicas: viewDicas, nova: viewNova }[state.view])(app);
   const s = state.source;
   $("#syncStatus").className = "status " + (s === "github" ? "ok" : s === "seed" ? "err" : "local");
   $("#syncStatus").title = s === "github" ? "Ligado ao GitHub (dados partilhados)" : s === "seed" ? "Dados iniciais (não partilhado ainda)" : "Cache local";
@@ -638,6 +638,89 @@ function teamStatCard(m, serie) {
   card.append(rows);
   return card;
 }
+
+/* ================= DICAS DE TREINO ================= */
+function viewDicas(app) {
+  const js = [...state.data.jornadas].sort((a, b) => a.numero - b.numero);
+  const n = js.length || 1;
+  const mean = (fn) => js.reduce((s, j) => s + (fn(j) || 0), 0) / n;
+  // médias da época
+  const gs = mean((j) => msAdv(j, "Resultado"));
+  const gm = mean((j) => ms(j, "Resultado"));
+  const rem = mean((j) => ms(j, "Remates"));
+  const remB = mean((j) => ms(j, "Remates à baliza"));
+  const posse = mean((j) => { const v = ms(j, "Posse de bola"); return v == null ? 0 : v * 100; });
+  const pe = mean((j) => sumPlayers(j, "passesErrados"));
+  const pb = mean((j) => sumPlayers(j, "perdasBola"));
+  const des = mean((j) => sumPlayers(j, "desarmes"));
+  const pf = mean((j) => sumPlayers(j, "passeFinalizacao"));
+  const cruzOk = mean((j) => sumPlayers(j, "cruzamentosBemSucedidos"));
+  const cruzTot = mean((j) => sumPlayers(j, "cruzamentosBemSucedidos") + sumPlayers(j, "cruzamentosFalhados"));
+  const turnovers = pe + pb;
+  const precisao = rem ? Math.round((remB / rem) * 100) : 0;
+  const cruzPrec = cruzTot ? Math.round((cruzOk / cruzTot) * 100) : 0;
+  const r1 = (x) => Math.round(x * 10) / 10;
+
+  app.append(el("div", { class: "section-title" }, "Dicas de treino"));
+  app.append(el("p", { class: "dicas-intro" }, "Sugestões de treino baseadas nas estatísticas reais da equipa. Com apenas 1 hora por semana (quinta-feira), o objetivo é treinar com foco, não treinar tudo ao mesmo tempo."));
+
+  // ---- O que dizem os números ----
+  app.append(el("h3", { class: "dicas-h" }, "O que dizem os números"));
+  const sinais = [
+    ["Perdas de posse", `~${r1(pe)} passes errados + ~${r1(pb)} perdas = ~${r1(turnovers)} por jogo`, "É o principal problema"],
+    ["Posse de bola", `${Math.round(posse)}%`, "Passamos o jogo a correr atrás da bola"],
+    ["Desarmes", `~${r1(des)} por jogo`, "Confirma: enorme carga defensiva, sempre sem bola"],
+    ["Produção ofensiva", `${r1(rem)} remates, ${precisao}% à baliza, ${r1(pf)} passes p/ finalização, ${r1(gm)} golos`, "Cria-se pouco e o que se cria falha"],
+    ["Cruzamentos", `${r1(cruzTot)} tentados, ${cruzPrec}% conseguidos`, "Uma tática que ainda não compensa"],
+    ["Golos sofridos", `${r1(gs)} por jogo`, "Muitos vêm dessas perdas de bola → contra-ataques"],
+  ];
+  const st = el("table", { class: "dicas-table" });
+  st.append(el("thead", {}, el("tr", {}, el("th", {}, "Sinal"), el("th", {}, "Números"), el("th", {}, "Leitura"))));
+  const stb = el("tbody");
+  sinais.forEach((row) => stb.append(el("tr", {}, el("td", { class: "sig" }, row[0]), el("td", { class: "nums" }, row[1]), el("td", {}, row[2]))));
+  st.append(stb);
+  app.append(tableScroll(st));
+  app.append(el("p", { class: "dicas-note" }, "A história é uma cadeia ligada: perdemos a bola facilmente → não temos posse → defendemos constantemente → as perdas em zonas perigosas viram golos sofridos. Resolver a posse primeiro melhora quase tudo o resto."));
+
+  // ---- Prioridade nº1 ----
+  app.append(el("h3", { class: "dicas-h" }, "Prioridade n.º 1: manter a bola"));
+  app.append(el("p", {}, "Com apenas 1 hora por semana, não treines dez coisas. A retenção de bola sob pressão é o que dá maior retorno — reduz as perdas, aumenta a posse, alivia a carga defensiva e cria mais tempo de ataque, tudo ao mesmo tempo."));
+
+  // ---- Sessão de 1 hora ----
+  app.append(el("h3", { class: "dicas-h" }, "Uma sessão de 1 hora (repetível)"));
+  const sessao = [
+    ["10 min", "Rondos (meínhos / keep-away)", "4x2 ou 5x2 num quadrado apertado, máximo 2 toques. É o melhor exercício para os nossos números — treina passe sob pressão, exatamente onde perdemos as bolas. Conta passes seguidos, torna-o competitivo."],
+    ["20 min", "Jogo de posse posicional", "6x6 (+2 jogadores neutros que jogam sempre com quem tem a bola, logo 8x6). Objetivo: completar X passes = 1 ponto. Sem rematar. Obriga a valorizar a bola em vez de a forçar para a frente e perder."],
+    ["20 min", "Transição + finalização", "Jogo reduzido (ex.: 7x7) com balizas a sério, mas com regra: ao recuperar a bola há ~6 segundos / 3 passes para rematar. Treina reagir depressa após recuperar e acertar na baliza (a nossa precisão e os golos precisam)."],
+    ["10 min", "Jogo livre", "Para terminar — deixa-os jogar e divertirem-se."],
+  ];
+  const sl = el("div", { class: "dicas-session" });
+  sessao.forEach((b) => sl.append(el("div", { class: "sess-block" },
+    el("span", { class: "sess-time" }, b[0]),
+    el("div", { class: "sess-body" }, el("strong", {}, b[1]), el("p", {}, b[2])),
+  )));
+  app.append(sl);
+
+  // ---- Rotação semanal ----
+  app.append(el("h3", { class: "dicas-h" }, "Roda o bloco temático (20 min) de semana para semana"));
+  app.append(el("p", {}, "Mantém os rondos + jogo de posse constantes (são a nossa fraqueza central). Varia o foco do bloco de finalização:"));
+  const rot = [
+    ["Semana A — Qualidade de finalização", "Repetições de remate: primeiro acertar na baliza, depois potência. A precisão de " + precisao + "% e " + r1(gm) + " golos precisam de volume + técnica."],
+    ["Semana B — Cruzamentos e ataque à área", `Só ${cruzPrec}% dos cruzamentos resultam, por isso treina a entrega (cruzamentos rasteiros e atrasados batem os altos neste escalão) e o timing das desmarcações para os receber.`],
+    ["Semana C — Organização defensiva", `Como sofremos ${r1(gs)} golos por jogo, treina manter o bloco compacto e não entrar de rompante nos desarmes (${r1(des)} desarmes/jogo sugere que nos precipitamos) — temporizar, atrasar, encaminhar para fora.`],
+  ];
+  const rl = el("div", { class: "dicas-cards" });
+  rot.forEach((r) => rl.append(el("div", { class: "card dica-card" }, el("strong", {}, r[0]), el("p", {}, r[1]))));
+  app.append(rl);
+
+  // ---- Mentalidade ----
+  app.append(el("h3", { class: "dicas-h" }, "Uma ideia para o dia de jogo"));
+  app.append(el("div", { class: "dica-highlight" },
+    el("p", {}, el("strong", {}, "A bola é a melhor defesa. "), `Com a diferença de posse (${Math.round(posse)}%), cada passe certo mantido é um desarme que não temos de fazer. Premeia os passes seguros ("aborrecidos") no treino para que isso passe para os jogos.`)));
+
+  app.append(el("p", { class: "dicas-foot" }, "Estas dicas atualizam-se automaticamente com os números da época. À medida que registas mais jornadas, o separador \u201cEstatísticas da equipa\u201d mostra se as perdas de bola estão mesmo a baixar — esse é o teu marcador de que o treino está a resultar."));
+}
+
 
 function openPlayerModal(nome) {
   const b = $("#modalBody"); b.innerHTML = "";
