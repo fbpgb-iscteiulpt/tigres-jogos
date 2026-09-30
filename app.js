@@ -414,23 +414,34 @@ function topTable(players, sortKey, cols, colLabels, limit = 8) {
   return t;
 }
 
-/* Data real da jornada: o 2º dia do intervalo ("19 / 20 Setembro") é sempre Sábado;
-   a hora indica Sexta (21:30), Sábado (restantes slots) ou Domingo (11:00 / 12:40). */
+/* Data real da jornada: o intervalo ("3 / 4 Outubro") é o fim de semana Sábado / Domingo
+   (1.º número = Sábado, 2.º = Domingo). A hora indica Sexta (21:30, = Sábado − 1),
+   Sábado (restantes slots) ou Domingo (11:00 / 12:40). */
 const MESES_PT = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-const DIAS_PT = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+function mesIdxPT(nome) { return MESES_PT.findIndex((x) => x.toLowerCase() === (nome || "").toLowerCase()); }
+function anoDoMes(mesIdx) { return mesIdx >= 8 ? 2025 : 2026; } // Set–Dez → 2025, Jan–Jun → 2026
 function dataJornada(range, hora) {
   const parts = String(range || "").split("/");
   if (parts.length < 2) return range || "";
-  const m = parts[1].trim().match(/(\d{1,2})\s+([A-Za-zçÇãÃéÉíÍ]+)/);
-  if (!m) return range || "";
-  const dia = +m[1];
-  const mesIdx = MESES_PT.findIndex((x) => x.toLowerCase() === m[2].toLowerCase());
-  if (mesIdx < 0) return range || "";
-  const ano = mesIdx >= 8 ? 2025 : 2026; // Set–Dez → 2025, Jan–Jun → 2026
-  const dt = new Date(ano, mesIdx, dia); // 2º dia = Sábado
-  if (hora === "21:30") dt.setDate(dt.getDate() - 1);              // Sexta
-  else if (hora === "11:00" || hora === "12:40") dt.setDate(dt.getDate() + 1); // Domingo
-  return `${DIAS_PT[dt.getDay()]}, ${dt.getDate()} ${MESES_PT[dt.getMonth()]}`;
+  // 2.º número (Domingo) traz sempre o mês; o 1.º (Sábado) pode herdá-lo
+  const mDom = parts[1].trim().match(/(\d{1,2})\s+([A-Za-zçÇãÃéÉíÍ]+)/);
+  const mSab = parts[0].trim().match(/(\d{1,2})(?:\s+([A-Za-zçÇãÃéÉíÍ]+))?/);
+  if (!mDom || !mSab) return range || "";
+  const mesDom = mesIdxPT(mDom[2]);
+  const mesSab = mSab[2] ? mesIdxPT(mSab[2]) : mesDom; // sem mês no 1.º → usa o do 2.º
+  if (mesSab < 0 || mesDom < 0) return range || "";
+  if (hora === "11:00" || hora === "12:40") {
+    // Domingo — 2.º número
+    return `Domingo, ${+mDom[1]} ${MESES_PT[mesDom]}`;
+  }
+  // Sábado — 1.º número
+  const sab = new Date(anoDoMes(mesSab), mesSab, +mSab[1]);
+  if (hora === "21:30") {
+    // Sexta = Sábado − 1 (aritmética trata salto de mês)
+    const sex = new Date(sab); sex.setDate(sex.getDate() - 1);
+    return `Sexta, ${sex.getDate()} ${MESES_PT[sex.getMonth()]}`;
+  }
+  return `Sábado, ${sab.getDate()} ${MESES_PT[sab.getMonth()]}`;
 }
 
 function viewJornadas(app) {
