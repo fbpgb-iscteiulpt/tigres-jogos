@@ -269,6 +269,24 @@ function computeKings(data) {
     rows.sort((a, b) => dir === "max" ? b.avg - a.avg || b.tent - a.tent || a.nome.localeCompare(b.nome) : a.avg - b.avg || b.tent - a.tent || a.nome.localeCompare(b.nome));
     return rows.slice(0, 3);
   }
+  // Precisão de remate: remates à baliza (dos eventos) ÷ remates totais (stat).
+  // Só conta jogadores com pelo menos 1 remate.
+  function rankingPrecisaoRemate() {
+    const onTarget = {};
+    for (const j of data.jornadas) {
+      for (const e of (j.eventos || [])) {
+        if (e.acao === "Remate à baliza" && e.jogador) onTarget[e.jogador] = (onTarget[e.jogador] || 0) + 1;
+      }
+    }
+    const rows = players.map((pl) => {
+      const rem = pl.games.reduce((s, g) => s + (+g.remates || 0), 0);
+      if (rem <= 0) return null;
+      const ab = Math.min(onTarget[pl.nome] || 0, rem);
+      return { nome: pl.nome, avg: ab / rem, bem: ab, tent: rem };
+    }).filter(Boolean);
+    rows.sort((a, b) => b.avg - a.avg || b.tent - a.tent || a.nome.localeCompare(b.nome));
+    return rows.slice(0, 3);
+  }
   return {
     consistency: ranking("passesErrados", "min", min40),
     keyPass: ranking("passeFinalizacao", "max", jogou),
@@ -280,6 +298,7 @@ function computeKings(data) {
     drible: rankingRatio("driblesBemSucedidos", "driblesFalhados", "max"),
     peDeTijolo: rankingRatio("driblesBemSucedidos", "driblesFalhados", "min"),
     crossing: rankingRatio("cruzamentosBemSucedidos", "cruzamentosFalhados", "max"),
+    precisaoRemate: rankingPrecisaoRemate(),
   };
 }
 
@@ -314,25 +333,23 @@ function viewEpoca(app) {
       `J${r.numero} vs ${r.adversario}: ${r.gf ?? "?"}-${r.ga ?? "?"}`)));
   app.append(rec);
 
-  // Top scorers / assists / minutes
+  // Top scorers / assists
   app.append(el("div", { class: "section-title" }, "Melhores marcadores"));
-  app.append(topTable(A.playersArr, "golos", ["golos", "assistencias", "remates"], ["Golos", "Assist.", "Remates"]));
+  app.append(topTable(A.playersArr, "golos", ["golos", "remates"], ["Golos", "Remates"]));
 
-  app.append(el("div", { class: "section-title" }, "Assistências"));
-  app.append(topTable(A.playersArr, "assistencias", ["assistencias", "passeFinalizacao", "golos"], ["Assist.", "Passe fin.", "Golos"]));
+  app.append(el("div", { class: "section-title" }, "Mais Assistências"));
+  app.append(topTable(A.playersArr, "assistencias", ["assistencias", "passeFinalizacao"], ["Assist.", "Passe fin."]));
 
-  app.append(el("div", { class: "section-title" }, "Mais minutos"));
-  app.append(topTable(A.playersArr, "minutos", ["minutos", "jogos", "titular"], ["Minutos", "Jogos", "Titular"]));
-
-  // Prémios da época ("kings")
+  // Highlights da época ("kings")
   const K = computeKings(state.data);
-  app.append(el("div", { class: "section-title" }, "Prémios da época"));
+  app.append(el("div", { class: "section-title" }, "Highlights da Época"));
   const kings = el("div", { class: "grid kings" });
   kings.append(
     kingCard("👑", "Consistency King", "Menos passes falhados por jogo", K.consistency, "unidade", "(mín. 40 min por jogo)"),
     kingCard("🎯", "Key Pass King", "Mais passes p/ finalização por jogo", K.keyPass, "unidade"),
     kingCard("🛡️", "Recovery King", "Mais desarmes por jogo", K.recovery, "unidade"),
     kingCard("🥅", "Shooting King", "Mais remates por jogo", K.shooting, "unidade"),
+    kingCard("🎯", "Sniper — Precisão de remate", "Melhor % de remates à baliza", K.precisaoRemate, "unidade", "(remates à baliza ÷ remates)", fmtRatio),
     kingCard("🧱", 'No "X" King', "Mais perdas de bola por jogo", K.noX, "unidade"),
     kingCard("🙈", "The Blind Passer", "Mais passes falhados por jogo", K.blindPasser, "unidade"),
     kingCard("🥊", "The Foul King", "Mais faltas por jogo", K.foul, "unidade"),
@@ -733,6 +750,10 @@ function openPlayerModal(nome) {
     if (p) perJ.push({ numero: j.numero, adversario: j.adversario, ...p });
   });
   if (!perJ.length) { b.append(el("p", { class: "empty" }, "Sem participações registadas.")); showModal(); return; }
+
+  // Perfil do jogador — médias por 80 min (mostra a "forma" do jogador)
+  b.append(playerProfile(perJ));
+
   const cols = [["titular", "Tit"], ["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["passeFinalizacao", "PF"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"], ["driblesBemSucedidos", "DB"], ["driblesFalhados", "DF"], ["cruzamentosBemSucedidos", "CB"], ["cruzamentosFalhados", "CF"]];
   const t = el("table", { class: "pstat-table" });
   const h = el("tr", {}, el("th", {}, "Jornada"));
@@ -753,6 +774,43 @@ function openPlayerModal(nome) {
   t.append(trT);
   b.append(tableScroll(t));
   showModal();
+}
+
+/* Perfil do jogador — barras de médias por 80 minutos, com escala de referência */
+function playerProfile(perJ) {
+  const minutos = perJ.reduce((s, p) => s + (+p.minutos || 0), 0);
+  const wrap = el("div", { class: "profile" });
+  wrap.append(el("div", { class: "profile-title" }, "Perfil por 80 min"));
+  if (minutos <= 0) { wrap.append(el("div", { class: "empty" }, "Sem minutos jogados.")); return wrap; }
+  const sum = (k) => perJ.reduce((s, p) => s + (+p[k] || 0), 0);
+  const per80 = (k) => (sum(k) / minutos) * 80;
+  // label, chave, máximo de referência, negativo?
+  const metrics = [
+    ["Golos", "golos", 2, false],
+    ["Assistências", "assistencias", 2, false],
+    ["Remates", "remates", 4, false],
+    ["Passe p/ finalização", "passeFinalizacao", 3, false],
+    ["Desarmes", "desarmes", 12, false],
+    ["Defesas", "defesas", 6, false],
+    ["Dribles conseguidos", "driblesBemSucedidos", 4, false],
+    ["Cruzamentos conseguidos", "cruzamentosBemSucedidos", 3, false],
+    ["Perdas de bola", "perdasBola", 6, true],
+    ["Passes errados", "passesErrados", 8, true],
+    ["Faltas", "faltas", 4, true],
+  ];
+  const rows = el("div", { class: "profile-rows" });
+  metrics.forEach(([lbl, key, ref, neg]) => {
+    const v = per80(key);
+    const w = Math.max(0, Math.min(100, (v / ref) * 100));
+    rows.append(el("div", { class: "pf-row" },
+      el("span", { class: "pf-lbl" }, lbl),
+      el("div", { class: "pf-bar" }, el("div", { class: "pf-fill" + (neg ? " neg" : ""), style: `width:${w}%` })),
+      el("span", { class: "pf-val" }, (Math.round(v * 10) / 10).toString()),
+    ));
+  });
+  wrap.append(rows);
+  wrap.append(el("div", { class: "pf-note" }, `Média por 80 min ao longo de ${perJ.length} ${perJ.length === 1 ? "jogo" : "jogos"} (${minutos} min no total). Barras a vermelho = indicadores a reduzir.`));
+  return wrap;
 }
 
 /* ================= NOVA JORNADA (form) ================= */
