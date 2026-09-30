@@ -414,6 +414,25 @@ function topTable(players, sortKey, cols, colLabels, limit = 8) {
   return t;
 }
 
+/* Data real da jornada: o 2º dia do intervalo ("19 / 20 Setembro") é sempre Sábado;
+   a hora indica Sexta (21:30), Sábado (restantes slots) ou Domingo (11:00 / 12:40). */
+const MESES_PT = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+const DIAS_PT = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+function dataJornada(range, hora) {
+  const parts = String(range || "").split("/");
+  if (parts.length < 2) return range || "";
+  const m = parts[1].trim().match(/(\d{1,2})\s+([A-Za-zçÇãÃéÉíÍ]+)/);
+  if (!m) return range || "";
+  const dia = +m[1];
+  const mesIdx = MESES_PT.findIndex((x) => x.toLowerCase() === m[2].toLowerCase());
+  if (mesIdx < 0) return range || "";
+  const ano = mesIdx >= 8 ? 2025 : 2026; // Set–Dez → 2025, Jan–Jun → 2026
+  const dt = new Date(ano, mesIdx, dia); // 2º dia = Sábado
+  if (hora === "21:30") dt.setDate(dt.getDate() - 1);              // Sexta
+  else if (hora === "11:00" || hora === "12:40") dt.setDate(dt.getDate() + 1); // Domingo
+  return `${DIAS_PT[dt.getDay()]}, ${dt.getDate()} ${MESES_PT[dt.getMonth()]}`;
+}
+
 function viewJornadas(app) {
   app.append(el("div", { class: "section-title" }, "Jornadas disputadas"));
   const jogadas = [...state.data.jornadas].sort((a, b) => b.numero - a.numero);
@@ -421,7 +440,8 @@ function viewJornadas(app) {
   if (!jogadas.length) list.append(el("div", { class: "empty" }, "Ainda sem jornadas registadas."));
   jogadas.forEach((j) => {
     const { gf, ga, res } = resultOf(j);
-    const meta = [j.data, j.casa === false ? "fora" : j.casa === true ? "casa" : null].filter(Boolean).join(" · ");
+    const dataTxt = dataJornada(j.data, j.hora);
+    const meta = [dataTxt, j.hora, j.casa === false ? "fora" : j.casa === true ? "casa" : null].filter(Boolean).join(" · ");
     const row = el("div", { class: "jrow", onclick: () => openJornadaModal(j.numero) },
       el("span", { class: "jnum" }, `Jornada ${j.numero}`, meta ? el("span", { class: "jdate" }, meta) : null),
       el("span", { class: "jteams" }, teamTag(state.data.meta.clube), el("span", { class: "vs" }, "vs"), teamTag(j.adversario)),
@@ -441,7 +461,7 @@ function viewJornadas(app) {
     const fl = el("div", { class: "jlist" });
     futuras.forEach((f) => {
       const local = f.casa ? "casa" : "fora";
-      const meta = [f.data, f.hora, local].filter(Boolean).join(" · ");
+      const meta = [dataJornada(f.data, f.hora), f.hora, local].filter(Boolean).join(" · ");
       fl.append(el("div", { class: "jrow future" },
         el("span", { class: "jnum" }, `Jornada ${f.numero}`, el("span", { class: "jdate" }, meta)),
         el("span", { class: "jteams" }, teamTag(state.data.meta.clube), el("span", { class: "vs" }, "vs"), teamTag(f.adversario)),
@@ -492,7 +512,7 @@ function openJornadaModal(numero) {
     el("span", {}, ` ${gf ?? "?"}–${ga ?? "?"} `),
     teamTag(j.adversario, true)));
   b.append(el("div", { class: "chips" },
-    j.data ? el("span", { class: "chip" }, `Data: ${j.data}${j.casa === false ? " (fora)" : j.casa === true ? " (casa)" : ""}`) : null,
+    j.data ? el("span", { class: "chip" }, `Data: ${dataJornada(j.data, j.hora)}${j.hora ? " · " + j.hora : ""}${j.casa === false ? " (fora)" : j.casa === true ? " (casa)" : ""}`) : null,
     el("span", { class: "chip" }, `Tática: ${fmt(j.tatica)}`),
     el("span", { class: "chip" }, `Convocados: ${j.players.length}`)));
 
