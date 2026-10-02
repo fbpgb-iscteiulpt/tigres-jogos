@@ -276,3 +276,35 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 .jvideo{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#c4302b;text-decoration:none;white-space:nowrap;padding:3px 8px;border:1px solid #e4c4c2;border-radius:999px;background:#fdf2f1}
 .jvideo:hover{background:#f9e2e0;border-color:#c4302b}
 .btn.small{padding:7px 12px;font-size:13px}
+
+/* Vídeo embebido (16:9 responsivo) */
+.video-embed{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;margin:8px 0}
+.video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+/* Posse: vídeo ao lado dos cronómetros */
+.posse-main{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start;margin:8px 0}
+.posse-video label{display:block;font-weight:700;color:var(--navy);margin-bottom:6px}
+.posse-video select{width:100%;margin-bottom:4px}
+.posse-timercol{display:flex;flex-direction:column;gap:10px}
+.posse-timercol .posse-timers{margin:0}
+.posse-timercol .posse-controls{margin:0}
+@media(max-width:860px){.posse-main{grid-template-columns:1fr}}
+
+/* Comparador de jogadores */
+.cmp-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0 14px}
+.cmp-grid{display:grid;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line)}
+.cmp-head{border-bottom:2px solid var(--navy);margin-bottom:4px}
+.cmp-cell{min-width:0}
+.cmp-metric{font-size:13px;font-weight:700;color:var(--navy)}
+.cmp-player{cursor:pointer;display:flex;flex-direction:column;gap:1px;text-align:center}
+.cmp-player strong{color:var(--navy);font-size:14px}
+.cmp-player:hover strong{text-decoration:underline}
+.cmp-sub{font-size:11px;color:var(--muted)}
+.cmp-bar{background:var(--surface2);border-radius:999px;height:9px;overflow:hidden;margin-bottom:3px}
+.cmp-fill{height:100%;background:var(--navy2);border-radius:999px}
+.cmp-fill.neg{background:#d8a0a0}
+.cmp-fill.best{background:var(--win)}
+.cmp-fill.neg.best{background:var(--loss)}
+.cmp-val{font-size:13px;font-weight:700;color:var(--navy);text-align:center;display:block;font-variant-numeric:tabular-nums}
+.cmp-val.best{color:var(--win)}
+@media(max-width:620px){.cmp-picker{grid-template-columns:1fr}.cmp-metric{font-size:11px}.cmp-player strong{font-size:12px}}

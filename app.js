@@ -326,7 +326,7 @@ function render() {
   $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.view === state.view));
   const app = $("#app");
   app.innerHTML = "";
-  ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, equipa: viewEquipa, dicas: viewDicas, posse: viewPosse, nova: viewNova }[state.view])(app);
+  ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, comparar: viewComparar, equipa: viewEquipa, dicas: viewDicas, posse: viewPosse, nova: viewNova }[state.view])(app);
   const s = state.source;
   $("#syncStatus").className = "status " + (s === "github" ? "ok" : s === "seed" ? "err" : "local");
   $("#syncStatus").title = s === "github" ? "Ligado ao GitHub (dados partilhados)" : s === "seed" ? "Dados iniciais (não partilhado ainda)" : "Cache local";
@@ -514,6 +514,25 @@ function videoLink(url) {
   }, "▶ Vídeo");
 }
 
+/* Extrai o ID de 11 caracteres de um URL do YouTube (watch?v=, youtu.be/, embed/) */
+function youtubeId(url) {
+  if (!url) return null;
+  const m = String(url).match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/);
+  return m ? m[1] : null;
+}
+/* Caixa de vídeo embebido (responsiva, 16:9) */
+function videoEmbed(url) {
+  const id = youtubeId(url);
+  if (!id) return null;
+  const box = el("div", { class: "video-embed" });
+  box.append(el("iframe", {
+    src: `https://www.youtube.com/embed/${id}`,
+    title: "Vídeo do jogo", frameborder: "0", allowfullscreen: "true",
+    allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+  }));
+  return box;
+}
+
 /* ================= CLASSIFICAÇÃO ================= */
 function viewClassificacao(app) {
   const tabela = state.data.classificacao || [];
@@ -557,8 +576,10 @@ function openJornadaModal(numero) {
     j.data ? el("span", { class: "chip" }, `Data: ${dataJornada(j.data, j.hora)}${j.hora ? " · " + j.hora : ""}${j.casa === false ? " (fora)" : j.casa === true ? " (casa)" : ""}`) : null,
     el("span", { class: "chip" }, `Tática: ${fmt(j.tatica)}`),
     el("span", { class: "chip" }, `Convocados: ${j.players.length}`)));
-  if (j.video) b.append(el("div", { class: "chips" },
-    el("a", { class: "btn ghost small", href: j.video, target: "_blank", rel: "noopener" }, "▶ Ver vídeo do jogo")));
+  if (j.video) {
+    b.append(el("div", { class: "section-title" }, "Vídeo do jogo"));
+    b.append(videoEmbed(j.video));
+  }
 
   // Match stats compare
   b.append(el("div", { class: "section-title" }, "Estatísticas do jogo"));
@@ -848,22 +869,8 @@ function playerProfile(perJ) {
   if (minutos <= 0) { wrap.append(el("div", { class: "empty" }, "Sem minutos jogados.")); return wrap; }
   const sum = (k) => perJ.reduce((s, p) => s + (+p[k] || 0), 0);
   const per80 = (k) => (sum(k) / minutos) * 80;
-  // label, chave, máximo de referência, negativo?
-  const metrics = [
-    ["Golos", "golos", 2, false],
-    ["Assistências", "assistencias", 2, false],
-    ["Remates", "remates", 4, false],
-    ["Passe p/ finalização", "passeFinalizacao", 3, false],
-    ["Desarmes", "desarmes", 12, false],
-    ["Defesas", "defesas", 6, false],
-    ["Dribles conseguidos", "driblesBemSucedidos", 4, false],
-    ["Cruzamentos conseguidos", "cruzamentosBemSucedidos", 3, false],
-    ["Perdas de bola", "perdasBola", 6, true],
-    ["Passes errados", "passesErrados", 8, true],
-    ["Faltas", "faltas", 4, true],
-  ];
   const rows = el("div", { class: "profile-rows" });
-  metrics.forEach(([lbl, key, ref, neg]) => {
+  PERFIL_METRICS.forEach(([lbl, key, ref, neg]) => {
     const v = per80(key);
     const w = Math.max(0, Math.min(100, (v / ref) * 100));
     rows.append(el("div", { class: "pf-row" },
@@ -875,6 +882,94 @@ function playerProfile(perJ) {
   wrap.append(rows);
   wrap.append(el("div", { class: "pf-note" }, `Média por 80 min ao longo de ${perJ.length} ${perJ.length === 1 ? "jogo" : "jogos"} (${minutos} min no total). Barras a vermelho = indicadores a reduzir.`));
   return wrap;
+}
+
+/* Métricas usadas no perfil e no comparador: [label, chave, máx referência, negativo?] */
+const PERFIL_METRICS = [
+  ["Golos", "golos", 2, false],
+  ["Assistências", "assistencias", 2, false],
+  ["Remates", "remates", 4, false],
+  ["Passe p/ finalização", "passeFinalizacao", 3, false],
+  ["Desarmes", "desarmes", 12, false],
+  ["Defesas", "defesas", 6, false],
+  ["Dribles conseguidos", "driblesBemSucedidos", 4, false],
+  ["Cruzamentos conseguidos", "cruzamentosBemSucedidos", 3, false],
+  ["Perdas de bola", "perdasBola", 6, true],
+  ["Passes errados", "passesErrados", 8, true],
+  ["Faltas", "faltas", 4, true],
+];
+
+/* ================= COMPARAR JOGADORES ================= */
+function viewComparar(app) {
+  app.append(el("div", { class: "section-title" }, "Comparar jogadores"));
+  app.append(el("p", { class: "dicas-intro" }, "Escolhe 2 ou 3 jogadores para comparar os perfis por 80 minutos lado a lado. O melhor valor de cada indicador fica destacado (verde = bom; vermelho = indicador a reduzir)."));
+
+  // Jogadores com minutos registados
+  const agregados = {};
+  state.data.jornadas.forEach((j) => j.players.forEach((p) => {
+    const a = (agregados[p.nome] ||= { nome: p.nome, minutos: 0 });
+    PERFIL_METRICS.forEach(([, k]) => { a[k] = (a[k] || 0) + (+p[k] || 0); });
+    a.minutos += (+p.minutos || 0);
+  }));
+  const nomes = Object.values(agregados).filter((a) => a.minutos > 0).map((a) => a.nome).sort((x, y) => x.localeCompare(y));
+  if (nomes.length < 2) { app.append(el("div", { class: "empty" }, "Precisas de pelo menos 2 jogadores com minutos registados.")); return; }
+
+  // Seleção (3 dropdowns; o 3.º é opcional)
+  const sel = [0, 1, 2].map((i) => {
+    const s = el("select");
+    s.append(el("option", { value: "" }, i < 2 ? "— escolher —" : "— (opcional) —"));
+    nomes.forEach((n) => s.append(el("option", { value: n }, n)));
+    if (i < nomes.length && i < 2) s.value = nomes[i];
+    return s;
+  });
+  const picker = el("div", { class: "cmp-picker" },
+    field("Jogador 1", sel[0]), field("Jogador 2", sel[1]), field("Jogador 3", sel[2]));
+  app.append(picker);
+
+  const out = el("div", { class: "cmp-out" });
+  app.append(out);
+
+  const per80 = (a, k) => a.minutos > 0 ? ((+a[k] || 0) / a.minutos) * 80 : 0;
+  function build() {
+    out.innerHTML = "";
+    const chosen = sel.map((s) => s.value).filter(Boolean);
+    const uniq = [...new Set(chosen)];
+    if (uniq.length < 2) { out.append(el("div", { class: "empty" }, "Escolhe pelo menos 2 jogadores diferentes.")); return; }
+    const players = uniq.map((n) => agregados[n]);
+
+    // Cabeçalho com nomes + posição + minutos
+    const header = el("div", { class: "cmp-grid cmp-head", style: `grid-template-columns:1.4fr repeat(${players.length},1fr)` });
+    header.append(el("div", { class: "cmp-cell cmp-metric" }, "Por 80 min"));
+    players.forEach((p) => {
+      const pos = state.data.listas.posicoes?.[p.nome] || "";
+      header.append(el("div", { class: "cmp-cell cmp-player", onclick: () => openPlayerModal(p.nome) },
+        el("strong", {}, p.nome),
+        el("span", { class: "cmp-sub" }, `${pos ? pos + " · " : ""}${p.minutos} min`)));
+    });
+    out.append(header);
+
+    // Linhas de métricas
+    PERFIL_METRICS.forEach(([lbl, key, ref, neg]) => {
+      const vals = players.map((p) => per80(p, key));
+      // melhor valor: menor se negativo, maior se positivo
+      const best = neg ? Math.min(...vals) : Math.max(...vals);
+      const anyNonZero = vals.some((v) => v > 0);
+      const grid = el("div", { class: "cmp-grid", style: `grid-template-columns:1.4fr repeat(${players.length},1fr)` });
+      grid.append(el("div", { class: "cmp-cell cmp-metric" }, lbl));
+      vals.forEach((v) => {
+        const w = Math.max(0, Math.min(100, (v / ref) * 100));
+        const isBest = anyNonZero && v === best;
+        const cell = el("div", { class: "cmp-cell" },
+          el("div", { class: "cmp-bar" }, el("div", { class: "cmp-fill" + (neg ? " neg" : "") + (isBest ? " best" : ""), style: `width:${w}%` })),
+          el("span", { class: "cmp-val" + (isBest ? " best" : "") }, (Math.round(v * 10) / 10).toString()));
+        grid.append(cell);
+      });
+      out.append(grid);
+    });
+    out.append(el("p", { class: "pf-note" }, "Valores por 80 min ao longo da época. O destaque assinala o melhor em cada indicador (nos negativos, o mais baixo)."));
+  }
+  sel.forEach((s) => s.addEventListener("change", build));
+  build();
 }
 
 /* ================= POSSE DE BOLA (cronómetros) =================
@@ -938,17 +1033,34 @@ function viewPosse(app) {
   const cTigres = makeCard("tigres", clube);
   const cAdv = makeCard("adv", "Adversário");
   timers.append(cTigres, cAdv);
-  app.append(timers);
 
   const status = el("div", { class: "posse-status" }, "");
-  app.append(status);
 
   // Controlos
   const pauseBtn = el("button", { class: "btn ghost", onclick: () => { posseBank(); tick(); } }, `Pausar tudo (${keyLabel(keys.pause)})`);
   const resetBtn = el("button", { class: "btn danger", onclick: () => {
     if (confirm("Repor ambos os cronómetros a zero?")) { posseState.ms.tigres = 0; posseState.ms.adv = 0; posseState.active = null; tick(); }
   } }, "Repor a zero");
-  app.append(el("div", { class: "posse-controls" }, pauseBtn, resetBtn));
+  const controls = el("div", { class: "posse-controls" }, pauseBtn, resetBtn);
+
+  // Painel de vídeo (dropdown de jogo + embed) ao lado dos cronómetros
+  const comVideo = (state.data.calendario || []).filter((c) => c.video).sort((a, b) => a.numero - b.numero);
+  const videoPanel = el("div", { class: "posse-video" });
+  if (comVideo.length) {
+    const sel = el("select");
+    comVideo.forEach((c) => sel.append(el("option", { value: c.video }, `Jornada ${c.numero} · ${c.casa ? clube + " vs " + c.adversario : c.adversario + " vs " + clube}`)));
+    const holder = el("div", { class: "posse-video-holder" });
+    const refresh = () => { holder.innerHTML = ""; const emb = videoEmbed(sel.value); if (emb) holder.append(emb); };
+    sel.addEventListener("change", refresh);
+    videoPanel.append(el("label", {}, "Vídeo do jogo"), sel, holder);
+    refresh();
+  } else {
+    videoPanel.append(el("p", { class: "dicas-note" }, "Sem vídeos disponíveis para já. Quando houver, aparecem aqui para cronometrares ao lado."));
+  }
+
+  // Coluna dos cronómetros + estado + controlos
+  const timerCol = el("div", { class: "posse-timercol" }, timers, status, controls);
+  app.append(el("div", { class: "posse-main" }, videoPanel, timerCol));
 
   // Configurar atalhos
   const cfg = el("div", { class: "posse-cfg" });
