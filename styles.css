@@ -268,3 +268,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 .key-cap:hover{border-color:var(--navy)}
 .key-cap.capturing{border-color:var(--win);color:var(--win);background:rgba(34,160,80,.08)}
 @media(max-width:520px){.posse-clock{font-size:34px}}
+
+.posse-save{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:14px}
+.posse-save select{margin-bottom:4px}

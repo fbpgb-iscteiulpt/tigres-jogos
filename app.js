@@ -934,6 +934,50 @@ function viewPosse(app) {
   cfg.append(el("p", { class: "dicas-note" }, "Clica num atalho e prime a tecla que queres. Evita teclas que uses para escrever."));
   app.append(cfg);
 
+  // Gravar posse medida numa jornada existente (overwrite)
+  const save = el("div", { class: "posse-save" });
+  save.append(el("div", { class: "posse-cfg-title" }, "Guardar na jornada"));
+  const jornadas = [...state.data.jornadas].sort((a, b) => a.numero - b.numero);
+  if (!jornadas.length) {
+    save.append(el("p", { class: "dicas-note" }, "Ainda não há jornadas registadas para gravar."));
+  } else {
+    const sel = el("select");
+    jornadas.forEach((j) => sel.append(el("option", { value: j.numero }, `Jornada ${j.numero} vs ${j.adversario}`)));
+    const info = el("p", { class: "dicas-note" }, "Substitui a posse de bola atual da jornada escolhida pelas percentagens medidas acima.");
+    const saveMsg = el("div", { class: "posse-status" }, "");
+    const doSave = (toGitHub) => async () => {
+      const tT = posseElapsed("tigres"), tA = posseElapsed("adv"), tot = tT + tA;
+      if (tot <= 0) { saveMsg.className = "posse-status"; saveMsg.style.color = "var(--loss)"; saveMsg.textContent = "❌ Sem tempo medido. Cronometra primeiro."; return; }
+      const fracT = Math.round((tT / tot) * 100) / 100; // ex. 0.60
+      const num = +sel.value;
+      const j = state.data.jornadas.find((x) => x.numero === num);
+      if (!j) return;
+      j.matchStats = j.matchStats || {};
+      j.matchStats["Posse de bola"] = { tigres: fracT, adversario: Math.round((1 - fracT) * 100) / 100 };
+      state.data.meta.atualizado = new Date().toISOString();
+      saveMsg.style.color = "";
+      if (toGitHub) {
+        try {
+          saveMsg.textContent = "A guardar no GitHub…";
+          await saveToGitHub(state.data, `Posse de bola — Jornada ${num}`);
+          state.source = "github";
+          saveMsg.className = "posse-status on";
+          saveMsg.textContent = `✅ Posse guardada e partilhada na Jornada ${num} (${Math.round(fracT * 100)}% / ${Math.round((1 - fracT) * 100)}%).`;
+        } catch (e) { saveMsg.className = "posse-status"; saveMsg.style.color = "var(--loss)"; saveMsg.textContent = "❌ " + e.message; }
+      } else {
+        localStorage.setItem("tigres_cache", JSON.stringify(state.data));
+        state.source = "local";
+        saveMsg.className = "posse-status on";
+        saveMsg.textContent = `✅ Posse guardada localmente na Jornada ${num} (${Math.round(fracT * 100)}% / ${Math.round((1 - fracT) * 100)}%). Lembra-te de a enviar para o GitHub.`;
+      }
+    };
+    const btnGh = el("button", { class: "btn", onclick: doSave(true) }, "Guardar no GitHub");
+    const btnLocal = el("button", { class: "btn ghost", onclick: doSave(false) }, "Guardar localmente");
+    if (!ghConfigured()) btnGh.disabled = true;
+    save.append(field("Jornada", sel), info, el("div", { class: "btnrow" }, btnGh, btnLocal), saveMsg);
+  }
+  app.append(save);
+
   // Atualização visual
   function tick() {
     const tT = posseElapsed("tigres"), tA = posseElapsed("adv"), tot = tT + tA;
