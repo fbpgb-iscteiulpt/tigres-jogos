@@ -477,6 +477,7 @@ function viewJornadas(app) {
       el("span", { class: "jteams" }, teamTag(state.data.meta.clube), el("span", { class: "vs" }, "vs"), teamTag(j.adversario)),
       el("span", { class: "jscore" }, `${gf ?? "?"}–${ga ?? "?"}`),
       el("span", { class: "badge " + (res === "?" ? "" : res) }, res === "w" ? "V" : res === "d" ? "E" : res === "l" ? "D" : "?"),
+      videoLink(j.video),
     );
     list.append(row);
   });
@@ -496,10 +497,21 @@ function viewJornadas(app) {
         el("span", { class: "jnum" }, `Jornada ${f.numero}`, el("span", { class: "jdate" }, meta)),
         el("span", { class: "jteams" }, teamTag(state.data.meta.clube), el("span", { class: "vs" }, "vs"), teamTag(f.adversario)),
         el("span", { class: "jscore muted" }, "–"),
+        videoLink(f.video),
       ));
     });
     app.append(fl);
   }
+}
+
+/* Link para o vídeo do jogo (abre o YouTube em nova aba, sem abrir o modal) */
+function videoLink(url) {
+  if (!url) return null;
+  return el("a", {
+    class: "jvideo", href: url, target: "_blank", rel: "noopener",
+    title: "Ver vídeo do jogo no YouTube",
+    onclick: (e) => e.stopPropagation(),
+  }, "▶ Vídeo");
 }
 
 /* ================= CLASSIFICAÇÃO ================= */
@@ -545,6 +557,8 @@ function openJornadaModal(numero) {
     j.data ? el("span", { class: "chip" }, `Data: ${dataJornada(j.data, j.hora)}${j.hora ? " · " + j.hora : ""}${j.casa === false ? " (fora)" : j.casa === true ? " (casa)" : ""}`) : null,
     el("span", { class: "chip" }, `Tática: ${fmt(j.tatica)}`),
     el("span", { class: "chip" }, `Convocados: ${j.players.length}`)));
+  if (j.video) b.append(el("div", { class: "chips" },
+    el("a", { class: "btn ghost small", href: j.video, target: "_blank", rel: "noopener" }, "▶ Ver vídeo do jogo")));
 
   // Match stats compare
   b.append(el("div", { class: "section-title" }, "Estatísticas do jogo"));

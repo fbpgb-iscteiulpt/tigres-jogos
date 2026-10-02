@@ -271,3 +271,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 
 .posse-save{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:14px}
 .posse-save select{margin-bottom:4px}
+
+/* Link de vídeo nas jornadas */
+.jvideo{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#c4302b;text-decoration:none;white-space:nowrap;padding:3px 8px;border:1px solid #e4c4c2;border-radius:999px;background:#fdf2f1}
+.jvideo:hover{background:#f9e2e0;border-color:#c4302b}
+.btn.small{padding:7px 12px;font-size:13px}
