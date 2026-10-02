@@ -303,11 +303,13 @@ function computeKings(data) {
 }
 
 /* ================= VIEWS ================= */
+let viewCleanup = null; // função de limpeza da vista atual (listeners/intervalos)
 function render() {
+  if (typeof viewCleanup === "function") { viewCleanup(); viewCleanup = null; }
   $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.view === state.view));
   const app = $("#app");
   app.innerHTML = "";
-  ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, equipa: viewEquipa, dicas: viewDicas, nova: viewNova }[state.view])(app);
+  ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, equipa: viewEquipa, dicas: viewDicas, posse: viewPosse, nova: viewNova }[state.view])(app);
   const s = state.source;
   $("#syncStatus").className = "status " + (s === "github" ? "ok" : s === "seed" ? "err" : "local");
   $("#syncStatus").title = s === "github" ? "Ligado ao GitHub (dados partilhados)" : s === "seed" ? "Dados iniciais (não partilhado ainda)" : "Cache local";
@@ -842,6 +844,136 @@ function playerProfile(perJ) {
   wrap.append(rows);
   wrap.append(el("div", { class: "pf-note" }, `Média por 80 min ao longo de ${perJ.length} ${perJ.length === 1 ? "jogo" : "jogos"} (${minutos} min no total). Barras a vermelho = indicadores a reduzir.`));
   return wrap;
+}
+
+/* ================= POSSE DE BOLA (cronómetros) =================
+   Dois cronómetros (Tigres / Adversário). Arrancar um pára o outro.
+   Atalhos de teclado configuráveis. Tempos finais + percentagens no fim. */
+const posseState = {
+  ms: { tigres: 0, adv: 0 }, // tempo acumulado em milissegundos
+  active: null,              // 'tigres' | 'adv' | null
+  since: 0,                  // timestamp em que o cronómetro ativo arrancou
+};
+function posseKeys() {
+  let k = {};
+  try { k = JSON.parse(localStorage.getItem("tigres_posse_keys") || "{}"); } catch (e) { k = {}; }
+  return { tigres: k.tigres || "a", adv: k.adv || "l", pause: k.pause || " " };
+}
+function setPosseKeys(k) { localStorage.setItem("tigres_posse_keys", JSON.stringify(k)); }
+function posseElapsed(side) {
+  let v = posseState.ms[side];
+  if (posseState.active === side) v += Date.now() - posseState.since;
+  return v;
+}
+function posseBank() {
+  if (posseState.active) { posseState.ms[posseState.active] += Date.now() - posseState.since; posseState.active = null; }
+}
+function posseActivate(side) {
+  if (posseState.active === side) { posseBank(); return; } // tocar de novo = pausa
+  posseBank();
+  posseState.active = side;
+  posseState.since = Date.now();
+}
+function fmtClock(ms) {
+  const t = Math.floor(ms / 1000);
+  const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+  const mm = String(m).padStart(2, "0"), ss = String(s).padStart(2, "0");
+  return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+function keyLabel(k) { return k === " " ? "Espaço" : k.length === 1 ? k.toUpperCase() : k; }
+
+function viewPosse(app) {
+  const clube = state.data.meta.clube || "Tigres";
+  app.append(el("div", { class: "section-title" }, "Posse de bola — cronómetros"));
+  app.append(el("p", { class: "dicas-intro" }, "Enquanto revês o vídeo do jogo, usa os atalhos de teclado para cronometrar a posse de cada equipa. Arrancar um cronómetro pára automaticamente o outro. No fim tens os tempos e as percentagens."));
+
+  const keys = posseKeys();
+
+  const timers = el("div", { class: "posse-timers" });
+  const makeCard = (side, nome) => {
+    const clock = el("div", { class: "posse-clock" }, fmtClock(posseElapsed(side)));
+    const pct = el("div", { class: "posse-pct" }, "");
+    const keyTxt = el("strong", {}, keyLabel(keys[side]));
+    const card = el("div", { class: "posse-card " + side },
+      el("div", { class: "posse-team" }, nome),
+      clock,
+      pct,
+      el("div", { class: "posse-key" }, "Atalho: ", keyTxt),
+      el("button", { class: "btn posse-btn", onclick: () => { posseActivate(side); tick(); } }, "Iniciar / Pausar"),
+    );
+    card._clock = clock; card._pct = pct; card._keyTxt = keyTxt;
+    return card;
+  };
+  const cTigres = makeCard("tigres", clube);
+  const cAdv = makeCard("adv", "Adversário");
+  timers.append(cTigres, cAdv);
+  app.append(timers);
+
+  const status = el("div", { class: "posse-status" }, "");
+  app.append(status);
+
+  // Controlos
+  const pauseBtn = el("button", { class: "btn ghost", onclick: () => { posseBank(); tick(); } }, `Pausar tudo (${keyLabel(keys.pause)})`);
+  const resetBtn = el("button", { class: "btn danger", onclick: () => {
+    if (confirm("Repor ambos os cronómetros a zero?")) { posseState.ms.tigres = 0; posseState.ms.adv = 0; posseState.active = null; tick(); }
+  } }, "Repor a zero");
+  app.append(el("div", { class: "posse-controls" }, pauseBtn, resetBtn));
+
+  // Configurar atalhos
+  const cfg = el("div", { class: "posse-cfg" });
+  cfg.append(el("div", { class: "posse-cfg-title" }, "Atalhos de teclado"));
+  const caps = {};
+  let capturing = null; // 'tigres' | 'adv' | 'pause'
+  const mkRow = (which, label) => {
+    const val = el("button", { class: "key-cap" }, keyLabel(keys[which]));
+    val.addEventListener("click", () => { capturing = which; val.textContent = "Prime uma tecla…"; val.classList.add("capturing"); });
+    caps[which] = val;
+    return el("div", { class: "posse-cfg-row" }, el("span", {}, label), val);
+  };
+  cfg.append(mkRow("tigres", clube), mkRow("adv", "Adversário"), mkRow("pause", "Pausar tudo"));
+  cfg.append(el("p", { class: "dicas-note" }, "Clica num atalho e prime a tecla que queres. Evita teclas que uses para escrever."));
+  app.append(cfg);
+
+  // Atualização visual
+  function tick() {
+    const tT = posseElapsed("tigres"), tA = posseElapsed("adv"), tot = tT + tA;
+    cTigres._clock.textContent = fmtClock(tT);
+    cAdv._clock.textContent = fmtClock(tA);
+    const pT = tot > 0 ? Math.round((tT / tot) * 100) : 0;
+    cTigres._pct.textContent = tot > 0 ? pT + "%" : "–";
+    cAdv._pct.textContent = tot > 0 ? (100 - pT) + "%" : "–";
+    cTigres.classList.toggle("running", posseState.active === "tigres");
+    cAdv.classList.toggle("running", posseState.active === "adv");
+    status.textContent = posseState.active === "tigres" ? `A contar: ${clube}` : posseState.active === "adv" ? "A contar: Adversário" : "Em pausa";
+    status.className = "posse-status " + (posseState.active ? "on" : "");
+  }
+
+  const interval = setInterval(tick, 100);
+  tick();
+
+  // Teclado
+  function onKey(e) {
+    const k = (e.key || "").length === 1 ? e.key.toLowerCase() : e.key;
+    if (capturing) {
+      e.preventDefault();
+      keys[capturing] = k;
+      setPosseKeys(keys);
+      caps[capturing].textContent = keyLabel(k);
+      caps[capturing].classList.remove("capturing");
+      cTigres._keyTxt.textContent = keyLabel(keys.tigres);
+      cAdv._keyTxt.textContent = keyLabel(keys.adv);
+      pauseBtn.textContent = `Pausar tudo (${keyLabel(keys.pause)})`;
+      capturing = null;
+      return;
+    }
+    if (k === keys.tigres) { e.preventDefault(); posseActivate("tigres"); tick(); }
+    else if (k === keys.adv) { e.preventDefault(); posseActivate("adv"); tick(); }
+    else if (k === keys.pause) { e.preventDefault(); posseBank(); tick(); }
+  }
+  document.addEventListener("keydown", onKey);
+
+  // Limpeza ao sair da vista (o tempo continua guardado em posseState)
+  viewCleanup = () => { clearInterval(interval); document.removeEventListener("keydown", onKey); posseBank(); };
 }
 
 /* ================= NOVA JORNADA (form) ================= */

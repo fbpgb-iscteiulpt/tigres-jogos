@@ -245,3 +245,26 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 .pf-val{font-size:13px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;color:var(--navy)}
 .pf-note{font-size:11px;color:var(--muted);margin-top:8px}
 @media(max-width:420px){.pf-row{grid-template-columns:104px 1fr 30px}.pf-lbl{font-size:11px}}
+
+/* Posse de bola (cronómetros) */
+.posse-timers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:8px 0}
+.posse-card{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:18px 14px;transition:border-color .15s,box-shadow .15s}
+.posse-card.tigres{border-top:4px solid var(--navy)}
+.posse-card.adv{border-top:4px solid var(--muted)}
+.posse-card.running{border-color:var(--win);box-shadow:0 0 0 3px rgba(34,160,80,.18)}
+.posse-team{font-weight:800;color:var(--navy);font-size:15px;text-align:center}
+.posse-clock{font-size:44px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1}
+.posse-pct{font-size:18px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.posse-key{font-size:12px;color:var(--muted)}
+.posse-btn{margin-top:4px}
+.posse-status{text-align:center;font-weight:700;color:var(--muted);margin:6px 0;min-height:22px}
+.posse-status.on{color:var(--win)}
+.posse-controls{display:flex;gap:10px;justify-content:center;margin:8px 0 18px}
+.posse-cfg{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.posse-cfg-title{font-weight:800;color:var(--navy);margin-bottom:10px}
+.posse-cfg-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
+.posse-cfg-row:last-of-type{border-bottom:none}
+.key-cap{min-width:120px;padding:7px 12px;border:2px solid var(--line);border-radius:8px;background:var(--surface2);font-weight:700;color:var(--navy);cursor:pointer;font-size:14px}
+.key-cap:hover{border-color:var(--navy)}
+.key-cap.capturing{border-color:var(--win);color:var(--win);background:rgba(34,160,80,.08)}
+@media(max-width:520px){.posse-clock{font-size:34px}}
