@@ -114,8 +114,22 @@ const getToken = () => localStorage.getItem("tigres_gh_token") || "";
 const setToken = (t) => localStorage.setItem("tigres_gh_token", t);
 
 async function loadData() {
-  // 1) tenta GitHub (raw público) para ter a versão mais recente partilhada
+  // 1) tenta a API do GitHub (sempre fresca, sem cache de CDN) para a versão partilhada
   if (ghConfigured()) {
+    try {
+      const token = getToken();
+      const headers = { Accept: "application/vnd.github+json" };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const r = await fetch(apiUrl() + "?ref=" + CONFIG.githubBranch + "&t=" + Date.now(), { cache: "no-store", headers });
+      if (r.ok) {
+        const payload = await r.json();
+        const d = JSON.parse(b64decode(payload.content));
+        state.source = "github";
+        localStorage.setItem("tigres_cache", JSON.stringify(d));
+        return d;
+      }
+    } catch (e) { /* API falhou — tenta raw */ }
+    // 1b) fallback: raw público (pode estar em cache de CDN ~5 min)
     try {
       const r = await fetch(rawUrl(), { cache: "no-store" });
       if (r.ok) {
@@ -166,6 +180,9 @@ async function saveToGitHub(data, msg) {
 }
 function b64encode(str) {
   return btoa(unescape(encodeURIComponent(str)));
+}
+function b64decode(b64) {
+  return decodeURIComponent(escape(atob(String(b64).replace(/\s/g, ""))));
 }
 
 // Exportar Excel (.xlsx) — ficheiro SpreadsheetML simples que o Excel abre
