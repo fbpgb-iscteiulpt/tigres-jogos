@@ -696,6 +696,7 @@ function viewEquipa(app) {
     { lbl: "Passes errados", f: (j) => sumPlayers(j, "passesErrados"), dir: "down" },
     { lbl: "Perdas de bola", f: (j) => sumPlayers(j, "perdasBola"), dir: "down" },
     { lbl: "Desarmes", f: (j) => sumPlayers(j, "desarmes"), dir: "up" },
+    { lbl: "Cartões vermelhos", f: (j) => ms(j, "Cartões Vermelhos"), dir: "down" },
     { lbl: "Golos por jornada (dif.)", f: (j) => { const g = ms(j, "Resultado"), s = msAdv(j, "Resultado"); return g == null || s == null ? null : g - s; }, dir: "up", sign: true },
   ];
 
