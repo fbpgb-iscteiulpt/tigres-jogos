@@ -286,6 +286,17 @@ function computeKings(data) {
     rows.sort((a, b) => dir === "max" ? b.avg - a.avg || b.tent - a.tent || a.nome.localeCompare(b.nome) : a.avg - b.avg || b.tent - a.tent || a.nome.localeCompare(b.nome));
     return rows.slice(0, 3);
   }
+  // Ranking por TOTAL acumulado na época (soma, sem dividir por jogos)
+  function rankingTotal(metric, dir, filter) {
+    const rows = players.map((pl) => {
+      const gs = pl.games.filter(filter);
+      if (!gs.length) return null;
+      const total = gs.reduce((s, g) => s + (+g[metric] || 0), 0);
+      return { nome: pl.nome, avg: total, total, jogos: gs.length };
+    }).filter(Boolean);
+    rows.sort((a, b) => dir === "max" ? b.total - a.total || a.nome.localeCompare(b.nome) : a.total - b.total || a.nome.localeCompare(b.nome));
+    return rows.slice(0, 3);
+  }
   // Precisão de remate: remates à baliza (dos eventos) ÷ remates totais (stat).
   // Só conta jogadores com pelo menos 1 remate.
   function rankingPrecisaoRemate() {
@@ -312,7 +323,8 @@ function computeKings(data) {
     noX: ranking("perdasBola", "max", jogou),
     blindPasser: ranking("passesErrados", "max", jogou),
     foul: ranking("faltas", "max", jogou),
-    drible: rankingRatio("driblesBemSucedidos", "driblesFalhados", "max"),
+    drible: rankingTotal("driblesBemSucedidos", "max", jogou),
+    dribleEfficiency: rankingRatio("driblesBemSucedidos", "driblesFalhados", "max"),
     peDeTijolo: rankingRatio("driblesBemSucedidos", "driblesFalhados", "min"),
     crossing: rankingRatio("cruzamentosBemSucedidos", "cruzamentosFalhados", "max"),
     precisaoRemate: rankingPrecisaoRemate(),
@@ -372,7 +384,8 @@ function viewEpoca(app) {
     kingCard("🧱", 'No "X" King', "Mais perdas de bola por jogo", K.noX, "unidade"),
     kingCard("🙈", "The Blind Passer", "Mais passes falhados por jogo", K.blindPasser, "unidade"),
     kingCard("🥊", "The Foul King", "Mais faltas por jogo", K.foul, "unidade"),
-    kingCard("⚡", "Drible King", "Melhor % de dribles conseguidos", K.drible, "unidade", "(dribles bem sucedidos ÷ efetuados)", fmtRatio),
+    kingCard("⚡", "Drible King", "Mais dribles bem sucedidos", K.drible, "unidade", "(total na época)", fmtTotal),
+    kingCard("🎩", "Drible Efficiency King", "Melhor % de dribles conseguidos", K.dribleEfficiency, "unidade", "(dribles bem sucedidos ÷ efetuados)", fmtRatio),
     kingCard("🎯", "Crossing King", "Melhor % de cruzamentos conseguidos", K.crossing, "unidade", "(cruzamentos bem sucedidos ÷ efetuados)", fmtRatio),
     kingCard("🧿", "Pés de tijolo", "Pior % de dribles conseguidos", K.peDeTijolo, "unidade", "(mín. 1 drible efetuado)", fmtRatio),
   );
@@ -383,6 +396,10 @@ function viewEpoca(app) {
 function fmtRatio(r, isLeader) {
   const p = Math.round(r.avg * 100);
   return `${p}% (${r.bem}/${r.tent})`;
+}
+// Formatação de valor para cartões de total acumulado (número inteiro)
+function fmtTotal(r, isLeader) {
+  return `${r.total}`;
 }
 
 function kingCard(icon, title, subtitle, top3, unit, note, valFmt) {
