@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-10-04T16:25:45.995Z",
+    "atualizado": "2026-10-07T17:17:01.640Z",
     "versao": 7
   },
   "listas": {
@@ -2428,8 +2428,8 @@
           "adversario": 0
         },
         "Posse de bola": {
-          "tigres": 0.58,
-          "adversario": 0.42
+          "tigres": 0.61,
+          "adversario": 0.39
         },
         "Cruzamentos": {
           "tigres": 10,
