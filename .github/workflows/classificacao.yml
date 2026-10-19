@@ -2,7 +2,7 @@ name: Atualizar classificação
 
 on:
   schedule:
-    - cron: "0 */6 * * *"   # de 6 em 6 horas
+    - cron: "0 */3 * * *"   # de 6 em 6 horas
   workflow_dispatch:         # botão "Run workflow" para correr à mão
 
 permissions:
