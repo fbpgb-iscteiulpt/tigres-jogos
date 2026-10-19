@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-10-17T20:20:29.849Z",
-    "versao": 9
+    "atualizado": "2026-10-19T08:49:35.774Z",
+    "versao": 10
   },
   "listas": {
     "jogadores": [
@@ -4547,11 +4547,11 @@
         },
         "Remates": {
           "tigres": 10,
-          "adversario": 5
+          "adversario": 6
         },
         "Remates à baliza": {
           "tigres": 4,
-          "adversario": 1
+          "adversario": 2
         },
         "Cantos": {
           "tigres": 2,
@@ -5159,6 +5159,10 @@
         },
         {
           "acao": "Golo sofrido normal",
+          "jogador": null
+        },
+        {
+          "acao": "Remate sofrido à baliza",
           "jogador": null
         },
         {
@@ -5973,6 +5977,18 @@
     },
     {
       "pos": 2,
+      "equipa": "CDUL",
+      "pts": 13,
+      "j": 5,
+      "v": 4,
+      "e": 1,
+      "dd": 0,
+      "gm": 13,
+      "gs": 3,
+      "td": 11
+    },
+    {
+      "pos": 3,
       "equipa": "Pé Leve",
       "pts": 12,
       "j": 5,
@@ -5984,19 +6000,19 @@
       "td": 11
     },
     {
-      "pos": 3,
-      "equipa": "CDUL",
-      "pts": 10,
-      "j": 4,
+      "pos": 4,
+      "equipa": "AQA",
+      "pts": 11,
+      "j": 5,
       "v": 3,
-      "e": 1,
+      "e": 2,
       "dd": 0,
-      "gm": 10,
-      "gs": 3,
-      "td": 7
+      "gm": 14,
+      "gs": 8,
+      "td": 19
     },
     {
-      "pos": 4,
+      "pos": 5,
       "equipa": "Vips",
       "pts": 10,
       "j": 5,
@@ -6008,31 +6024,7 @@
       "td": 9
     },
     {
-      "pos": 5,
-      "equipa": "AQA",
-      "pts": 8,
-      "j": 4,
-      "v": 2,
-      "e": 2,
-      "dd": 0,
-      "gm": 11,
-      "gs": 6,
-      "td": 16
-    },
-    {
       "pos": 6,
-      "equipa": "Olímpico",
-      "pts": 7,
-      "j": 4,
-      "v": 2,
-      "e": 1,
-      "dd": 1,
-      "gm": 7,
-      "gs": 1,
-      "td": 6
-    },
-    {
-      "pos": 7,
       "equipa": "Madeira",
       "pts": 7,
       "j": 5,
@@ -6042,6 +6034,18 @@
       "gm": 8,
       "gs": 6,
       "td": 9
+    },
+    {
+      "pos": 7,
+      "equipa": "Olímpico",
+      "pts": 7,
+      "j": 5,
+      "v": 2,
+      "e": 1,
+      "dd": 2,
+      "gm": 7,
+      "gs": 4,
+      "td": 10
     },
     {
       "pos": 8,
@@ -6167,13 +6171,13 @@
       "pos": 18,
       "equipa": "SD76",
       "pts": 3,
-      "j": 4,
+      "j": 5,
       "v": 1,
       "e": 0,
-      "dd": 3,
-      "gm": 6,
-      "gs": 10,
-      "td": 14
+      "dd": 4,
+      "gm": 8,
+      "gs": 13,
+      "td": 17
     }
   ]
 }
