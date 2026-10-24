@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-10-24T15:29:37.513Z",
+    "atualizado": "2026-10-24T20:20:53.670Z",
     "versao": 10
   },
   "listas": {
@@ -5966,17 +5966,41 @@
     {
       "pos": 1,
       "equipa": "Leões",
-      "pts": 15,
-      "j": 5,
-      "v": 5,
+      "pts": 18,
+      "j": 6,
+      "v": 6,
       "e": 0,
       "dd": 0,
-      "gm": 15,
+      "gm": 18,
       "gs": 0,
-      "td": 14
+      "td": 17
     },
     {
       "pos": 2,
+      "equipa": "AQA",
+      "pts": 14,
+      "j": 6,
+      "v": 4,
+      "e": 2,
+      "dd": 0,
+      "gm": 20,
+      "gs": 9,
+      "td": 21
+    },
+    {
+      "pos": 3,
+      "equipa": "Vips",
+      "pts": 13,
+      "j": 6,
+      "v": 4,
+      "e": 1,
+      "dd": 1,
+      "gm": 22,
+      "gs": 8,
+      "td": 10
+    },
+    {
+      "pos": 4,
       "equipa": "CDUL",
       "pts": 13,
       "j": 5,
@@ -5988,40 +6012,16 @@
       "td": 11
     },
     {
-      "pos": 3,
+      "pos": 5,
       "equipa": "Pé Leve",
       "pts": 12,
-      "j": 5,
+      "j": 6,
       "v": 4,
       "e": 0,
-      "dd": 1,
+      "dd": 2,
       "gm": 8,
-      "gs": 7,
-      "td": 11
-    },
-    {
-      "pos": 4,
-      "equipa": "AQA",
-      "pts": 11,
-      "j": 5,
-      "v": 3,
-      "e": 2,
-      "dd": 0,
-      "gm": 14,
       "gs": 8,
-      "td": 19
-    },
-    {
-      "pos": 5,
-      "equipa": "Vips",
-      "pts": 10,
-      "j": 5,
-      "v": 3,
-      "e": 1,
-      "dd": 1,
-      "gm": 16,
-      "gs": 7,
-      "td": 9
+      "td": 12
     },
     {
       "pos": 6,
@@ -6037,6 +6037,18 @@
     },
     {
       "pos": 7,
+      "equipa": "Tigres",
+      "pts": 9,
+      "j": 6,
+      "v": 3,
+      "e": 0,
+      "dd": 3,
+      "gm": 7,
+      "gs": 14,
+      "td": 13
+    },
+    {
+      "pos": 8,
       "equipa": "Incríveis",
       "pts": 8,
       "j": 6,
@@ -6048,19 +6060,31 @@
       "td": 18
     },
     {
-      "pos": 8,
-      "equipa": "Olímpico",
+      "pos": 9,
+      "equipa": "Madeirinha",
       "pts": 7,
       "j": 5,
       "v": 2,
       "e": 1,
       "dd": 2,
-      "gm": 7,
-      "gs": 4,
-      "td": 11
+      "gm": 8,
+      "gs": 8,
+      "td": 7
     },
     {
-      "pos": 9,
+      "pos": 10,
+      "equipa": "Olímpico",
+      "pts": 7,
+      "j": 6,
+      "v": 2,
+      "e": 1,
+      "dd": 3,
+      "gm": 7,
+      "gs": 7,
+      "td": 15
+    },
+    {
+      "pos": 11,
       "equipa": "Canarinhos",
       "pts": 6,
       "j": 5,
@@ -6072,31 +6096,19 @@
       "td": 10
     },
     {
-      "pos": 10,
+      "pos": 12,
       "equipa": "Laranjada",
       "pts": 6,
-      "j": 5,
+      "j": 6,
       "v": 2,
       "e": 0,
-      "dd": 3,
-      "gm": 9,
-      "gs": 10,
-      "td": 13
+      "dd": 4,
+      "gm": 10,
+      "gs": 16,
+      "td": 16
     },
     {
-      "pos": 11,
-      "equipa": "Tigres",
-      "pts": 6,
-      "j": 5,
-      "v": 2,
-      "e": 0,
-      "dd": 3,
-      "gm": 5,
-      "gs": 13,
-      "td": 13
-    },
-    {
-      "pos": 12,
+      "pos": 13,
       "equipa": "Briosa",
       "pts": 6,
       "j": 5,
@@ -6108,39 +6120,27 @@
       "td": 23
     },
     {
-      "pos": 13,
-      "equipa": "Madeirinha",
-      "pts": 4,
-      "j": 4,
-      "v": 1,
-      "e": 1,
-      "dd": 2,
-      "gm": 7,
-      "gs": 8,
-      "td": 7
-    },
-    {
       "pos": 14,
       "equipa": "Purrianos",
       "pts": 4,
-      "j": 5,
+      "j": 6,
       "v": 1,
       "e": 1,
-      "dd": 3,
-      "gm": 7,
-      "gs": 13,
+      "dd": 4,
+      "gm": 8,
+      "gs": 19,
       "td": 9
     },
     {
       "pos": 15,
       "equipa": "Milionários",
       "pts": 4,
-      "j": 5,
+      "j": 6,
       "v": 1,
       "e": 1,
-      "dd": 3,
-      "gm": 5,
-      "gs": 9,
+      "dd": 4,
+      "gm": 6,
+      "gs": 11,
       "td": 13
     },
     {
