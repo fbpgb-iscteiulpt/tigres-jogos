@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-10-24T10:24:48.336Z",
+    "atualizado": "2026-10-24T15:29:37.513Z",
     "versao": 10
   },
   "listas": {
@@ -6025,6 +6025,18 @@
     },
     {
       "pos": 6,
+      "equipa": "Madeira",
+      "pts": 10,
+      "j": 6,
+      "v": 3,
+      "e": 1,
+      "dd": 2,
+      "gm": 12,
+      "gs": 7,
+      "td": 9
+    },
+    {
+      "pos": 7,
       "equipa": "Incríveis",
       "pts": 8,
       "j": 6,
@@ -6034,18 +6046,6 @@
       "gm": 7,
       "gs": 8,
       "td": 18
-    },
-    {
-      "pos": 7,
-      "equipa": "Madeira",
-      "pts": 7,
-      "j": 5,
-      "v": 2,
-      "e": 1,
-      "dd": 2,
-      "gm": 8,
-      "gs": 6,
-      "td": 9
     },
     {
       "pos": 8,
@@ -6063,13 +6063,13 @@
       "pos": 9,
       "equipa": "Canarinhos",
       "pts": 6,
-      "j": 4,
+      "j": 5,
       "v": 2,
       "e": 0,
-      "dd": 2,
-      "gm": 6,
-      "gs": 9,
-      "td": 9
+      "dd": 3,
+      "gm": 7,
+      "gs": 13,
+      "td": 10
     },
     {
       "pos": 10,
