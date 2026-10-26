@@ -249,6 +249,38 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 .pf-val{font-size:13px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;color:var(--navy)}
 .pf-note{font-size:11px;color:var(--muted);margin-top:8px}
 @media(max-width:420px){.pf-row{grid-template-columns:104px 1fr 30px}.pf-lbl{font-size:11px}}
+/* Evolução do jogador */
+.evo{margin:18px 0 16px;padding-top:14px;border-top:1px solid var(--line)}
+.evo-gap{margin-top:18px}
+.evo-chart-wrap{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:8px 8px 6px;overflow-x:auto}
+.evo-chart{width:100%;min-width:520px;height:auto;display:block}
+.evo-grid{stroke:#d6deea;stroke-width:1}
+.evo-axis{font-size:11px;fill:var(--muted);font-family:inherit}
+.evo-j{font-weight:700;fill:var(--navy)}
+.evo-line{fill:none;stroke:var(--navy);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.evo-team{fill:none;stroke:#8a9ab3;stroke-width:2;stroke-dasharray:6 5}
+.evo-dot{stroke:#fff;stroke-width:2;cursor:default}
+.evo-dot.up{fill:var(--win)}
+.evo-dot.down{fill:var(--loss)}
+.evo-val{font-size:12px;font-weight:800;fill:var(--navy);font-family:inherit}
+.evo-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);padding:6px 4px 2px}
+.lg{display:inline-flex;align-items:center;gap:6px}
+.lg::before{content:"";display:inline-block}
+.lg-player::before{width:18px;height:3px;background:var(--navy);border-radius:2px}
+.lg-team::before{width:18px;border-top:2px dashed #8a9ab3}
+.lg-up::before,.lg-down::before{width:10px;height:10px;border-radius:50%}
+.lg-up::before{background:var(--win)}
+.lg-down::before{background:var(--loss)}
+.evo-toggle{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:8px}
+.evo-toggle button{background:#fff;border:none;padding:7px 12px;font-weight:700;color:var(--navy);cursor:pointer;font-size:13px}
+.evo-toggle button+button{border-left:1px solid var(--line)}
+.evo-toggle button.active{background:var(--navy);color:#fff}
+.evo-table td.evo-good{background:#e3f4e8;color:#17663a;font-weight:700}
+.evo-table td.evo-bad{background:#fbe5e5;color:#a32020;font-weight:700}
+.evo-table td.evo-few{color:#9aa6b8;font-style:italic}
+.evo-table td.evo-na{color:#c3ccd9}
+.evo-table td.evo-avg{font-weight:800;color:var(--navy);border-left:2px solid var(--line)}
+.evo-table tr.evo-min td{color:var(--muted);font-size:12px}
 
 /* Posse de bola (cronómetros) */
 .posse-timers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:8px 0}

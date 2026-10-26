@@ -883,6 +883,9 @@ function openPlayerModal(nome) {
   // Perfil do jogador — médias por 80 min (mostra a "forma" do jogador)
   b.append(playerProfile(perJ));
 
+  // Evolução jornada a jornada (nota + estatísticas)
+  b.append(playerEvolution(nome));
+
   const cols = [["titular", "Tit"], ["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["passeFinalizacao", "PF"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"], ["driblesBemSucedidos", "DB"], ["driblesFalhados", "DF"], ["cruzamentosBemSucedidos", "CB"], ["cruzamentosFalhados", "CF"]];
   const t = el("table", { class: "pstat-table" });
   const h = el("tr", {}, el("th", {}, "Jornada"));
@@ -927,6 +930,165 @@ function playerProfile(perJ) {
   wrap.append(el("div", { class: "pf-note" }, `Média por 80 min ao longo de ${perJ.length} ${perJ.length === 1 ? "jogo" : "jogos"} (${minutos} min no total). Barras a vermelho = indicadores a reduzir.`));
   return wrap;
 }
+
+/* ================= EVOLUÇÃO DO JOGADOR ================= */
+// Jogos com menos minutos do que isto não são extrapolados para 80 min
+// (mostram o valor real, a cinzento, e não entram nas comparações).
+const EVO_MIN_EXTRAPOLAR = 40;
+
+// Estatísticas na tabela de evolução: [label, chave, negativo?]
+const EVO_STATS = [
+  ["Golos", "golos", false],
+  ["Assistências", "assistencias", false],
+  ["Passe p/ finalização", "passeFinalizacao", false],
+  ["Remates", "remates", false],
+  ["Desarmes", "desarmes", false],
+  ["Defesas", "defesas", false],
+  ["Dribles conseguidos", "driblesBemSucedidos", false],
+  ["Dribles falhados", "driblesFalhados", true],
+  ["Cruzamentos conseguidos", "cruzamentosBemSucedidos", false],
+  ["Cruzamentos falhados", "cruzamentosFalhados", true],
+  ["Passes errados", "passesErrados", true],
+  ["Perdas de bola", "perdasBola", true],
+  ["Faltas", "faltas", true],
+];
+
+function playerEvolution(nome) {
+  const wrap = el("div", { class: "evo" });
+  const R = window.TigresRatings;
+  const notas = R ? R.computeRatings(state.data).porJornada : null;
+  const jornadas = [...state.data.jornadas].sort((a, b) => a.numero - b.numero);
+  // uma linha por jornada; jogos sem minutos contam como "não jogou"
+  const jogos = jornadas.map((j) => {
+    const p = j.players.find((x) => x.nome === nome);
+    const jogou = !!p && (+p.minutos || 0) > 0;
+    const row = notas?.[j.numero]?.find((r) => r.nome === nome);
+    const equipa = (notas?.[j.numero] || []).filter((r) => r.min > 0);
+    return {
+      numero: j.numero, adversario: j.adversario, jogou, p,
+      min: jogou ? +p.minutos : 0,
+      nota: jogou && row ? row.nota : null,
+      pos: row?.pos || "",
+      mediaEquipa: equipa.length ? equipa.reduce((s, r) => s + r.nota, 0) / equipa.length : null,
+    };
+  });
+
+  wrap.append(el("div", { class: "profile-title" }, "Evolução da nota por jornada"));
+  if (!notas) wrap.append(el("div", { class: "empty" }, "Modelo de notas indisponível."));
+  else wrap.append(evoChart(jogos));
+
+  wrap.append(el("div", { class: "profile-title evo-gap" }, "Estatísticas jogo a jogo"));
+  wrap.append(evoTable(jogos));
+  return wrap;
+}
+
+/* Gráfico SVG: nota do jogador (linha sólida) vs média da equipa (tracejado) */
+function evoChart(jogos) {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = (tag, attrs, text) => { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (text != null) n.textContent = text; return n; };
+  const W = 640, H = 230, L = 34, Rr = 14, T = 16, B = 46;
+  const n = jogos.length;
+  const x = (i) => L + (n === 1 ? (W - L - Rr) / 2 : (i * (W - L - Rr)) / (n - 1));
+  const y = (v) => T + ((10 - v) / 6) * (H - T - B); // eixo 4–10
+  const svg = s("svg", { viewBox: `0 0 ${W} ${H}`, class: "evo-chart", role: "img", "aria-label": "Evolução da nota por jornada" });
+  for (let v = 4; v <= 10; v += 2) {
+    svg.append(s("line", { x1: L, x2: W - Rr, y1: y(v), y2: y(v), class: "evo-grid" }));
+    svg.append(s("text", { x: L - 8, y: y(v) + 4, class: "evo-axis", "text-anchor": "end" }, v));
+  }
+  // linha da equipa (todas as jornadas)
+  const eq = jogos.map((g, i) => (g.mediaEquipa == null ? null : `${x(i)},${y(g.mediaEquipa)}`)).filter(Boolean);
+  if (eq.length > 1) svg.append(s("polyline", { points: eq.join(" "), class: "evo-team" }));
+  // linha do jogador: quebra nas jornadas em que não jogou
+  let seg = [];
+  const flush = () => { if (seg.length > 1) svg.append(s("polyline", { points: seg.join(" "), class: "evo-line" })); seg = []; };
+  jogos.forEach((g, i) => { if (g.nota == null) flush(); else seg.push(`${x(i)},${y(g.nota)}`); });
+  flush();
+  jogos.forEach((g, i) => {
+    svg.append(s("text", { x: x(i), y: H - B + 18, class: "evo-axis evo-j", "text-anchor": "middle" }, `J${g.numero}`));
+    if (g.nota == null) {
+      svg.append(s("text", { x: x(i), y: H - B + 32, class: "evo-axis", "text-anchor": "middle" }, "não jogou"));
+      return;
+    }
+    svg.append(s("text", { x: x(i), y: H - B + 32, class: "evo-axis", "text-anchor": "middle" }, `${g.pos} · ${g.min}'`));
+    const dot = s("circle", { cx: x(i), cy: y(g.nota), r: 6, class: "evo-dot" + (g.mediaEquipa != null && g.nota >= g.mediaEquipa ? " up" : " down") });
+    dot.append(s("title", {}, `J${g.numero} vs ${g.adversario}\nNota ${g.nota.toFixed(1)} (média da equipa ${g.mediaEquipa?.toFixed(1) ?? "—"})\n${g.pos} · ${g.min} min`));
+    svg.append(dot);
+    svg.append(s("text", { x: x(i), y: y(g.nota) - 11, class: "evo-val", "text-anchor": "middle" }, g.nota.toFixed(1)));
+  });
+  const box = el("div", { class: "evo-chart-wrap" });
+  box.append(svg);
+  box.append(el("div", { class: "evo-legend" },
+    el("span", { class: "lg lg-player" }, "Nota do jogador"),
+    el("span", { class: "lg lg-team" }, "Média da equipa"),
+    el("span", { class: "lg lg-up" }, "acima da média"),
+    el("span", { class: "lg lg-down" }, "abaixo da média")));
+  return box;
+}
+
+/* Tabela: estatísticas × jornadas, com cor face à média do próprio jogador */
+function evoTable(jogos) {
+  const box = el("div");
+  let modo = "total"; // "total" | "p80"
+  const toggle = el("div", { class: "evo-toggle" });
+  const bTot = el("button", { class: "active" }, "Totais por jogo");
+  const bP80 = el("button", {}, "Por 80 min");
+  toggle.append(bTot, bP80);
+  const holder = el("div");
+  const note = el("p", { class: "pf-note" });
+  const jogados = jogos.filter((g) => g.jogou);
+
+  const build = () => {
+    holder.innerHTML = "";
+    // valor de uma estatística num jogo; em "por 80" só extrapola com minutos suficientes
+    const val = (g, key) => {
+      const v = +g.p[key] || 0;
+      if (modo === "p80" && g.min >= EVO_MIN_EXTRAPOLAR) return { v: (v / g.min) * 80, escalado: true };
+      return { v, escalado: false };
+    };
+    // um jogo entra nas comparações em "totais" sempre; em "por 80" só se foi extrapolado
+    const conta = (g) => modo === "total" || g.min >= EVO_MIN_EXTRAPOLAR;
+    const t = el("table", { class: "pstat-table evo-table sticky-first" });
+    const h = el("tr", {}, el("th", {}, "Estatística"));
+    jogos.forEach((g) => h.append(el("th", { class: "num", title: `vs ${g.adversario}` }, `J${g.numero}`)));
+    h.append(el("th", { class: "num" }, modo === "total" ? "Média" : "Média/80"));
+    t.append(el("thead", {}, h));
+    const tb = el("tbody");
+    // linha de minutos (contexto)
+    const trMin = el("tr", { class: "evo-min" }, el("td", {}, "Minutos"));
+    jogos.forEach((g) => trMin.append(el("td", { class: "num" + (g.jogou && modo === "p80" && g.min < EVO_MIN_EXTRAPOLAR ? " evo-few" : "") }, g.jogou ? g.min : "—")));
+    trMin.append(el("td", { class: "num" }, jogados.length ? Math.round(jogados.reduce((s, g) => s + g.min, 0) / jogados.length) : "—"));
+    tb.append(trMin);
+    EVO_STATS.forEach(([lbl, key, neg]) => {
+      const base = jogados.filter(conta);
+      const media = base.length ? base.reduce((s, g) => s + val(g, key).v, 0) / base.length : null;
+      const tr = el("tr", {}, el("td", {}, lbl));
+      jogos.forEach((g) => {
+        if (!g.jogou) { tr.append(el("td", { class: "num evo-na" }, "—")); return; }
+        const { v } = val(g, key);
+        let cls = "num";
+        if (!conta(g)) cls += " evo-few";
+        else if (media != null && base.length > 1 && Math.abs(v - media) > 1e-9) {
+          const melhor = neg ? v < media : v > media;
+          cls += melhor ? " evo-good" : " evo-bad";
+        }
+        tr.append(el("td", { class: cls }, fmtEvo(v)));
+      });
+      tr.append(el("td", { class: "num evo-avg" }, media == null ? "—" : fmtEvo(media)));
+      tb.append(tr);
+    });
+    t.append(tb);
+    holder.append(tableScroll(t));
+    note.textContent = modo === "total"
+      ? "Verde = melhor do que a média do próprio jogador; vermelho = pior (nos indicadores a reduzir, como passes errados, menos é melhor). — = não jogou."
+      : `Valores por 80 min. Jogos com menos de ${EVO_MIN_EXTRAPOLAR} min não são extrapolados: mostram o valor real a cinzento e não entram na média nem nas cores.`;
+  };
+  bTot.addEventListener("click", () => { modo = "total"; bTot.classList.add("active"); bP80.classList.remove("active"); build(); });
+  bP80.addEventListener("click", () => { modo = "p80"; bP80.classList.add("active"); bTot.classList.remove("active"); build(); });
+  build();
+  box.append(toggle, holder, note);
+  return box;
+}
+function fmtEvo(v) { return Number.isInteger(v) ? String(v) : (Math.round(v * 10) / 10).toString(); }
 
 /* Métricas usadas no perfil e no comparador: [label, chave, máx referência, negativo?] */
 const PERFIL_METRICS = [
