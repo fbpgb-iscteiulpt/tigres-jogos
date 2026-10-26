@@ -269,7 +269,7 @@ function computeKings(data) {
       return { nome: pl.nome, avg: total / gs.length, jogos: gs.length };
     }).filter(Boolean);
     rows.sort((a, b) => dir === "max" ? b.avg - a.avg || a.nome.localeCompare(b.nome) : a.avg - b.avg || a.nome.localeCompare(b.nome));
-    return rows.slice(0, 3);
+    return rows; // lista completa (o cartão mostra o top 3; o popup mostra tudo)
   }
   const jogou = (g) => (+g.minutos || 0) > 0;       // participou
   const min40 = (g) => (+g.minutos || 0) >= 40;     // ≥40 minutos
@@ -284,7 +284,7 @@ function computeKings(data) {
       return { nome: pl.nome, avg: bem / tent, bem, tent };
     }).filter(Boolean);
     rows.sort((a, b) => dir === "max" ? b.avg - a.avg || b.tent - a.tent || a.nome.localeCompare(b.nome) : a.avg - b.avg || b.tent - a.tent || a.nome.localeCompare(b.nome));
-    return rows.slice(0, 3);
+    return rows; // lista completa (o cartão mostra o top 3; o popup mostra tudo)
   }
   // Ranking por TOTAL acumulado na época (soma, sem dividir por jogos)
   function rankingTotal(metric, dir, filter) {
@@ -295,7 +295,7 @@ function computeKings(data) {
       return { nome: pl.nome, avg: total, total, jogos: gs.length };
     }).filter(Boolean);
     rows.sort((a, b) => dir === "max" ? b.total - a.total || a.nome.localeCompare(b.nome) : a.total - b.total || a.nome.localeCompare(b.nome));
-    return rows.slice(0, 3);
+    return rows; // lista completa (o cartão mostra o top 3; o popup mostra tudo)
   }
   // Precisão de remate: remates à baliza (dos eventos) ÷ remates totais (stat).
   // Só conta jogadores com pelo menos 1 remate.
@@ -313,7 +313,7 @@ function computeKings(data) {
       return { nome: pl.nome, avg: ab / rem, bem: ab, tent: rem };
     }).filter(Boolean);
     rows.sort((a, b) => b.avg - a.avg || b.tent - a.tent || a.nome.localeCompare(b.nome));
-    return rows.slice(0, 3);
+    return rows; // lista completa (o cartão mostra o top 3; o popup mostra tudo)
   }
   return {
     consistency: ranking("passesErrados", "min", min40),
@@ -402,11 +402,12 @@ function fmtTotal(r, isLeader) {
   return `${r.total}`;
 }
 
-function kingCard(icon, title, subtitle, top3, unit, note, valFmt) {
+function kingCard(icon, title, subtitle, rows, unit, note, valFmt) {
   const card = el("div", { class: "card king" });
   card.append(el("div", { class: "king-title" }, el("span", { class: "king-icon" }, icon), el("span", {}, title)));
   card.append(el("div", { class: "king-sub" }, subtitle + (note ? " " + note : "")));
-  if (!top3 || !top3.length) { card.append(el("div", { class: "empty" }, "Sem dados")); return card; }
+  if (!rows || !rows.length) { card.append(el("div", { class: "empty" }, "Sem dados")); return card; }
+  const top3 = rows.slice(0, 3);
   const leader = top3[0];
   const lead = el("div", { class: "king-leader", onclick: () => openPlayerModal(leader.nome) },
     el("span", { class: "king-name" }, leader.nome),
@@ -421,7 +422,32 @@ function kingCard(icon, title, subtitle, top3, unit, note, valFmt) {
       el("span", { class: "king-rval" }, valFmt ? valFmt(r, false) : `${r.avg.toFixed(1)}`))));
     card.append(list);
   }
+  if (rows.length > 3) {
+    card.append(el("button", { class: "king-more", onclick: () => openRankingModal(icon, title, subtitle, note, rows, valFmt) },
+      `Ver lista completa (${rows.length})`));
+  }
   return card;
+}
+
+// Popup com o ranking completo de um "king"
+function openRankingModal(icon, title, subtitle, note, rows, valFmt) {
+  const b = $("#modalBody"); b.innerHTML = "";
+  b.append(el("h2", {}, el("span", {}, icon), el("span", {}, title)));
+  b.append(el("p", { class: "hint" }, subtitle + (note ? " " + note : "")));
+  const t = el("table", { class: "rank-full" });
+  t.append(el("thead", {}, el("tr", {}, el("th", { class: "rank" }, "#"), el("th", {}, "Jogador"), el("th", { class: "num" }, "Valor"))));
+  const tb = el("tbody");
+  rows.forEach((r, i) => {
+    const tr = el("tr", { class: i === 0 ? "rank-leader" : "" },
+      el("td", { class: "rank" }, i + 1),
+      el("td", {}, r.nome),
+      el("td", { class: "num" }, valFmt ? valFmt(r, i === 0) : `${r.avg.toFixed(1)} / jogo`));
+    tr.addEventListener("click", () => openPlayerModal(r.nome));
+    tb.append(tr);
+  });
+  t.append(tb);
+  b.append(tableScroll(t));
+  showModal();
 }
 
 function statCard(big, lbl, sub) {

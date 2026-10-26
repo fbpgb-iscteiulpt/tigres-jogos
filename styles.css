@@ -154,6 +154,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 .king-rank{color:var(--muted);font-weight:700}
 .king-rname{color:var(--navy)}
 .king-rval{color:var(--muted);font-variant-numeric:tabular-nums;font-weight:600}
+.king-more{margin-top:auto;align-self:flex-start;background:none;border:none;padding:4px 8px;color:var(--navy);font-weight:700;font-size:13px;cursor:pointer;border-radius:8px;text-decoration:underline;text-underline-offset:3px}
+.king-more:hover{background:var(--surface2)}
+.rank-full tr.rank-leader td{font-weight:800;color:var(--navy);background:var(--surface2)}
+.rank-full tbody tr{cursor:pointer}
 
 @media(max-width:640px){
   .topbar{gap:10px;padding:10px 12px}
