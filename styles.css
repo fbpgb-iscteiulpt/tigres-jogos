@@ -351,3 +351,22 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 .cmp-val{font-size:13px;font-weight:700;color:var(--navy);text-align:center;display:block;font-variant-numeric:tabular-nums}
 .cmp-val.best{color:var(--win)}
 @media(max-width:620px){.cmp-picker{grid-template-columns:1fr}.cmp-metric{font-size:11px}.cmp-player strong{font-size:12px}}
+/* Radar do comparador */
+.radar-box{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px 12px;margin-bottom:16px}
+.radar-wrap{overflow-x:auto}
+.radar-chart{width:100%;max-width:640px;min-width:520px;height:auto;display:block;margin:0 auto}
+.radar-off{fill:#e8eef7}
+.radar-def{fill:#f8eaea}
+.radar-ring{fill:none;stroke:#cfd8e5;stroke-width:1}
+.radar-axis{stroke:#cfd8e5;stroke-width:1}
+.radar-half{font-size:12px;font-weight:800;letter-spacing:2px;fill:var(--navy);font-family:inherit}
+.radar-half.def{fill:#a32020}
+.radar-lbl{font-size:12.5px;font-weight:700;fill:var(--navy);font-family:inherit}
+.radar-inv{font-size:10px;font-weight:600;fill:var(--muted)}
+.radar-tick{font-size:9.5px;fill:#7d8ba1;font-family:inherit;paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round}
+.radar-poly{fill-opacity:.28;stroke-width:2.5;stroke-linejoin:round}
+.radar-dot{stroke:#fff;stroke-width:1.5}
+.radar-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;padding:4px 0 2px}
+.radar-lg{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--navy)}
+.radar-lg:hover strong{text-decoration:underline}
+.radar-sw{width:14px;height:14px;border-radius:4px;opacity:.85}

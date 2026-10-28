@@ -1144,7 +1144,7 @@ const PERFIL_METRICS = [
 /* ================= COMPARAR JOGADORES ================= */
 function viewComparar(app) {
   app.append(el("div", { class: "section-title" }, "Comparar jogadores"));
-  app.append(el("p", { class: "dicas-intro" }, "Escolhe 2 ou 3 jogadores para comparar os perfis por 80 minutos lado a lado. O melhor valor de cada indicador fica destacado (verde = bom; vermelho = indicador a reduzir)."));
+  app.append(el("p", { class: "dicas-intro" }, "Escolhe 2 ou 3 jogadores para comparar os perfis por 80 minutos lado a lado: primeiro no radar (ofensivas em cima, defensivas em baixo) e depois indicador a indicador. Nas barras, o melhor valor de cada indicador fica destacado (verde = bom; vermelho = indicador a reduzir)."));
 
   // Jogadores com minutos registados
   const agregados = {};
@@ -1179,6 +1179,10 @@ function viewComparar(app) {
     if (uniq.length < 2) { out.append(el("div", { class: "empty" }, "Escolhe pelo menos 2 jogadores diferentes.")); return; }
     const players = uniq.map((n) => agregados[n]);
 
+    // Radar (ofensivas em cima, defensivas em baixo)
+    out.append(radarChart(uniq, radarAgg(state.data)));
+    out.append(el("div", { class: "section-title" }, "Valores por 80 min"));
+
     // Cabeçalho com nomes + posição + minutos
     const header = el("div", { class: "cmp-grid cmp-head", style: `grid-template-columns:1.4fr repeat(${players.length},1fr)` });
     header.append(el("div", { class: "cmp-cell cmp-metric" }, "Por 80 min"));
@@ -1212,6 +1216,133 @@ function viewComparar(app) {
   }
   sel.forEach((s) => s.addEventListener("change", build));
   build();
+}
+
+/* ================= RADAR (comparador) =================
+   Ofensivas na metade de cima, defensivas na metade de baixo.
+   Tudo por 80 min (exceto % de remates à baliza). "Mais longe do centro = melhor":
+   nos indicadores a reduzir a escala é invertida (0 fica na extremidade). */
+const RADAR_COLORS = ["#1f4e8c", "#e0734f", "#2a9d6a"];
+// [label (linhas), chave, tipo, invertido?, ângulo em graus a partir do topo, sentido horário]
+const RADAR_AXES = [
+  [["Remates"], "remates", "p80", false, -84],
+  [["Remate à", "baliza %"], "pctBaliza", "pct", false, -56],
+  [["Passe p/", "finalização"], "passeFinalizacao", "p80", false, -28],
+  [["Golos"], "golos", "p80", false, 0],
+  [["Assistências"], "assistencias", "p80", false, 28],
+  [["Dribles", "conseguidos"], "driblesBemSucedidos", "p80", false, 56],
+  [["Cruzamentos", "conseguidos"], "cruzamentosBemSucedidos", "p80", false, 84],
+  [["Desarmes"], "desarmes", "p80", false, 132],
+  [["Faltas"], "faltas", "p80", true, 168],
+  [["Passes", "errados"], "passesErrados", "p80", true, 204],
+  [["Perdas", "de bola"], "perdasBola", "p80", true, 240],
+];
+
+// Totais da época por jogador (+ remates à baliza a partir dos eventos)
+function radarAgg(data) {
+  const A = {};
+  for (const j of data.jornadas) {
+    for (const p of j.players) {
+      const a = (A[p.nome] ||= { nome: p.nome, minutos: 0, baliza: 0 });
+      a.minutos += +p.minutos || 0;
+      for (const [, k, tipo] of RADAR_AXES) if (tipo === "p80") a[k] = (a[k] || 0) + (+p[k] || 0);
+    }
+    for (const e of j.eventos || []) if (e.acao === "Remate à baliza" && e.jogador && A[e.jogador]) A[e.jogador].baliza++;
+  }
+  for (const a of Object.values(A)) a.baliza = Math.min(a.baliza, a.remates || 0);
+  return A;
+}
+function radarValue(a, key, tipo) {
+  if (tipo === "pct") return a.remates > 0 ? (a.baliza / a.remates) * 100 : 0;
+  return a.minutos > 0 ? ((a[key] || 0) / a.minutos) * 80 : 0;
+}
+// arredonda para cima para um valor "redondo" (1, 2, 2.5, 5, 10 × 10^n)
+function radarNice(v) {
+  if (v <= 0) return 1;
+  const m = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const s of [1, 2, 2.5, 5, 10]) if (s * m >= v - 1e-9) return s * m;
+  return 10 * m;
+}
+function radarFmt(v) { return Number.isInteger(Math.round(v * 100) / 100) ? String(Math.round(v)) : (Math.round(v * 10) / 10).toString(); }
+
+function radarChart(players, agg) {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = (tag, attrs, text) => { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (text != null) n.textContent = text; return n; };
+  const W = 640, H = 600, cx = W / 2, cy = 300, R = 210;
+  const rad = (deg) => (deg * Math.PI) / 180;
+  const pt = (deg, r) => [cx + r * Math.sin(rad(deg)), cy - r * Math.cos(rad(deg))];
+
+  // Escala de cada eixo: melhor/pior valor do plantel com minutos suficientes
+  const todos = Object.values(agg).filter((a) => a.minutos > 0);
+  const base = todos.filter((a) => a.minutos >= P80_MIN_EPOCA).length ? todos.filter((a) => a.minutos >= P80_MIN_EPOCA) : todos;
+  const escala = RADAR_AXES.map(([, key, tipo]) => (tipo === "pct" ? 100 : radarNice(Math.max(...base.map((a) => radarValue(a, key, tipo))))));
+  // fração 0..1 do centro para fora (invertidos: 0 = extremidade)
+  const frac = (v, i) => { const f = Math.max(0, Math.min(1, v / escala[i])); return RADAR_AXES[i][3] ? 1 - f : f; };
+
+  const svg = s("svg", { viewBox: `0 0 ${W} ${H}`, class: "radar-chart", role: "img", "aria-label": "Radar de comparação de jogadores" });
+  // metades: ofensiva (cima) e defensiva (baixo), separadas a ±108°
+  const sector = (a0, a1, cls) => {
+    const [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R);
+    svg.append(s("path", { d: `M${cx},${cy} L${x0},${y0} A${R},${R} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1},${y1} Z`, class: cls }));
+  };
+  sector(-108, 108, "radar-off");
+  sector(108, 252, "radar-def");
+  for (let k = 1; k <= 5; k++) svg.append(s("circle", { cx, cy, r: (R * k) / 5, class: "radar-ring" }));
+  svg.append(s("text", { x: cx, y: cy - R - 52, class: "radar-half", "text-anchor": "middle" }, "OFENSIVAS"));
+  svg.append(s("text", { x: cx, y: cy + R + 62, class: "radar-half def", "text-anchor": "middle" }, "DEFENSIVAS"));
+
+  RADAR_AXES.forEach(([lbl, , tipo, inv, deg], i) => {
+    const [x, y] = pt(deg, R);
+    svg.append(s("line", { x1: cx, y1: cy, x2: x, y2: y, class: "radar-axis" }));
+    // valores de escala a meio e na extremidade
+    [0.5, 1].forEach((f) => {
+      const v = inv ? escala[i] * (1 - f) : escala[i] * f;
+      const [tx, ty] = pt(deg, R * f);
+      svg.append(s("text", { x: tx, y: ty + 4, class: "radar-tick", "text-anchor": "middle" }, radarFmt(v) + (tipo === "pct" ? "%" : "")));
+    });
+    // rótulo do eixo
+    const [lx, ly] = pt(deg, R + 22);
+    const sx = Math.sin(rad(deg));
+    const anchor = Math.abs(sx) < 0.2 ? "middle" : sx > 0 ? "start" : "end";
+    const cy0 = Math.cos(rad(deg));
+    const nl = lbl.length + (inv ? 1 : 0); // n.º de linhas do rótulo
+    const y0 = cy0 > 0.3 ? ly - (nl - 1) * 13 : cy0 < -0.3 ? ly + 12 : ly + 4 - ((nl - 1) * 13) / 2;
+    const t = s("text", { x: lx, y: y0, class: "radar-lbl", "text-anchor": anchor });
+    lbl.forEach((line, k) => t.append(s("tspan", { x: lx, dy: k ? 13 : 0 }, line)));
+    if (inv) t.append(s("tspan", { x: lx, dy: 13, class: "radar-inv" }, "(menos é melhor)"));
+    svg.append(t);
+  });
+
+  // polígonos dos jogadores
+  players.forEach((nome, pi) => {
+    const a = agg[nome];
+    const cor = RADAR_COLORS[pi];
+    const pts = RADAR_AXES.map(([, key, tipo, , deg], i) => pt(deg, R * frac(radarValue(a, key, tipo), i)));
+    svg.append(s("polygon", { points: pts.map((p) => p.join(",")).join(" "), class: "radar-poly", fill: cor, stroke: cor }));
+    RADAR_AXES.forEach(([lbl, key, tipo], i) => {
+      const v = radarValue(a, key, tipo);
+      const dot = s("circle", { cx: pts[i][0], cy: pts[i][1], r: 4.5, fill: cor, class: "radar-dot" });
+      dot.append(s("title", {}, `${nome} — ${lbl.join(" ")}: ${radarFmt(v)}${tipo === "pct" ? "%" : " / 80 min"}${v > escala[i] && !RADAR_AXES[i][3] ? " (acima da escala)" : ""}`));
+      svg.append(dot);
+    });
+  });
+
+  const box = el("div", { class: "radar-box" });
+  const wrap = el("div", { class: "radar-wrap" });
+  wrap.append(svg);
+  box.append(wrap);
+  const legend = el("div", { class: "radar-legend" });
+  players.forEach((nome, pi) => {
+    const a = agg[nome];
+    legend.append(el("span", { class: "radar-lg", onclick: () => openPlayerModal(nome) },
+      el("span", { class: "radar-sw", style: `background:${RADAR_COLORS[pi]}` }),
+      el("strong", {}, nome),
+      el("span", { class: "cmp-sub" }, ` ${a.minutos} min${a.minutos < P80_MIN_EPOCA ? " · poucos minutos" : ""}`)));
+  });
+  box.append(legend);
+  box.append(el("p", { class: "pf-note" },
+    `Tudo por 80 min, exceto "Remate à baliza %" (remates à baliza ÷ remates). Mais longe do centro = melhor. Em Faltas, Passes errados e Perdas de bola a escala é invertida: a extremidade é 0. A escala de cada eixo vai até ao melhor (ou pior, nos invertidos) valor do plantel entre jogadores com ≥${P80_MIN_EPOCA} min.`));
+  return box;
 }
 
 /* ================= POSSE DE BOLA (cronómetros) =================
