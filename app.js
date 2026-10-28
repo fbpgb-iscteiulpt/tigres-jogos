@@ -261,10 +261,9 @@ function computeKings(data) {
   }
   const players = Object.entries(P).map(([nome, games]) => ({ nome, games }));
   const jogou = (g) => (+g.minutos || 0) > 0;       // participou
-  const min40 = (g) => (+g.minutos || 0) >= 40;     // ≥40 minutos
   // Ranking de contagem com dois separadores:
-  //  - total: soma na época (jogos que passam no filtro)
-  //  - p80:   soma ÷ minutos × 80, só com jogos ≥ EVO_MIN_EXTRAPOLAR min (não extrapola jogos curtos)
+  //  - total: soma na época
+  //  - p80:   soma ÷ minutos jogados na época × 80
   function rankingDual(metric, dir, filter) {
     const total = [], p80 = [];
     for (const pl of players) {
@@ -272,12 +271,8 @@ function computeKings(data) {
       if (!gs.length) continue;
       const soma = gs.reduce((s, g) => s + (+g[metric] || 0), 0);
       total.push({ nome: pl.nome, avg: soma, total: soma, jogos: gs.length });
-      const longos = gs.filter((g) => (+g.minutos || 0) >= EVO_MIN_EXTRAPOLAR);
-      const min = longos.reduce((s, g) => s + (+g.minutos || 0), 0);
-      if (min > 0) {
-        const v = longos.reduce((s, g) => s + (+g[metric] || 0), 0);
-        p80.push({ nome: pl.nome, avg: (v / min) * 80, min, jogos: longos.length });
-      }
+      const min = gs.reduce((s, g) => s + (+g.minutos || 0), 0);
+      if (min > 0) p80.push({ nome: pl.nome, avg: (soma / min) * 80, min, jogos: gs.length });
     }
     const ord = (k) => (a, b) => (dir === "max" ? b[k] - a[k] : a[k] - b[k]) || a.nome.localeCompare(b.nome);
     total.sort(ord("total"));
@@ -318,7 +313,7 @@ function computeKings(data) {
   return {
     golos: rankingDual("golos", "max", jogou),
     assistencias: rankingDual("assistencias", "max", jogou),
-    consistency: rankingDual("passesErrados", "min", min40),
+    consistency: rankingDual("passesErrados", "min", jogou),
     keyPass: rankingDual("passeFinalizacao", "max", jogou),
     recovery: rankingDual("desarmes", "max", jogou),
     shooting: rankingDual("remates", "max", jogou),
@@ -380,7 +375,7 @@ function viewEpoca(app) {
   kings.append(
     kingCard("⚽", "Golden Boot", "Mais golos", K.golos),
     kingCard("🅰️", "Assist King", "Mais assistências", K.assistencias),
-    kingCard("👑", "Consistency King", "Menos passes falhados", K.consistency, "unidade", "(só jogos com ≥40 min)"),
+    kingCard("👑", "Consistency King", "Menos passes falhados", K.consistency),
     kingCard("🎯", "Key Pass King", "Mais passes p/ finalização", K.keyPass),
     kingCard("🛡️", "Recovery King", "Mais desarmes", K.recovery),
     kingCard("🥅", "Shooting King", "Mais remates", K.shooting),
@@ -394,7 +389,7 @@ function viewEpoca(app) {
     kingCard("🧿", "Pés de tijolo", "Pior % de dribles conseguidos", K.peDeTijolo, "unidade", "(mín. 1 drible efetuado)", fmtRatio),
   );
   app.append(kings);
-  app.append(el("p", { class: "hint" }, `Total = soma na época. Por 80 min = total ÷ minutos × 80, contando só jogos com pelo menos ${EVO_MIN_EXTRAPOLAR} minutos (jogos mais curtos não são extrapolados).`));
+  app.append(el("p", { class: "hint" }, "Total = soma na época. Por 80 min = total ÷ minutos jogados na época × 80."));
 }
 
 // Formatação de valor para os cartões de rácio (percentagem)
