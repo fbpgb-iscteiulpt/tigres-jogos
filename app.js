@@ -272,11 +272,12 @@ function computeKings(data) {
       const soma = gs.reduce((s, g) => s + (+g[metric] || 0), 0);
       total.push({ nome: pl.nome, avg: soma, total: soma, jogos: gs.length });
       const min = gs.reduce((s, g) => s + (+g.minutos || 0), 0);
-      if (min > 0) p80.push({ nome: pl.nome, avg: (soma / min) * 80, min, jogos: gs.length });
+      if (min > 0) p80.push({ nome: pl.nome, avg: (soma / min) * 80, min, jogos: gs.length, insuf: min < P80_MIN_EPOCA });
     }
     const ord = (k) => (a, b) => (dir === "max" ? b[k] - a[k] : a[k] - b[k]) || a.nome.localeCompare(b.nome);
     total.sort(ord("total"));
-    p80.sort(ord("avg"));
+    // por 80 min: quem tem minutos suficientes primeiro (ordenado); os restantes no fim, por minutos
+    p80.sort((a, b) => (a.insuf - b.insuf) || (a.insuf ? b.min - a.min || a.nome.localeCompare(b.nome) : ord("avg")(a, b)));
     return { total, p80 }; // listas completas (o cartão mostra o top 3; o popup mostra tudo)
   }
   // Ranking por rácio: soma de "num" a dividir pela soma de (num+den) em todos os jogos.
@@ -389,7 +390,7 @@ function viewEpoca(app) {
     kingCard("🧿", "Pés de tijolo", "Pior % de dribles conseguidos", K.peDeTijolo, "unidade", "(mín. 1 drible efetuado)", fmtRatio),
   );
   app.append(kings);
-  app.append(el("p", { class: "hint" }, "Total = soma na época. Por 80 min = total ÷ minutos jogados na época × 80."));
+  app.append(el("p", { class: "hint" }, `Total = soma na época. Por 80 min = total ÷ minutos jogados na época × 80 (só entram no ranking jogadores com pelo menos ${P80_MIN_EPOCA} min na época).`));
 }
 
 // Formatação de valor para os cartões de rácio (percentagem)
@@ -400,6 +401,8 @@ function fmtRatio(r, isLeader) {
 // Formatação dos separadores dos cartões de contagem
 function fmtTotal(r) { return `${r.total}`; }
 function fmtP80(r, isLeader) { const v = (Math.round(r.avg * 10) / 10).toFixed(1); return isLeader ? `${v} / 80 min` : v; }
+// Mínimo de minutos na época para entrar nos rankings "por 80 min"
+const P80_MIN_EPOCA = 80;
 const KING_TABS = [["total", "Total", fmtTotal], ["p80", "Por 80 min", fmtP80]];
 
 // Cartão de highlight. `data` é uma lista (rácios) ou { total, p80 } (contagens, com separadores).
@@ -411,22 +414,26 @@ function kingCard(icon, title, subtitle, data, unit, note, valFmt) {
   const body = el("div", { class: "king-body" });
   const show = (rows, fmt, tabLabel) => {
     body.innerHTML = "";
-    if (!rows || !rows.length) { body.append(el("div", { class: "empty" }, "Sem dados")); return; }
-    const top3 = rows.slice(0, 3);
-    const leader = top3[0];
-    body.append(el("div", { class: "king-leader", onclick: () => openPlayerModal(leader.nome) },
-      el("span", { class: "king-name" }, leader.nome),
-      el("span", { class: "king-val" }, fmt(leader, true))));
-    const rest = top3.slice(1);
-    if (rest.length) {
-      const list = el("div", { class: "king-rest" });
-      rest.forEach((r, i) => list.append(el("div", { class: "king-rest-row", onclick: () => openPlayerModal(r.nome) },
-        el("span", { class: "king-rank" }, (i + 2) + "."),
-        el("span", { class: "king-rname" }, r.nome),
-        el("span", { class: "king-rval" }, fmt(r, false)))));
-      body.append(list);
+    const ranked = (rows || []).filter((r) => !r.insuf); // no cartão só entram jogadores com minutos suficientes
+    if (!ranked.length) {
+      body.append(el("div", { class: "empty" }, rows && rows.length ? `Ninguém tem ainda ${P80_MIN_EPOCA} min na época` : "Sem dados"));
+    } else {
+      const top3 = ranked.slice(0, 3);
+      const leader = top3[0];
+      body.append(el("div", { class: "king-leader", onclick: () => openPlayerModal(leader.nome) },
+        el("span", { class: "king-name" }, leader.nome),
+        el("span", { class: "king-val" }, fmt(leader, true))));
+      const rest = top3.slice(1);
+      if (rest.length) {
+        const list = el("div", { class: "king-rest" });
+        rest.forEach((r, i) => list.append(el("div", { class: "king-rest-row", onclick: () => openPlayerModal(r.nome) },
+          el("span", { class: "king-rank" }, (i + 2) + "."),
+          el("span", { class: "king-rname" }, r.nome),
+          el("span", { class: "king-rval" }, fmt(r, false)))));
+        body.append(list);
+      }
     }
-    if (rows.length > 3) {
+    if (rows && rows.length > Math.min(3, ranked.length)) {
       body.append(el("button", { class: "king-more", onclick: () => openRankingModal(icon, title, subtitle, note, rows, fmt, tabLabel) },
         `Ver lista completa (${rows.length})`));
     }
@@ -459,11 +466,17 @@ function openRankingModal(icon, title, subtitle, note, rows, valFmt, tabLabel) {
   t.append(el("thead", {}, el("tr", {}, el("th", { class: "rank" }, "#"), el("th", {}, "Jogador"),
     el("th", { class: "num" }, isP80 ? "Por 80 min" : "Valor"), isP80 ? el("th", { class: "num" }, "Minutos") : null)));
   const tb = el("tbody");
-  rows.forEach((r, i) => {
-    const tr = el("tr", { class: i === 0 ? "rank-leader" : "" },
-      el("td", { class: "rank" }, i + 1),
+  let pos = 0, sepFeito = false;
+  rows.forEach((r) => {
+    if (r.insuf && !sepFeito) {
+      sepFeito = true;
+      tb.append(el("tr", { class: "rank-sep" }, el("td", { colspan: isP80 ? 4 : 3 }, `Sem minutos suficientes (menos de ${P80_MIN_EPOCA} min na época) — fora do ranking`)));
+    }
+    if (!r.insuf) pos++;
+    const tr = el("tr", { class: r.insuf ? "rank-insuf" : pos === 1 ? "rank-leader" : "" },
+      el("td", { class: "rank" }, r.insuf ? "—" : pos),
       el("td", {}, r.nome),
-      el("td", { class: "num" }, isP80 ? fmtP80(r, false) : valFmt(r, i === 0)),
+      el("td", { class: "num" }, isP80 ? fmtP80(r, false) : valFmt(r, pos === 1)),
       isP80 ? el("td", { class: "num" }, r.min) : null);
     tr.addEventListener("click", () => openPlayerModal(r.nome));
     tb.append(tr);
