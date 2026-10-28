@@ -260,19 +260,30 @@ function computeKings(data) {
     for (const p of j.players) (P[p.nome] ||= []).push(p);
   }
   const players = Object.entries(P).map(([nome, games]) => ({ nome, games }));
-  // metric = stat key; dir 'max'|'min'; filter = quais jogos contam
-  function ranking(metric, dir, filter) {
-    const rows = players.map((pl) => {
-      const gs = pl.games.filter(filter);
-      if (!gs.length) return null;
-      const total = gs.reduce((s, g) => s + (+g[metric] || 0), 0);
-      return { nome: pl.nome, avg: total / gs.length, jogos: gs.length };
-    }).filter(Boolean);
-    rows.sort((a, b) => dir === "max" ? b.avg - a.avg || a.nome.localeCompare(b.nome) : a.avg - b.avg || a.nome.localeCompare(b.nome));
-    return rows; // lista completa (o cartão mostra o top 3; o popup mostra tudo)
-  }
   const jogou = (g) => (+g.minutos || 0) > 0;       // participou
   const min40 = (g) => (+g.minutos || 0) >= 40;     // ≥40 minutos
+  // Ranking de contagem com dois separadores:
+  //  - total: soma na época (jogos que passam no filtro)
+  //  - p80:   soma ÷ minutos × 80, só com jogos ≥ EVO_MIN_EXTRAPOLAR min (não extrapola jogos curtos)
+  function rankingDual(metric, dir, filter) {
+    const total = [], p80 = [];
+    for (const pl of players) {
+      const gs = pl.games.filter(filter);
+      if (!gs.length) continue;
+      const soma = gs.reduce((s, g) => s + (+g[metric] || 0), 0);
+      total.push({ nome: pl.nome, avg: soma, total: soma, jogos: gs.length });
+      const longos = gs.filter((g) => (+g.minutos || 0) >= EVO_MIN_EXTRAPOLAR);
+      const min = longos.reduce((s, g) => s + (+g.minutos || 0), 0);
+      if (min > 0) {
+        const v = longos.reduce((s, g) => s + (+g[metric] || 0), 0);
+        p80.push({ nome: pl.nome, avg: (v / min) * 80, min, jogos: longos.length });
+      }
+    }
+    const ord = (k) => (a, b) => (dir === "max" ? b[k] - a[k] : a[k] - b[k]) || a.nome.localeCompare(b.nome);
+    total.sort(ord("total"));
+    p80.sort(ord("avg"));
+    return { total, p80 }; // listas completas (o cartão mostra o top 3; o popup mostra tudo)
+  }
   // Ranking por rácio: soma de "num" a dividir pela soma de (num+den) em todos os jogos.
   // Só conta jogadores com pelo menos 1 tentativa (num+den > 0).
   function rankingRatio(numKey, denKey, dir) {
@@ -284,17 +295,6 @@ function computeKings(data) {
       return { nome: pl.nome, avg: bem / tent, bem, tent };
     }).filter(Boolean);
     rows.sort((a, b) => dir === "max" ? b.avg - a.avg || b.tent - a.tent || a.nome.localeCompare(b.nome) : a.avg - b.avg || b.tent - a.tent || a.nome.localeCompare(b.nome));
-    return rows; // lista completa (o cartão mostra o top 3; o popup mostra tudo)
-  }
-  // Ranking por TOTAL acumulado na época (soma, sem dividir por jogos)
-  function rankingTotal(metric, dir, filter) {
-    const rows = players.map((pl) => {
-      const gs = pl.games.filter(filter);
-      if (!gs.length) return null;
-      const total = gs.reduce((s, g) => s + (+g[metric] || 0), 0);
-      return { nome: pl.nome, avg: total, total, jogos: gs.length };
-    }).filter(Boolean);
-    rows.sort((a, b) => dir === "max" ? b.total - a.total || a.nome.localeCompare(b.nome) : a.total - b.total || a.nome.localeCompare(b.nome));
     return rows; // lista completa (o cartão mostra o top 3; o popup mostra tudo)
   }
   // Precisão de remate: remates à baliza (dos eventos) ÷ remates totais (stat).
@@ -316,14 +316,16 @@ function computeKings(data) {
     return rows; // lista completa (o cartão mostra o top 3; o popup mostra tudo)
   }
   return {
-    consistency: ranking("passesErrados", "min", min40),
-    keyPass: ranking("passeFinalizacao", "max", jogou),
-    recovery: ranking("desarmes", "max", jogou),
-    shooting: ranking("remates", "max", jogou),
-    noX: ranking("perdasBola", "max", jogou),
-    blindPasser: ranking("passesErrados", "max", jogou),
-    foul: ranking("faltas", "max", jogou),
-    drible: rankingTotal("driblesBemSucedidos", "max", jogou),
+    golos: rankingDual("golos", "max", jogou),
+    assistencias: rankingDual("assistencias", "max", jogou),
+    consistency: rankingDual("passesErrados", "min", min40),
+    keyPass: rankingDual("passeFinalizacao", "max", jogou),
+    recovery: rankingDual("desarmes", "max", jogou),
+    shooting: rankingDual("remates", "max", jogou),
+    noX: rankingDual("perdasBola", "max", jogou),
+    blindPasser: rankingDual("passesErrados", "max", jogou),
+    foul: rankingDual("faltas", "max", jogou),
+    drible: rankingDual("driblesBemSucedidos", "max", jogou),
     dribleEfficiency: rankingRatio("driblesBemSucedidos", "driblesFalhados", "max"),
     peDeTijolo: rankingRatio("driblesBemSucedidos", "driblesFalhados", "min"),
     crossing: rankingRatio("cruzamentosBemSucedidos", "cruzamentosFalhados", "max"),
@@ -376,20 +378,23 @@ function viewEpoca(app) {
   app.append(el("div", { class: "section-title" }, "Highlights da Época"));
   const kings = el("div", { class: "grid kings" });
   kings.append(
-    kingCard("👑", "Consistency King", "Menos passes falhados por jogo", K.consistency, "unidade", "(mín. 40 min por jogo)"),
-    kingCard("🎯", "Key Pass King", "Mais passes p/ finalização por jogo", K.keyPass, "unidade"),
-    kingCard("🛡️", "Recovery King", "Mais desarmes por jogo", K.recovery, "unidade"),
-    kingCard("🥅", "Shooting King", "Mais remates por jogo", K.shooting, "unidade"),
+    kingCard("⚽", "Golden Boot", "Mais golos", K.golos),
+    kingCard("🅰️", "Assist King", "Mais assistências", K.assistencias),
+    kingCard("👑", "Consistency King", "Menos passes falhados", K.consistency, "unidade", "(só jogos com ≥40 min)"),
+    kingCard("🎯", "Key Pass King", "Mais passes p/ finalização", K.keyPass),
+    kingCard("🛡️", "Recovery King", "Mais desarmes", K.recovery),
+    kingCard("🥅", "Shooting King", "Mais remates", K.shooting),
     kingCard("🎯", "Sniper — Precisão de remate", "Melhor % de remates à baliza", K.precisaoRemate, "unidade", "(remates à baliza ÷ remates)", fmtRatio),
-    kingCard("🧱", 'No "X" King', "Mais perdas de bola por jogo", K.noX, "unidade"),
-    kingCard("🙈", "The Blind Passer", "Mais passes falhados por jogo", K.blindPasser, "unidade"),
-    kingCard("🥊", "The Foul King", "Mais faltas por jogo", K.foul, "unidade"),
-    kingCard("⚡", "Drible King", "Mais dribles bem sucedidos", K.drible, "unidade", "(total na época)", fmtTotal),
+    kingCard("🧱", 'No "X" King', "Mais perdas de bola", K.noX),
+    kingCard("🙈", "The Blind Passer", "Mais passes falhados", K.blindPasser),
+    kingCard("🥊", "The Foul King", "Mais faltas", K.foul),
+    kingCard("⚡", "Drible King", "Mais dribles bem sucedidos", K.drible),
     kingCard("🎩", "Drible Efficiency King", "Melhor % de dribles conseguidos", K.dribleEfficiency, "unidade", "(dribles bem sucedidos ÷ efetuados)", fmtRatio),
     kingCard("🎯", "Crossing King", "Melhor % de cruzamentos conseguidos", K.crossing, "unidade", "(cruzamentos bem sucedidos ÷ efetuados)", fmtRatio),
     kingCard("🧿", "Pés de tijolo", "Pior % de dribles conseguidos", K.peDeTijolo, "unidade", "(mín. 1 drible efetuado)", fmtRatio),
   );
   app.append(kings);
+  app.append(el("p", { class: "hint" }, `Total = soma na época. Por 80 min = total ÷ minutos × 80, contando só jogos com pelo menos ${EVO_MIN_EXTRAPOLAR} minutos (jogos mais curtos não são extrapolados).`));
 }
 
 // Formatação de valor para os cartões de rácio (percentagem)
@@ -397,51 +402,74 @@ function fmtRatio(r, isLeader) {
   const p = Math.round(r.avg * 100);
   return `${p}% (${r.bem}/${r.tent})`;
 }
-// Formatação de valor para cartões de total acumulado (número inteiro)
-function fmtTotal(r, isLeader) {
-  return `${r.total}`;
-}
+// Formatação dos separadores dos cartões de contagem
+function fmtTotal(r) { return `${r.total}`; }
+function fmtP80(r, isLeader) { const v = (Math.round(r.avg * 10) / 10).toFixed(1); return isLeader ? `${v} / 80 min` : v; }
+const KING_TABS = [["total", "Total", fmtTotal], ["p80", "Por 80 min", fmtP80]];
 
-function kingCard(icon, title, subtitle, rows, unit, note, valFmt) {
+// Cartão de highlight. `data` é uma lista (rácios) ou { total, p80 } (contagens, com separadores).
+function kingCard(icon, title, subtitle, data, unit, note, valFmt) {
   const card = el("div", { class: "card king" });
   card.append(el("div", { class: "king-title" }, el("span", { class: "king-icon" }, icon), el("span", {}, title)));
   card.append(el("div", { class: "king-sub" }, subtitle + (note ? " " + note : "")));
-  if (!rows || !rows.length) { card.append(el("div", { class: "empty" }, "Sem dados")); return card; }
-  const top3 = rows.slice(0, 3);
-  const leader = top3[0];
-  const lead = el("div", { class: "king-leader", onclick: () => openPlayerModal(leader.nome) },
-    el("span", { class: "king-name" }, leader.nome),
-    el("span", { class: "king-val" }, valFmt ? valFmt(leader, true) : `${leader.avg.toFixed(1)} / jogo`));
-  card.append(lead);
-  const rest = top3.slice(1);
-  if (rest.length) {
-    const list = el("div", { class: "king-rest" });
-    rest.forEach((r, i) => list.append(el("div", { class: "king-rest-row", onclick: () => openPlayerModal(r.nome) },
-      el("span", { class: "king-rank" }, (i + 2) + "."),
-      el("span", { class: "king-rname" }, r.nome),
-      el("span", { class: "king-rval" }, valFmt ? valFmt(r, false) : `${r.avg.toFixed(1)}`))));
-    card.append(list);
+  const dual = data && !Array.isArray(data);
+  const body = el("div", { class: "king-body" });
+  const show = (rows, fmt, tabLabel) => {
+    body.innerHTML = "";
+    if (!rows || !rows.length) { body.append(el("div", { class: "empty" }, "Sem dados")); return; }
+    const top3 = rows.slice(0, 3);
+    const leader = top3[0];
+    body.append(el("div", { class: "king-leader", onclick: () => openPlayerModal(leader.nome) },
+      el("span", { class: "king-name" }, leader.nome),
+      el("span", { class: "king-val" }, fmt(leader, true))));
+    const rest = top3.slice(1);
+    if (rest.length) {
+      const list = el("div", { class: "king-rest" });
+      rest.forEach((r, i) => list.append(el("div", { class: "king-rest-row", onclick: () => openPlayerModal(r.nome) },
+        el("span", { class: "king-rank" }, (i + 2) + "."),
+        el("span", { class: "king-rname" }, r.nome),
+        el("span", { class: "king-rval" }, fmt(r, false)))));
+      body.append(list);
+    }
+    if (rows.length > 3) {
+      body.append(el("button", { class: "king-more", onclick: () => openRankingModal(icon, title, subtitle, note, rows, fmt, tabLabel) },
+        `Ver lista completa (${rows.length})`));
+    }
+  };
+  if (dual) {
+    const tabs = el("div", { class: "king-tabs" });
+    const btns = KING_TABS.map(([key, label, fmt]) => {
+      const b = el("button", { type: "button" }, label);
+      b.addEventListener("click", () => { btns.forEach((x) => x.classList.toggle("active", x === b)); show(data[key], fmt, label); });
+      return b;
+    });
+    tabs.append(...btns);
+    card.append(tabs);
+    btns[0].classList.add("active");
+    show(data.total, fmtTotal, KING_TABS[0][1]); // default: Total
+  } else {
+    show(data, valFmt || fmtTotal, null);
   }
-  if (rows.length > 3) {
-    card.append(el("button", { class: "king-more", onclick: () => openRankingModal(icon, title, subtitle, note, rows, valFmt) },
-      `Ver lista completa (${rows.length})`));
-  }
+  card.append(body);
   return card;
 }
 
 // Popup com o ranking completo de um "king"
-function openRankingModal(icon, title, subtitle, note, rows, valFmt) {
+function openRankingModal(icon, title, subtitle, note, rows, valFmt, tabLabel) {
   const b = $("#modalBody"); b.innerHTML = "";
   b.append(el("h2", {}, el("span", {}, icon), el("span", {}, title)));
-  b.append(el("p", { class: "hint" }, subtitle + (note ? " " + note : "")));
+  b.append(el("p", { class: "hint" }, subtitle + (tabLabel ? ` — ${tabLabel}` : "") + (note ? " " + note : "")));
+  const isP80 = valFmt === fmtP80;
   const t = el("table", { class: "rank-full" });
-  t.append(el("thead", {}, el("tr", {}, el("th", { class: "rank" }, "#"), el("th", {}, "Jogador"), el("th", { class: "num" }, "Valor"))));
+  t.append(el("thead", {}, el("tr", {}, el("th", { class: "rank" }, "#"), el("th", {}, "Jogador"),
+    el("th", { class: "num" }, isP80 ? "Por 80 min" : "Valor"), isP80 ? el("th", { class: "num" }, "Minutos") : null)));
   const tb = el("tbody");
   rows.forEach((r, i) => {
     const tr = el("tr", { class: i === 0 ? "rank-leader" : "" },
       el("td", { class: "rank" }, i + 1),
       el("td", {}, r.nome),
-      el("td", { class: "num" }, valFmt ? valFmt(r, i === 0) : `${r.avg.toFixed(1)} / jogo`));
+      el("td", { class: "num" }, isP80 ? fmtP80(r, false) : valFmt(r, i === 0)),
+      isP80 ? el("td", { class: "num" }, r.min) : null);
     tr.addEventListener("click", () => openPlayerModal(r.nome));
     tb.append(tr);
   });
