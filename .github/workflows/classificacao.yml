@@ -2,11 +2,15 @@ name: Atualizar classificação
 
 on:
   schedule:
-    - cron: "0 */3 * * *"   # de 6 em 6 horas
+    - cron: "0 */3 * * *"   # de 3 em 3 horas
   workflow_dispatch:         # botão "Run workflow" para correr à mão
 
 permissions:
   contents: write
+
+concurrency:
+  group: data-json           # não corre ao mesmo tempo que a atualização dos vídeos
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -24,4 +28,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
           git commit -m "Atualizar classificação (CIF)"
+          git pull --rebase
           git push
