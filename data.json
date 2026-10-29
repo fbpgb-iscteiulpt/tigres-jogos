@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-10-27T15:09:50.849Z",
-    "versao": 11
+    "atualizado": "2026-10-29T12:03:23.626Z",
+    "versao": 12
   },
   "listas": {
     "jogadores": [
@@ -80,9 +80,12 @@
       "Briosa"
     ],
     "acontecimentos": [
-      "Remate à baliza",
-      "Remate bloqueado",
-      "Remate fora",
+      "Remate à baliza fora de area",
+      "Remate bloqueado fora de area",
+      "Remate para fora fora de area",
+      "Remate à baliza de dentro de area",
+      "Remate bloqueado de dentro de area",
+      "Remate fora de dentro de area",
       "Falta",
       "Passe errado",
       "Perda de bola",
@@ -103,8 +106,10 @@
       "Falta sofrida",
       "Defesa",
       "Assistência",
-      "Remate sofrido",
-      "Remate sofrido à baliza",
+      "Remate sofrido fora de area",
+      "Remate sofrido à baliza fora de area",
+      "Remate sofrido dentro de area",
+      "Remate sofrido à baliza dentro de area",
       "Cruzamento falhado",
       "Cruzamento bem sucedido",
       "Drible bem sucedido",
@@ -127,7 +132,7 @@
         },
         "Remates": {
           "tigres": 8,
-          "adversario": 8
+          "adversario": 6
         },
         "Remates à baliza": {
           "tigres": 3,
@@ -534,7 +539,7 @@
           "jogador": "Rodrigo"
         },
         {
-          "acao": "Remate bloqueado",
+          "acao": "Remate bloqueado fora de area",
           "jogador": "Sobral"
         },
         {
@@ -542,7 +547,7 @@
           "jogador": null
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza de dentro de area",
           "jogador": "Branco"
         },
         {
@@ -694,11 +699,11 @@
           "jogador": "Tigrão"
         },
         {
-          "acao": "Remate bloqueado",
+          "acao": "Remate bloqueado fora de area",
           "jogador": "Paiva"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Paiva"
         },
         {
@@ -714,8 +719,13 @@
           "jogador": "Branco"
         },
         {
-          "acao": "Golo sofrido de bola parada",
+          "acao": "Remate sofrido à baliza fora de area",
           "jogador": null
+        },
+        {
+          "acao": "Golo sofrido de bola parada",
+          "jogador": null,
+          "minuto": 36
         },
         {
           "acao": "Livre direto defensivo",
@@ -842,8 +852,13 @@
           "jogador": "Stijn"
         },
         {
-          "acao": "Golo sofrido normal",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
+        },
+        {
+          "acao": "Golo sofrido normal",
+          "jogador": null,
+          "minuto": 49
         },
         {
           "acao": "Passe errado",
@@ -870,11 +885,11 @@
           "jogador": null
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza fora de area",
           "jogador": "Tomas M"
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza de dentro de area",
           "jogador": "Rodrigo"
         },
         {
@@ -970,7 +985,7 @@
           "jogador": null
         },
         {
-          "acao": "Remate bloqueado",
+          "acao": "Remate bloqueado fora de area",
           "jogador": "Tigrão"
         },
         {
@@ -1102,8 +1117,13 @@
           "jogador": "Jacob"
         },
         {
-          "acao": "Golo sofrido normal",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
+        },
+        {
+          "acao": "Golo sofrido normal",
+          "jogador": null,
+          "minuto": 78
         },
         {
           "acao": "Passe errado",
@@ -1118,7 +1138,7 @@
           "jogador": "Miguel Cruz"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate fora de dentro de area",
           "jogador": "Tomas M"
         },
         {
@@ -1252,6 +1272,18 @@
         {
           "acao": "Drible bem sucedido",
           "jogador": "Tigrão"
+        },
+        {
+          "acao": "Remate sofrido dentro de area",
+          "jogador": null
+        },
+        {
+          "acao": "Remate sofrido dentro de area",
+          "jogador": null
+        },
+        {
+          "acao": "Remate sofrido à baliza dentro de area",
+          "jogador": null
         }
       ],
       "data": "19 / 20 Setembro",
@@ -1272,7 +1304,7 @@
         },
         "Remates": {
           "tigres": 4,
-          "adversario": 15
+          "adversario": 14
         },
         "Remates à baliza": {
           "tigres": 1,
@@ -1603,7 +1635,7 @@
           "jogador": "Jacob"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -1623,7 +1655,7 @@
           "jogador": "Francisco"
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza de dentro de area",
           "jogador": "Nuno G"
         },
         {
@@ -1696,10 +1728,11 @@
         },
         {
           "acao": "Golo sofrido de bola parada",
-          "jogador": null
+          "jogador": null,
+          "minuto": 11
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -1748,10 +1781,11 @@
         },
         {
           "acao": "Golo sofrido de bola parada",
-          "jogador": null
+          "jogador": null,
+          "minuto": 18
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -1759,11 +1793,11 @@
           "jogador": null
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Paulinho"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido dentro de area",
           "jogador": null
         },
         {
@@ -1791,7 +1825,7 @@
           "jogador": "Paulinho"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido dentro de area",
           "jogador": null
         },
         {
@@ -1860,10 +1894,11 @@
         },
         {
           "acao": "Golo sofrido normal",
-          "jogador": null
+          "jogador": null,
+          "minuto": 32
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -1915,7 +1950,7 @@
           "jogador": "Paulinho"
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza fora de area",
           "jogador": null
         },
         {
@@ -1943,7 +1978,7 @@
           "jogador": "Paulinho"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Tomas M"
         },
         {
@@ -1975,7 +2010,7 @@
           "jogador": "Nuno G"
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -2023,7 +2058,7 @@
           "jogador": "Afonso"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -2059,7 +2094,7 @@
           "jogador": null
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -2119,7 +2154,7 @@
           "jogador": "Tigrão"
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -2159,7 +2194,7 @@
           "jogador": "Afonso"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido dentro de area",
           "jogador": null
         },
         {
@@ -2175,7 +2210,7 @@
           "jogador": "Rodrigo"
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -2191,7 +2226,7 @@
           "jogador": "Miguel Cruz"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Nuno G"
         },
         {
@@ -2239,7 +2274,7 @@
           "jogador": "Miguel Cruz"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido dentro de area",
           "jogador": null
         },
         {
@@ -2417,7 +2452,7 @@
         },
         "Remates": {
           "tigres": 8,
-          "adversario": 3
+          "adversario": 2
         },
         "Remates à baliza": {
           "tigres": 3,
@@ -2789,7 +2824,8 @@
         },
         {
           "acao": "Golo marcado de bola parada",
-          "jogador": "Stijn"
+          "jogador": "Stijn",
+          "minuto": 6
         },
         {
           "acao": "Desarme",
@@ -2860,11 +2896,11 @@
           "jogador": null
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza de dentro de area",
           "jogador": "Stijn"
         },
         {
-          "acao": "Remate bloqueado",
+          "acao": "Remate bloqueado fora de area",
           "jogador": "Tomas M"
         },
         {
@@ -2884,7 +2920,7 @@
           "jogador": null
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate fora de dentro de area",
           "jogador": "Stijn"
         },
         {
@@ -2961,10 +2997,11 @@
         },
         {
           "acao": "Golo sofrido de bola parada",
-          "jogador": null
+          "jogador": null,
+          "minuto": 27
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -3104,7 +3141,7 @@
           "jogador": "Tomas M"
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza de dentro de area",
           "jogador": "Ze Miguel"
         },
         {
@@ -3240,7 +3277,7 @@
           "jogador": "Branco"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -3272,7 +3309,7 @@
           "jogador": "Tomas M"
         },
         {
-          "acao": "Remate bloqueado",
+          "acao": "Remate bloqueado fora de area",
           "jogador": "Paulinho"
         },
         {
@@ -3324,7 +3361,7 @@
           "jogador": "Miguel Cruz"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Branco"
         },
         {
@@ -3340,12 +3377,13 @@
           "jogador": "Miguel Cruz"
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza de dentro de area",
           "jogador": "Branco"
         },
         {
           "acao": "Golo marcado de bola parada",
-          "jogador": "Branco"
+          "jogador": "Branco",
+          "minuto": 67
         },
         {
           "acao": "Falta",
@@ -3396,7 +3434,7 @@
           "jogador": "Miguel Cruz"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate fora de dentro de area",
           "jogador": "Jacob"
         },
         {
@@ -3494,7 +3532,7 @@
         },
         "Remates": {
           "tigres": 2,
-          "adversario": 13
+          "adversario": 12
         },
         "Remates à baliza": {
           "tigres": 0,
@@ -3817,7 +3855,7 @@
       ],
       "eventos": [
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -4001,7 +4039,7 @@
           "jogador": null
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido dentro de area",
           "jogador": null
         },
         {
@@ -4069,7 +4107,7 @@
           "jogador": "Tigrão"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido dentro de area",
           "jogador": null
         },
         {
@@ -4093,7 +4131,7 @@
           "jogador": "Simão"
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -4154,10 +4192,11 @@
         },
         {
           "acao": "Golo sofrido de bola parada",
-          "jogador": null
+          "jogador": null,
+          "minuto": 36
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza fora de area",
           "jogador": null
         },
         {
@@ -4165,7 +4204,7 @@
           "jogador": "Paulinho"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -4185,12 +4224,13 @@
           "jogador": null
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
           "acao": "Golo sofrido de bola parada",
-          "jogador": null
+          "jogador": null,
+          "minuto": 40
         },
         {
           "acao": "Passe errado",
@@ -4214,10 +4254,11 @@
         },
         {
           "acao": "Golo sofrido normal",
-          "jogador": null
+          "jogador": null,
+          "minuto": 42
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -4249,7 +4290,7 @@
           "jogador": "Ze Miguel"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -4301,7 +4342,7 @@
           "jogador": "Ze Miguel"
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -4345,11 +4386,11 @@
           "jogador": null
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Paulinho"
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -4457,7 +4498,7 @@
           "jogador": null
         },
         {
-          "acao": "Remate bloqueado",
+          "acao": "Remate bloqueado fora de area",
           "jogador": "Tigrão"
         },
         {
@@ -4477,12 +4518,13 @@
           "jogador": "Fonseca"
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
           "acao": "Golo sofrido normal",
-          "jogador": null
+          "jogador": null,
+          "minuto": 70
         },
         {
           "acao": "Desarme",
@@ -4551,7 +4593,7 @@
         },
         "Remates à baliza": {
           "tigres": 5,
-          "adversario": 3
+          "adversario": 4
         },
         "Cantos": {
           "tigres": 2,
@@ -4902,7 +4944,7 @@
           "jogador": "Tigrão"
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza fora de area",
           "jogador": null
         },
         {
@@ -4922,7 +4964,7 @@
           "jogador": "Miguel Cruz"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido dentro de area",
           "jogador": null
         },
         {
@@ -4994,7 +5036,7 @@
           "jogador": "Paulinho"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -5046,7 +5088,7 @@
           "jogador": "Miguel Cruz"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido à baliza fora de area",
           "jogador": null
         },
         {
@@ -5070,12 +5112,13 @@
           "jogador": "Paulinho"
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza fora de area",
           "jogador": "Rodrigo"
         },
         {
           "acao": "Golo marcado normal",
-          "jogador": "Rodrigo"
+          "jogador": "Rodrigo",
+          "minuto": 17
         },
         {
           "acao": "Assistência",
@@ -5122,12 +5165,13 @@
           "jogador": "Paulinho"
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza fora de area",
           "jogador": "Ze Miguel"
         },
         {
           "acao": "Golo marcado normal",
-          "jogador": "Ze Miguel"
+          "jogador": "Ze Miguel",
+          "minuto": 20
         },
         {
           "acao": "Assistência",
@@ -5159,10 +5203,11 @@
         },
         {
           "acao": "Golo sofrido normal",
-          "jogador": null
+          "jogador": null,
+          "minuto": 24
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -5170,7 +5215,7 @@
           "jogador": "Paulinho"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Paiva"
         },
         {
@@ -5206,7 +5251,7 @@
           "jogador": "Dentes"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Rodrigo"
         },
         {
@@ -5322,7 +5367,7 @@
           "jogador": null
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza de dentro de area",
           "jogador": "Leo"
         },
         {
@@ -5338,7 +5383,7 @@
           "jogador": "Ze Miguel"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Paiva"
         },
         {
@@ -5358,7 +5403,7 @@
           "jogador": "Rodrigo"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Paulinho"
         },
         {
@@ -5422,7 +5467,7 @@
           "jogador": "Leo"
         },
         {
-          "acao": "Remate bloqueado",
+          "acao": "Remate bloqueado fora de area",
           "jogador": "Dentes"
         },
         {
@@ -5430,7 +5475,7 @@
           "jogador": null
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate fora de dentro de area",
           "jogador": "Francisco"
         },
         {
@@ -5518,7 +5563,7 @@
           "jogador": null
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -5531,10 +5576,11 @@
         },
         {
           "acao": "Golo marcado normal",
-          "jogador": "Paiva"
+          "jogador": "Paiva",
+          "minuto": 62
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza de dentro de area",
           "jogador": "Paiva"
         },
         {
@@ -5566,7 +5612,7 @@
           "jogador": null
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Ze Miguel"
         },
         {
@@ -5583,10 +5629,11 @@
         },
         {
           "acao": "Golo sofrido de bola parada",
-          "jogador": null
+          "jogador": null,
+          "minuto": 68
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -5678,7 +5725,7 @@
           "jogador": "Rodrigo"
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza de dentro de area",
           "jogador": "Sergio"
         },
         {
@@ -6039,7 +6086,7 @@
           "jogador": "Fonseca"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -6048,10 +6095,11 @@
         },
         {
           "acao": "Golo sofrido de bola parada",
-          "jogador": null
+          "jogador": null,
+          "minuto": 8
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza dentro de area",
           "jogador": null
         },
         {
@@ -6075,7 +6123,7 @@
           "jogador": "Francisco"
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza fora de area",
           "jogador": null
         },
         {
@@ -6135,7 +6183,7 @@
           "jogador": "Paulinho"
         },
         {
-          "acao": "Remate sofrido à baliza",
+          "acao": "Remate sofrido à baliza fora de area",
           "jogador": null
         },
         {
@@ -6163,7 +6211,7 @@
           "jogador": "Ze Miguel"
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza de dentro de area",
           "jogador": "Paiva"
         },
         {
@@ -6263,7 +6311,7 @@
           "jogador": "Miguel Cruz"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -6387,7 +6435,7 @@
           "jogador": "Leo"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate para fora fora de area",
           "jogador": "Rodrigo"
         },
         {
@@ -6591,7 +6639,7 @@
           "jogador": "Francisco"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -6647,7 +6695,7 @@
           "jogador": "Paiva"
         },
         {
-          "acao": "Remate sofrido",
+          "acao": "Remate sofrido fora de area",
           "jogador": null
         },
         {
@@ -6679,12 +6727,13 @@
           "jogador": "Miguel Cruz"
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza de dentro de area",
           "jogador": "Sergio"
         },
         {
           "acao": "Golo marcado normal",
-          "jogador": "Sergio"
+          "jogador": "Sergio",
+          "minuto": 65
         },
         {
           "acao": "Drible bem sucedido",
@@ -6695,7 +6744,7 @@
           "jogador": "Simão"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate fora de dentro de area",
           "jogador": "Leo"
         },
         {
@@ -6703,12 +6752,13 @@
           "jogador": "Nuno G"
         },
         {
-          "acao": "Remate à baliza",
+          "acao": "Remate à baliza fora de area",
           "jogador": "Nuno G"
         },
         {
           "acao": "Golo marcado normal",
-          "jogador": "Nuno G"
+          "jogador": "Nuno G",
+          "minuto": 66
         },
         {
           "acao": "Desarme",
@@ -6803,7 +6853,7 @@
           "jogador": "Simão"
         },
         {
-          "acao": "Remate fora",
+          "acao": "Remate fora de dentro de area",
           "jogador": "Sergio"
         },
         {
@@ -7242,7 +7292,7 @@
       "dd": 4,
       "gm": 10,
       "gs": 16,
-      "td": 14
+      "td": 16
     },
     {
       "pos": 14,
