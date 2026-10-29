@@ -355,19 +355,8 @@ function viewEpoca(app) {
   );
   app.append(cards);
 
-  app.append(el("div", { class: "section-title" }, "Resultados"));
-  const rec = el("div", { class: "record" });
-  A.results.forEach((r) =>
-    rec.append(el("span", { class: "pill " + (r.res === "?" ? "" : r.res) },
-      `J${r.numero} vs ${r.adversario}: ${r.gf ?? "?"}-${r.ga ?? "?"}`)));
-  app.append(rec);
-
-  // Top scorers / assists
-  app.append(el("div", { class: "section-title" }, "Melhores marcadores"));
-  app.append(topTable(A.playersArr, "golos", ["golos", "remates"], ["Golos", "Remates"]));
-
-  app.append(el("div", { class: "section-title" }, "Mais Assistências"));
-  app.append(topTable(A.playersArr, "assistencias", ["assistencias", "passeFinalizacao"], ["Assist.", "Passe fin."]));
+  app.append(el("div", { class: "section-title" }, "Últimos resultados"));
+  app.append(lastResults(5));
 
   // Highlights da época ("kings")
   const K = computeKings(state.data);
@@ -493,23 +482,32 @@ function statCard(big, lbl, sub) {
     sub ? el("span", { class: "sub" }, sub) : null);
 }
 
-function topTable(players, sortKey, cols, colLabels, limit = 8) {
-  const rows = [...players].filter((p) => (p[sortKey] || 0) > 0).sort((a, b) => b[sortKey] - a[sortKey]).slice(0, limit);
-  const t = el("table");
-  const head = el("tr", {}, el("th", { class: "rank" }, "#"), el("th", {}, "Jogador"));
-  colLabels.forEach((c) => head.append(el("th", { class: "num" }, c)));
-  t.append(el("thead", {}, head));
-  const tb = el("tbody");
-  if (!rows.length) tb.append(el("tr", {}, el("td", { colspan: cols.length + 2, class: "empty" }, "Sem dados ainda")));
-  rows.forEach((p, i) => {
-    const tr = el("tr", {}, el("td", { class: "rank" }, i + 1), el("td", {}, p.nome));
-    cols.forEach((c) => tr.append(el("td", { class: "num" }, fmt(p[c]))));
-    tr.addEventListener("click", () => openPlayerModal(p.nome));
-    t.append(tr);
-    tb.append(tr);
+/* Últimos N resultados, estilo Flashscore (mais recente em cima) */
+function lastResults(n) {
+  const clube = state.data.meta.clube;
+  const js = [...state.data.jornadas].sort((a, b) => b.numero - a.numero).slice(0, n);
+  const box = el("div", { class: "card fs-list" });
+  if (!js.length) { box.append(el("div", { class: "empty" }, "Ainda sem jornadas registadas.")); return box; }
+  js.forEach((j) => {
+    const { gf, ga, res } = resultOf(j);
+    const fora = j.casa === false;
+    const casa = fora ? [j.adversario, ga] : [clube, gf];
+    const vis = fora ? [clube, gf] : [j.adversario, ga];
+    const team = ([nome, g]) => {
+      const vence = g != null && g > (nome === clube ? ga : gf);
+      return el("div", { class: "fs-team" + (vence ? " win" : "") + (nome === clube ? " us" : "") },
+        teamLogo(nome), el("span", { class: "fs-name" }, nome), el("span", { class: "fs-goals" }, g ?? "–"));
+    };
+    const dataTxt = dataJornada(j.data, j.hora);
+    box.append(el("div", { class: "fs-row", onclick: () => openJornadaModal(j.numero), title: "Abrir jornada" },
+      el("div", { class: "fs-meta" }, el("span", { class: "fs-j" }, `J${j.numero}`), el("span", { class: "fs-date" }, dataTxt ? dataTxt.replace(/^[^,]*,\s*/, "") : "")),
+      el("div", { class: "fs-teams" }, team(casa), team(vis)),
+      el("span", { class: "fs-res " + (res === "?" ? "" : res) }, res === "w" ? "V" : res === "d" ? "E" : res === "l" ? "D" : "?")));
   });
-  t.append(tb);
-  return t;
+  if (state.data.jornadas.length > n) {
+    box.append(el("button", { class: "king-more fs-all", type: "button", onclick: () => { state.view = "jornadas"; render(); } }, `Ver todas as jornadas (${state.data.jornadas.length})`));
+  }
+  return box;
 }
 
 /* Data real da jornada: o intervalo ("3 / 4 Outubro") é o fim de semana Sábado / Domingo
