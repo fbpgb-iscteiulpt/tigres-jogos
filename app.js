@@ -346,14 +346,7 @@ function render() {
 function viewEpoca(app) {
   const A = seasonAgg(state.data);
   app.append(el("div", { class: "section-title" }, "Resumo da época"));
-  const cards = el("div", { class: "grid cards" });
-  cards.append(
-    statCard(`${A.v}-${A.e}-${A.d}`, "V–E–D", `${A.jogos} jogos`),
-    statCard(`${A.gf}`, "Golos marcados"),
-    statCard(`${A.ga}`, "Golos sofridos"),
-    statCard(`${A.gf - A.ga > 0 ? "+" : ""}${A.gf - A.ga}`, "Diferença"),
-  );
-  app.append(cards);
+  app.append(seasonCockpit(A));
 
   const prox = nextGame();
   if (prox) {
@@ -387,6 +380,71 @@ function viewEpoca(app) {
   app.append(kings);
   app.append(el("p", { class: "hint" }, `Total = soma na época. Por 80 min = total ÷ minutos jogados na época × 80 (só entram no ranking jogadores com pelo menos ${P80_MIN_EPOCA} min na época).`));
 }
+
+/* Tendência da forma recente: pontos por jogo dos últimos 3 vs os 3 anteriores (ou vs a época, se houver menos de 6 jogos) */
+function formTrend(results) {
+  const pts = (r) => (r.res === "w" ? 3 : r.res === "d" ? 1 : 0);
+  const jogados = results.filter((r) => r.res !== "?").sort((a, b) => a.numero - b.numero);
+  if (jogados.length < 2) return null;
+  const n = Math.min(3, jogados.length - 1);
+  const ult = jogados.slice(-n), ant = jogados.length >= 2 * n ? jogados.slice(-2 * n, -n) : jogados.slice(0, -n);
+  const ppgU = ult.reduce((s, r) => s + pts(r), 0) / ult.length;
+  const ppgA = ant.reduce((s, r) => s + pts(r), 0) / ant.length;
+  const dif = ppgU - ppgA;
+  const dir = dif > 0.34 ? "up" : dif < -0.34 ? "down" : "flat";
+  return { dir, n, ptsU: ult.reduce((s, r) => s + pts(r), 0), ptsA: ant.reduce((s, r) => s + pts(r), 0), nA: ant.length };
+}
+
+/* Cockpit do resumo da época: posição na classificação, registo, golos, forma e tendência */
+function seasonCockpit(A) {
+  const clube = state.data.meta.clube;
+  const tabela = [...(state.data.classificacao || [])].sort((a, b) => a.pos - b.pos);
+  const linha = tabela.find((r) => r.equipa === clube);
+  const box = el("div", { class: "card cockpit" });
+
+  // Posição
+  const posBox = el("div", { class: "ck-pos", onclick: () => { state.view = "classificacao"; render(); }, title: "Ver classificação" });
+  if (linha) {
+    const lider = tabela[0];
+    const gap = lider && lider.equipa !== clube ? lider.pts - linha.pts : 0;
+    posBox.append(
+      el("span", { class: "ck-pos-lbl" }, "Classificação"),
+      el("span", { class: "ck-pos-num" }, `${linha.pos}`, el("sup", {}, "º")),
+      el("span", { class: "ck-pos-sub" }, `de ${tabela.length} · ${linha.pts} pts`),
+      el("span", { class: "ck-pos-gap" }, linha.pos === 1 ? "Líder" : `a ${gap} pts do 1.º`));
+  } else {
+    posBox.append(el("span", { class: "ck-pos-lbl" }, "Classificação"), el("span", { class: "ck-pos-num" }, "–"));
+  }
+
+  // Forma (últimos 5, mais antigo à esquerda) + tendência
+  const recentes = [...A.results].filter((r) => r.res !== "?").sort((a, b) => a.numero - b.numero).slice(-5);
+  const t = formTrend(A.results);
+  const formBox = el("div", { class: "ck-form" });
+  formBox.append(el("span", { class: "ck-lbl" }, "Forma recente"));
+  const dots = el("div", { class: "ck-dots" });
+  recentes.forEach((r) => dots.append(el("span", { class: "ck-dot " + r.res, title: `J${r.numero} vs ${r.adversario}: ${r.gf}-${r.ga}` }, r.res === "w" ? "V" : r.res === "d" ? "E" : "D")));
+  formBox.append(dots);
+  if (t) {
+    const txt = { up: "Tendência positiva", down: "Tendência negativa", flat: "Tendência estável" }[t.dir];
+    const arrow = { up: "▲", down: "▼", flat: "▶" }[t.dir];
+    formBox.append(el("div", { class: "ck-trend " + t.dir },
+      el("span", { class: "ck-arrow" }, arrow),
+      el("span", {}, el("strong", {}, txt), el("small", {}, `${t.ptsU} pts nos últimos ${t.n} jogos · ${t.ptsA} nos ${t.nA} anteriores`))));
+  }
+
+  // Números da época
+  const dg = A.gf - A.ga;
+  const nums = el("div", { class: "ck-nums" },
+    ckNum(`${A.jogos}`, "Jogos"),
+    ckNum(`${A.v}-${A.e}-${A.d}`, "V-E-D"),
+    ckNum(`${A.gf}`, "Marcados"),
+    ckNum(`${A.ga}`, "Sofridos"),
+    ckNum(`${dg > 0 ? "+" : ""}${dg}`, "Diferença", dg > 0 ? "pos" : dg < 0 ? "neg" : ""));
+
+  box.append(el("div", { class: "ck-top" }, posBox, formBox), nums);
+  return box;
+}
+function ckNum(v, lbl, cls = "") { return el("div", { class: "ck-num " + cls }, el("span", { class: "ck-v" }, v), el("span", { class: "ck-l" }, lbl)); }
 
 // Formatação de valor para os cartões de rácio (percentagem)
 function fmtRatio(r, isLeader) {

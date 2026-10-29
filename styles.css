@@ -43,6 +43,60 @@ main{flex:1;max-width:1100px;width:100%;margin:0 auto;padding:22px 18px 40px}
 .section-title:first-child{margin-top:0}
 
 /* Record pills */
+/* Cockpit do resumo da época */
+.card.cockpit{display:flex;flex-direction:column;gap:14px;padding:16px}
+.ck-top{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:stretch}
+.ck-pos{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:120px;padding:12px 16px;border-radius:12px;background:var(--navy);color:#fff;cursor:pointer;text-align:center}
+.ck-pos-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;opacity:.8}
+.ck-pos-num{font-size:44px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.ck-pos-num sup{font-size:18px;vertical-align:top;margin-left:1px}
+.ck-pos-sub{font-size:12px;font-weight:700;opacity:.9}
+.ck-pos-gap{font-size:11px;opacity:.75}
+.ck-form{display:flex;flex-direction:column;justify-content:center;gap:8px;min-width:0}
+.ck-lbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.ck-dots{display:flex;gap:6px}
+.ck-dot{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;background:var(--muted)}
+.ck-dot.w{background:var(--win)}
+.ck-dot.d{background:var(--draw)}
+.ck-dot.l{background:var(--loss)}
+.ck-dot:last-child{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--navy)}
+.ck-trend{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:var(--surface2)}
+.ck-trend strong{display:block;font-size:14px}
+.ck-trend small{display:block;font-size:11px;color:var(--muted)}
+.ck-arrow{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex-shrink:0}
+.ck-trend.up strong{color:var(--win)}
+.ck-trend.up .ck-arrow{background:var(--win)}
+.ck-trend.down strong{color:var(--loss)}
+.ck-trend.down .ck-arrow{background:var(--loss)}
+.ck-trend.flat strong{color:var(--muted)}
+.ck-trend.flat .ck-arrow{background:var(--muted)}
+.ck-nums{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);padding-top:12px}
+.ck-num{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.ck-num+.ck-num{border-left:1px solid var(--line)}
+.ck-v{font-size:22px;font-weight:800;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums}
+.ck-l{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.ck-num.pos .ck-v{color:var(--win)}
+.ck-num.neg .ck-v{color:var(--loss)}
+.ck-trend{align-self:flex-start}
+@media(min-width:900px){
+  .card.cockpit{display:grid;grid-template-columns:auto auto 1fr;align-items:stretch;gap:24px}
+  .ck-top{display:contents}
+  .ck-nums{border-top:none;border-left:1px solid var(--line);padding:0 0 0 24px;align-items:center}
+  .ck-v{font-size:28px}
+}
+@media(max-width:420px){
+  .card.cockpit{padding:12px;gap:12px}
+  .ck-top{gap:10px}
+  .ck-pos{min-width:92px;padding:10px 8px}
+  .ck-pos-num{font-size:36px}
+  .ck-dot{width:26px;height:26px;font-size:12px}
+  .ck-dots{gap:5px}
+  .ck-trend{padding:6px 8px;gap:8px}
+  .ck-trend strong{font-size:13px}
+  .ck-arrow{width:24px;height:24px;font-size:11px}
+  .ck-v{font-size:18px}
+  .ck-l{font-size:9px;letter-spacing:.2px}
+}
 /* Últimos resultados (estilo Flashscore) */
 .fs-list{padding:4px 0;gap:0}
 .fs-row{display:grid;grid-template-columns:64px 1fr 30px;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}

@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-10-29T12:03:23.626Z",
+    "atualizado": "2026-10-29T14:13:50.645Z",
     "versao": 12
   },
   "listas": {
@@ -6945,7 +6945,8 @@
       "data": "31 Outubro / 1 Novembro",
       "hora": "18:50",
       "adversario": "Olímpico",
-      "casa": true
+      "casa": true,
+      "video": "https://www.youtube.com/watch?v=L7goLPba-pQ"
     },
     {
       "numero": 8,
