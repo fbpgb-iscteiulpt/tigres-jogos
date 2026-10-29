@@ -318,31 +318,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 /* Link de vídeo nas jornadas */
 .jvideo{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#c4302b;text-decoration:none;white-space:nowrap;padding:3px 8px;border:1px solid #e4c4c2;border-radius:999px;background:#fdf2f1}
 .jvideo:hover{background:#f9e2e0;border-color:#c4302b}
-/* xG na lista de jornadas */
-.jxg{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;padding:3px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface2)}
-@media(max-width:620px){.jxg{display:none}}
-/* xG no detalhe da jornada */
-.xg-block{margin-bottom:6px}
-.xg-vs{display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--navy)}
-.xg-table td:first-child{white-space:nowrap}
-.xg-table tr.xg-total td{font-weight:800;color:var(--navy);border-top:2px solid var(--line)}
-/* Cronologia dos golos */
-.gtl{margin-bottom:6px}
-.gtl-bar{position:relative;height:30px;background:var(--surface2);border:1px solid var(--line);border-radius:999px;margin:6px 16px 0}
-.gtl-ht{position:absolute;left:50%;top:-4px;bottom:-4px;border-left:2px dashed #b9c4d4}
-.gtl-dot{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:800;color:#fff;padding:3px 6px;border-radius:999px;white-space:nowrap}
-.gtl-dot.tigres{background:var(--win)}
-.gtl-dot.adv{background:var(--loss)}
-@media(max-width:620px){.gtl-dot{font-size:0;padding:0;width:12px;height:12px;border:2px solid #fff}}
-.gtl-axis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin:4px 16px 8px}
-.gtl-list{display:flex;flex-direction:column;gap:4px}
-.gtl-row{display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:10px;padding:6px 10px;border-radius:8px;font-size:14px}
-.gtl-row.tigres{background:#e3f4e8}
-.gtl-row.adv{background:#fbe5e5}
-.gtl-min{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}
-.gtl-who{color:var(--navy);font-weight:600}
-.gtl-tag{font-size:11px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 7px;background:#fff}
-.gtl-score{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}
 /* Análise dos minutos dos golos */
 .gma{display:flex;flex-direction:column;gap:12px}
 .gma-rows{display:flex;flex-direction:column;gap:4px}

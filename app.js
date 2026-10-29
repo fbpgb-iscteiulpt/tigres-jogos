@@ -545,19 +545,16 @@ function dataJornada(range, hora) {
 function viewJornadas(app) {
   app.append(el("div", { class: "section-title" }, "Jornadas disputadas"));
   const jogadas = [...state.data.jornadas].sort((a, b) => b.numero - a.numero);
-  const XG = TigresXG.xgSeason(state.data).porJornada;
   const list = el("div", { class: "jlist" });
   if (!jogadas.length) list.append(el("div", { class: "empty" }, "Ainda sem jornadas registadas."));
   jogadas.forEach((j) => {
     const { gf, ga, res } = resultOf(j);
     const dataTxt = dataJornada(j.data, j.hora);
     const meta = [dataTxt, j.hora, j.casa === false ? "fora" : j.casa === true ? "casa" : null].filter(Boolean).join(" · ");
-    const x = XG[j.numero];
     const row = el("div", { class: "jrow", onclick: () => openJornadaModal(j.numero) },
       el("span", { class: "jnum" }, `Jornada ${j.numero}`, meta ? el("span", { class: "jdate" }, meta) : null),
       el("span", { class: "jteams" }, teamTag(state.data.meta.clube), el("span", { class: "vs" }, "vs"), teamTag(j.adversario)),
       el("span", { class: "jscore" }, `${gf ?? "?"}–${ga ?? "?"}`),
-      x ? el("span", { class: "jxg", title: "Golos esperados (xG)" }, `xG ${x.tigres.xg.toFixed(1)}–${x.adv.xg.toFixed(1)}`) : null,
       el("span", { class: "badge " + (res === "?" ? "" : res) }, res === "w" ? "V" : res === "d" ? "E" : res === "l" ? "D" : "?"),
       videoLink(j.video),
     );
@@ -659,16 +656,6 @@ function openJornadaModal(numero) {
     el("span", { class: "chip" }, `Tática: ${fmt(j.tatica)}`),
     el("span", { class: "chip" }, `Convocados: ${j.players.length}`)));
 
-  // Golos (com minuto) e golos esperados
-  const golos = TigresXG.goalEvents(j);
-  if (golos.length) {
-    b.append(el("div", { class: "section-title" }, "Golos"));
-    b.append(goalTimeline(golos, j.adversario));
-  }
-  b.append(el("div", { class: "section-title" }, "Golos esperados (xG)"));
-  const S = TigresXG.xgSeason(state.data);
-  b.append(xgBlock(S.porJornada[j.numero], j, S.fator));
-
   if (j.video) {
     b.append(el("div", { class: "section-title" }, "Vídeo do jogo"));
     b.append(videoEmbed(j.video));
@@ -676,7 +663,7 @@ function openJornadaModal(numero) {
 
   // Match stats compare
   b.append(el("div", { class: "section-title" }, "Estatísticas do jogo"));
-  b.append(compareBlock(j.matchStats, j.adversario));
+  b.append(compareBlock(j.matchStats, j.adversario, TigresXG.xgSeason(state.data).porJornada[j.numero]));
 
   // Player table
   b.append(el("div", { class: "section-title" }, "Jogadores"));
@@ -705,80 +692,9 @@ function openJornadaModal(numero) {
   showModal();
 }
 
-/* Cronologia dos golos de um jogo: linha 0–80' + lista */
-function goalTimeline(golos, adversario) {
-  const box = el("div", { class: "gtl" });
-  const ord = [...golos].sort((a, b) => (a.minuto ?? 999) - (b.minuto ?? 999));
-  const bar = el("div", { class: "gtl-bar" }, el("span", { class: "gtl-ht", title: "Intervalo (40')" }));
-  ord.filter((g) => g.minuto != null).forEach((g) => {
-    const left = Math.max(0, Math.min(100, (g.minuto / 80) * 100));
-    bar.append(el("span", { class: `gtl-dot ${g.lado}`, style: `left:${left}%`, title: `${g.minuto}' — ${g.lado === "tigres" ? g.jogador || "Tigres" : adversario}` }, `${g.minuto}'`));
-  });
-  box.append(bar, el("div", { class: "gtl-axis" }, el("span", {}, "0'"), el("span", {}, "40'"), el("span", {}, "80'")));
-  const list = el("div", { class: "gtl-list" });
-  let tig = 0, adv = 0;
-  ord.forEach((g) => {
-    g.lado === "tigres" ? tig++ : adv++;
-    list.append(el("div", { class: `gtl-row ${g.lado}` },
-      el("span", { class: "gtl-min" }, g.minuto != null ? `${g.minuto}'` : "—"),
-      el("span", { class: "gtl-who" }, g.lado === "tigres" ? `⚽ ${g.jogador || state.data.meta.clube}` : `⚽ ${adversario}`),
-      g.bolaParada ? el("span", { class: "gtl-tag" }, "bola parada") : null,
-      el("span", { class: "gtl-score" }, `${tig}–${adv}`)));
-  });
-  box.append(list);
-  return box;
-}
-
-/* Golos esperados de um jogo: barra comparativa + origem do xG por tipo de remate */
-function xgBlock(x, j, fator) {
-  const wrap = el("div", { class: "xg-block" });
-  if (!x) { wrap.append(el("div", { class: "empty" }, "Sem remates registados.")); return wrap; }
-  const colL = teamColor(state.data.meta.clube), colR = teamColor(j.adversario, true);
-  const a = x.tigres.xg, c = x.adv.xg, tot = a + c || 1;
-  const { gf, ga } = resultOf(j);
-  wrap.append(el("div", { class: "cmp" },
-    el("div", { class: "cmp-head" }, teamTag(state.data.meta.clube), teamTag(j.adversario)),
-    el("div", { class: "cmprow" }, el("span", { class: "lbl" }, "xG (golos esperados)"),
-      el("div", { style: "display:grid;grid-template-columns:52px 1fr 52px;align-items:center;gap:10px" },
-        el("span", { class: "v l" }, a.toFixed(2)),
-        el("div", { class: "bar" },
-          el("div", { class: "fill-l", style: fillStyle((a / tot) * 100, colL) }),
-          el("div", { class: "fill-r", style: fillStyle((c / tot) * 100, colR) })),
-        el("span", { class: "v r" }, c.toFixed(2)))),
-    el("div", { class: "cmprow" }, el("span", { class: "lbl" }, "Golos marcados (diferença face ao xG)"),
-      el("div", { class: "xg-vs" },
-        el("span", {}, `${golosTxt(gf)} (${fmtDif((gf ?? 0) - a)})`),
-        el("span", {}, `${golosTxt(ga)} (${fmtDif((ga ?? 0) - c)})`)))));
-  // detalhe por tipo de remate
-  const t = el("table", { class: "pstat-table xg-table" });
-  t.append(el("thead", {}, el("tr", {}, el("th", {}, "Origem do xG"), el("th", { class: "num" }, "Valor"),
-    el("th", { class: "num" }, state.data.meta.clube), el("th", { class: "num" }, "xG"),
-    el("th", { class: "num" }, j.adversario), el("th", { class: "num" }, "xG"))));
-  const tb = el("tbody");
-  const linha = (lado, cat) => x[lado].linhas.find((l) => l.cat === cat);
-  TigresXG.XG_CATS.forEach((cat) => {
-    const lt = linha("tigres", cat), la = linha("adv", cat);
-    if (!lt && !la) return;
-    const val = (lt || la).valor;
-    tb.append(el("tr", {}, el("td", {}, TigresXG.XG_CAT_LABELS[cat]), el("td", { class: "num" }, val.toFixed(2)),
-      el("td", { class: "num" }, lt ? lt.n : 0), el("td", { class: "num" }, lt ? lt.xg.toFixed(2) : "0.00"),
-      el("td", { class: "num" }, la ? la.n : 0), el("td", { class: "num" }, la ? la.xg.toFixed(2) : "0.00")));
-  });
-  tb.append(el("tr", { class: "xg-total" }, el("td", {}, "Total"), el("td", {}),
-    el("td", { class: "num" }, x.tigres.remates), el("td", { class: "num" }, a.toFixed(2)),
-    el("td", { class: "num" }, x.adv.remates), el("td", { class: "num" }, c.toFixed(2))));
-  t.append(tb);
-  wrap.append(tableScroll(t));
-  const semZona = [...x.tigres.linhas, ...x.adv.linhas].some((l) => l.cat === "sem-zona");
-  wrap.append(el("p", { class: "hint" },
-    `Cada remate vale a probabilidade de golo do seu tipo (zona + resultado). Os remates à baliza estão calibrados com os golos desta liga (×${fator.toFixed(2)} face ao futebol profissional). Penálti = 0.76.` +
-    (semZona ? " Há remates registados sem zona (formato antigo): valem como remate para fora." : "")));
-  return wrap;
-}
 function fmtDif(v) { const r = Math.round(v * 10) / 10; return r > 0 ? `+${r.toFixed(1)}` : r < 0 ? r.toFixed(1) : "0.0"; }
-function golosTxt(n) { return n == null ? "? golos" : n === 1 ? "1 golo" : `${n} golos`; }
 
-function compareBlock(ms, adversario) {
+function compareBlock(ms, adversario, xg) {
   const wrap = el("div", { class: "cmp" });
   wrap.append(el("div", { class: "cmp-head" },
     teamTag(state.data.meta.clube), teamTag(adversario)));
@@ -786,10 +702,19 @@ function compareBlock(ms, adversario) {
   const colR = teamColor(adversario, true); // vsTigres = true (é sempre contra os Tigres)
   const order = ["Resultado", "Remates", "Remates à baliza", "Cantos", "Faltas", "Fora de jogo", "Posse de bola"];
   const keys = order.filter((k) => ms && k in ms).concat(Object.keys(ms || {}).filter((k) => !order.includes(k)));
+  // xG logo a seguir à posse de bola
+  const stats = { ...ms };
+  if (xg) {
+    const XK = "xG (golos esperados)";
+    stats[XK] = { tigres: Math.round(xg.tigres.xg * 100) / 100, adversario: Math.round(xg.adv.xg * 100) / 100 };
+    const iP = keys.indexOf("Posse de bola");
+    keys.splice(iP >= 0 ? iP + 1 : keys.length, 0, XK);
+  }
   keys.forEach((k) => {
-    const v = ms[k]; let a = v.tigres, c = v.adversario;
+    const v = stats[k]; let a = v.tigres, c = v.adversario;
     const isPct = k === "Posse de bola";
-    const dispA = isPct ? pct(a) : fmt(a), dispC = isPct ? pct(c) : fmt(c);
+    const isXg = k.startsWith("xG");
+    const dispA = isPct ? pct(a) : isXg ? a.toFixed(2) : fmt(a), dispC = isPct ? pct(c) : isXg ? c.toFixed(2) : fmt(c);
     const na = +a || 0, nc = +c || 0, tot = na + nc || 1;
     const row = el("div", { class: "cmprow" });
     row.append(el("span", { class: "lbl" }, k));
