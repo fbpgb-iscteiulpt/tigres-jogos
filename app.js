@@ -355,6 +355,12 @@ function viewEpoca(app) {
   );
   app.append(cards);
 
+  const prox = nextGame();
+  if (prox) {
+    app.append(el("div", { class: "section-title" }, "Próximo jogo"));
+    app.append(nextGameCard(prox));
+  }
+
   app.append(el("div", { class: "section-title" }, "Últimos resultados"));
   app.append(lastResults(5));
 
@@ -482,32 +488,74 @@ function statCard(big, lbl, sub) {
     sub ? el("span", { class: "sub" }, sub) : null);
 }
 
-/* Últimos N resultados, estilo Flashscore (mais recente em cima) */
-function lastResults(n) {
+/* Linha de jogo estilo Flashscore: equipa da casa em cima, golos à direita, V/E/D */
+function fsRow(j, { video = false } = {}) {
   const clube = state.data.meta.clube;
+  const { gf, ga, res } = resultOf(j);
+  const fora = j.casa === false;
+  const casa = fora ? [j.adversario, ga] : [clube, gf];
+  const vis = fora ? [clube, gf] : [j.adversario, ga];
+  const team = ([nome, g]) => {
+    const vence = g != null && g > (nome === clube ? ga : gf);
+    return el("div", { class: "fs-team" + (vence ? " win" : "") + (nome === clube ? " us" : "") },
+      teamLogo(nome), el("span", { class: "fs-name" }, nome), el("span", { class: "fs-goals" }, g ?? "–"));
+  };
+  return el("div", { class: "fs-row" + (video ? " with-video" : ""), onclick: () => openJornadaModal(j.numero), title: "Abrir jornada" },
+    fsMeta(j),
+    el("div", { class: "fs-teams" }, team(casa), team(vis)),
+    el("span", { class: "fs-res " + (res === "?" ? "" : res) }, res === "w" ? "V" : res === "d" ? "E" : res === "l" ? "D" : "?"),
+    video ? (videoLink(j.video) || el("span")) : null);
+}
+/* Jogo por disputar (calendário): mesma estrutura, hora em vez de resultado */
+function fsFuture(f) {
+  const clube = state.data.meta.clube;
+  const [casa, vis] = f.casa === false ? [f.adversario, clube] : [clube, f.adversario];
+  const team = (nome) => el("div", { class: "fs-team" + (nome === clube ? " us" : "") }, teamLogo(nome), el("span", { class: "fs-name" }, nome), el("span"));
+  return el("div", { class: "fs-row future with-video" },
+    fsMeta(f),
+    el("div", { class: "fs-teams" }, team(casa), team(vis)),
+    el("span", { class: "fs-hora" }, f.hora || "–"),
+    videoLink(f.video) || el("span"));
+}
+function fsMeta(j) {
+  const dataTxt = dataJornada(j.data, j.hora);
+  return el("div", { class: "fs-meta" }, el("span", { class: "fs-j" }, `J${j.numero}`), el("span", { class: "fs-date" }, dataTxt ? dataTxt.replace(/^[^,]*,\s*/, "") : ""));
+}
+
+/* Últimos N resultados (mais recente em cima) */
+function lastResults(n) {
   const js = [...state.data.jornadas].sort((a, b) => b.numero - a.numero).slice(0, n);
   const box = el("div", { class: "card fs-list" });
   if (!js.length) { box.append(el("div", { class: "empty" }, "Ainda sem jornadas registadas.")); return box; }
-  js.forEach((j) => {
-    const { gf, ga, res } = resultOf(j);
-    const fora = j.casa === false;
-    const casa = fora ? [j.adversario, ga] : [clube, gf];
-    const vis = fora ? [clube, gf] : [j.adversario, ga];
-    const team = ([nome, g]) => {
-      const vence = g != null && g > (nome === clube ? ga : gf);
-      return el("div", { class: "fs-team" + (vence ? " win" : "") + (nome === clube ? " us" : "") },
-        teamLogo(nome), el("span", { class: "fs-name" }, nome), el("span", { class: "fs-goals" }, g ?? "–"));
-    };
-    const dataTxt = dataJornada(j.data, j.hora);
-    box.append(el("div", { class: "fs-row", onclick: () => openJornadaModal(j.numero), title: "Abrir jornada" },
-      el("div", { class: "fs-meta" }, el("span", { class: "fs-j" }, `J${j.numero}`), el("span", { class: "fs-date" }, dataTxt ? dataTxt.replace(/^[^,]*,\s*/, "") : "")),
-      el("div", { class: "fs-teams" }, team(casa), team(vis)),
-      el("span", { class: "fs-res " + (res === "?" ? "" : res) }, res === "w" ? "V" : res === "d" ? "E" : res === "l" ? "D" : "?")));
-  });
+  js.forEach((j) => box.append(fsRow(j)));
   if (state.data.jornadas.length > n) {
     box.append(el("button", { class: "king-more fs-all", type: "button", onclick: () => { state.view = "jornadas"; render(); } }, `Ver todas as jornadas (${state.data.jornadas.length})`));
   }
   return box;
+}
+
+/* Próximo jogo (primeira jornada do calendário ainda por disputar) */
+const ESTADIO = "Estádio Pinto Basto";
+function nextGame() {
+  const jogadas = new Set(state.data.jornadas.map((j) => j.numero));
+  return (state.data.calendario || []).filter((f) => !jogadas.has(f.numero)).sort((a, b) => a.numero - b.numero)[0] || null;
+}
+function nextGameCard(f) {
+  const clube = state.data.meta.clube;
+  const [casa, vis] = f.casa === false ? [f.adversario, clube] : [clube, f.adversario];
+  const side = (nome) => el("div", { class: "ng-team" + (nome === clube ? " us" : "") }, teamLogo(nome, true), el("span", {}, nome));
+  const card = el("div", { class: "card ng" });
+  card.append(el("div", { class: "ng-top" }, el("span", { class: "ng-j" }, `Jornada ${f.numero}`), el("span", { class: "ng-local" }, f.casa === false ? "Fora" : "Casa")));
+  card.append(el("div", { class: "ng-match" }, side(casa), el("div", { class: "ng-vs" }, el("span", { class: "ng-hora" }, f.hora || "–"), el("span", {}, "vs")), side(vis)));
+  card.append(el("div", { class: "ng-info" },
+    el("div", {}, el("span", { class: "ng-ic" }, "📅"), dataJornada(f.data, f.hora) || f.data || "Data por definir"),
+    el("div", {}, el("span", { class: "ng-ic" }, "🕒"), f.hora || "Hora por definir"),
+    el("div", {}, el("span", { class: "ng-ic" }, "🏟️"), ESTADIO),
+    el("div", {}, el("span", { class: "ng-ic" }, "🆚"), f.adversario)));
+  card.append(f.video
+    ? el("a", { class: "btn ng-live", href: f.video, target: "_blank", rel: "noopener" }, "▶ Ver transmissão")
+    : el("div", { class: "ng-nolive" }, "Link da transmissão ainda não disponível"));
+  return card;
 }
 
 /* Data real da jornada: o intervalo ("3 / 4 Outubro") é o fim de semana Sábado / Domingo
@@ -543,21 +591,9 @@ function dataJornada(range, hora) {
 function viewJornadas(app) {
   app.append(el("div", { class: "section-title" }, "Jornadas disputadas"));
   const jogadas = [...state.data.jornadas].sort((a, b) => b.numero - a.numero);
-  const list = el("div", { class: "jlist" });
+  const list = el("div", { class: "card fs-list" });
   if (!jogadas.length) list.append(el("div", { class: "empty" }, "Ainda sem jornadas registadas."));
-  jogadas.forEach((j) => {
-    const { gf, ga, res } = resultOf(j);
-    const dataTxt = dataJornada(j.data, j.hora);
-    const meta = [dataTxt, j.hora, j.casa === false ? "fora" : j.casa === true ? "casa" : null].filter(Boolean).join(" · ");
-    const row = el("div", { class: "jrow", onclick: () => openJornadaModal(j.numero) },
-      el("span", { class: "jnum" }, `Jornada ${j.numero}`, meta ? el("span", { class: "jdate" }, meta) : null),
-      el("span", { class: "jteams" }, teamTag(state.data.meta.clube), el("span", { class: "vs" }, "vs"), teamTag(j.adversario)),
-      el("span", { class: "jscore" }, `${gf ?? "?"}–${ga ?? "?"}`),
-      el("span", { class: "badge " + (res === "?" ? "" : res) }, res === "w" ? "V" : res === "d" ? "E" : res === "l" ? "D" : "?"),
-      videoLink(j.video),
-    );
-    list.append(row);
-  });
+  jogadas.forEach((j) => list.append(fsRow(j, { video: true })));
   app.append(list);
 
   // Próximas jornadas (do calendário)
@@ -566,17 +602,8 @@ function viewJornadas(app) {
   const futuras = cal.filter((f) => !jogadasNums.has(f.numero)).sort((a, b) => a.numero - b.numero);
   if (futuras.length) {
     app.append(el("div", { class: "section-title" }, "Próximas jornadas"));
-    const fl = el("div", { class: "jlist" });
-    futuras.forEach((f) => {
-      const local = f.casa ? "casa" : "fora";
-      const meta = [dataJornada(f.data, f.hora), f.hora, local].filter(Boolean).join(" · ");
-      fl.append(el("div", { class: "jrow future" },
-        el("span", { class: "jnum" }, `Jornada ${f.numero}`, el("span", { class: "jdate" }, meta)),
-        el("span", { class: "jteams" }, teamTag(state.data.meta.clube), el("span", { class: "vs" }, "vs"), teamTag(f.adversario)),
-        el("span", { class: "jscore muted" }, "–"),
-        videoLink(f.video),
-      ));
-    });
+    const fl = el("div", { class: "card fs-list" });
+    futuras.forEach((f) => fl.append(fsFuture(f)));
     app.append(fl);
   }
 }
