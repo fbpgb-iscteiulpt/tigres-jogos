@@ -439,7 +439,7 @@ function seasonCockpit(A) {
     ckNum(`${A.v}-${A.e}-${A.d}`, "V-E-D"),
     ckNum(`${A.gf}`, "Marcados"),
     ckNum(`${A.ga}`, "Sofridos"),
-    ckNum(`${dg > 0 ? "+" : ""}${dg}`, "Diferença", dg > 0 ? "pos" : dg < 0 ? "neg" : ""));
+    ckNum(`${dg > 0 ? "+" : ""}${dg}`, "Diferença"));
 
   box.append(el("div", { class: "ck-top" }, posBox, formBox), nums);
   return box;

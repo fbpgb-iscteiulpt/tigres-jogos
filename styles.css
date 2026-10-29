@@ -75,8 +75,6 @@ main{flex:1;max-width:1100px;width:100%;margin:0 auto;padding:22px 18px 40px}
 .ck-num+.ck-num{border-left:1px solid var(--line)}
 .ck-v{font-size:22px;font-weight:800;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums}
 .ck-l{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
-.ck-num.pos .ck-v{color:var(--win)}
-.ck-num.neg .ck-v{color:var(--loss)}
 .ck-trend{align-self:flex-start}
 @media(min-width:900px){
   .card.cockpit{display:grid;grid-template-columns:auto auto 1fr;align-items:stretch;gap:24px}
