@@ -153,7 +153,7 @@ async function loadData() {
 async function saveToGitHub(data, msg) {
   const token = getToken();
   if (!ghConfigured()) throw new Error("GitHub não configurado (edita CONFIG no app.js).");
-  if (!token) throw new Error("Sem token. Abre 'Nova Jornada' → Definições e cola o teu token.");
+  if (!token) throw new Error("Sem token. Abre 'Posse' → ⚙ Definições e cola o teu token.");
   // obter SHA atual
   let sha;
   const head = await fetch(apiUrl() + "?ref=" + CONFIG.githubBranch, {
@@ -183,47 +183,6 @@ function b64encode(str) {
 }
 function b64decode(b64) {
   return decodeURIComponent(escape(atob(String(b64).replace(/\s/g, ""))));
-}
-
-// Exportar Excel (.xlsx) — ficheiro SpreadsheetML simples que o Excel abre
-function exportExcel() {
-  const data = state.data;
-  const sheets = [];
-  data.jornadas.forEach((j) => {
-    const rows = [];
-    rows.push(["Ação", "Jogador", "Minuto", "", "Estatística", data.meta.clube, j.adversario]);
-    const statKeys = Object.keys(j.matchStats || {});
-    const maxLen = Math.max(j.eventos.length, j.players.length, statKeys.length);
-    // Cabeçalho jogadores
-    const pHead = ["", "", "", "", "", "", "", "", "Convocado", "Titular", "Minutos", "Remates", "Desarmes", "Defesas", "Golos", "Assist.", "Passe fin.", "Faltas", "Passes err.", "Perdas", "Dribles OK", "Dribles falh.", "Cruz. OK", "Cruz. falh."];
-    rows.push(pHead);
-    for (let i = 0; i < maxLen; i++) {
-      const ev = j.eventos[i] || {};
-      const st = statKeys[i] ? [statKeys[i], j.matchStats[statKeys[i]].tigres, j.matchStats[statKeys[i]].adversario] : ["", "", ""];
-      const p = j.players[i];
-      const prow = p ? [p.nome, p.titular ? "X" : "", p.minutos, p.remates, p.desarmes, p.defesas, p.golos, p.assistencias, p.passeFinalizacao, p.faltas, p.passesErrados, p.perdasBola, p.driblesBemSucedidos, p.driblesFalhados, p.cruzamentosBemSucedidos, p.cruzamentosFalhados] : [];
-      rows.push([ev.acao || "", ev.jogador || "", ev.minuto ?? "", "", st[0], st[1], st[2], "", ...prow]);
-    }
-    sheets.push({ name: `${j.numero}a Jornada`, rows });
-  });
-  const xml = buildSpreadsheetML(sheets);
-  const blob = new Blob([xml], { type: "application/vnd.ms-excel" });
-  const a = el("a", { href: URL.createObjectURL(blob), download: "AnaliseJogos_Tigres.xls" });
-  document.body.append(a); a.click(); a.remove();
-}
-function buildSpreadsheetML(sheets) {
-  const esc = (v) => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const cell = (v) => {
-    if (v === "" || v === null || v === undefined) return "<Cell/>";
-    const isNum = typeof v === "number";
-    return `<Cell><Data ss:Type="${isNum ? "Number" : "String"}">${esc(v)}</Data></Cell>`;
-  };
-  const body = sheets.map((s) =>
-    `<Worksheet ss:Name="${esc(s.name)}"><Table>` +
-    s.rows.map((r) => `<Row>${r.map(cell).join("")}</Row>`).join("") +
-    `</Table></Worksheet>`
-  ).join("");
-  return `<?xml version="1.0"?>\n<?mso-application progid="Excel.Sheet"?>\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">${body}</Workbook>`;
 }
 
 /* ================= AGGREGATIONS ================= */
@@ -336,7 +295,7 @@ function render() {
   $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.view === state.view));
   const app = $("#app");
   app.innerHTML = "";
-  ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, comparar: viewComparar, equipa: viewEquipa, dicas: viewDicas, posse: viewPosse, nova: viewNova }[state.view])(app);
+  ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, comparar: viewComparar, equipa: viewEquipa, dicas: viewDicas, posse: viewPosse }[state.view])(app);
   const s = state.source;
   $("#syncStatus").className = "status " + (s === "github" ? "ok" : s === "seed" ? "err" : "local");
   $("#syncStatus").title = s === "github" ? "Ligado ao GitHub (dados partilhados)" : s === "seed" ? "Dados iniciais (não partilhado ainda)" : "Cache local";
@@ -607,9 +566,7 @@ function nextGameCard(f) {
   card.append(el("div", { class: "ng-match" }, side(casa), el("div", { class: "ng-vs" }, el("span", { class: "ng-hora" }, f.hora || "–"), el("span", {}, "vs")), side(vis)));
   card.append(el("div", { class: "ng-info" },
     el("div", {}, el("span", { class: "ng-ic" }, "📅"), dataJornada(f.data, f.hora) || f.data || "Data por definir"),
-    el("div", {}, el("span", { class: "ng-ic" }, "🕒"), f.hora || "Hora por definir"),
-    el("div", {}, el("span", { class: "ng-ic" }, "🏟️"), ESTADIO),
-    el("div", {}, el("span", { class: "ng-ic" }, "🆚"), f.adversario)));
+    el("div", {}, el("span", { class: "ng-ic" }, "🏟️"), ESTADIO)));
   card.append(f.video
     ? el("a", { class: "btn ng-live", href: f.video, target: "_blank", rel: "noopener" }, "▶ Ver transmissão")
     : el("div", { class: "ng-nolive" }, "Link da transmissão ainda não disponível"));
@@ -1658,7 +1615,8 @@ function viewPosse(app) {
     const btnGh = el("button", { class: "btn", onclick: doSave(true) }, "Guardar no GitHub");
     const btnLocal = el("button", { class: "btn ghost", onclick: doSave(false) }, "Guardar localmente");
     if (!ghConfigured()) btnGh.disabled = true;
-    save.append(field("Jornada", sel), info, el("div", { class: "btnrow" }, btnGh, btnLocal), saveMsg);
+    const btnCfg = el("button", { class: "btn ghost small", type: "button", onclick: openSettingsModal }, "⚙ Definições / Token");
+    save.append(field("Jornada", sel), info, el("div", { class: "btnrow" }, btnGh, btnLocal, btnCfg), saveMsg);
   }
   app.append(save);
 
@@ -1704,157 +1662,6 @@ function viewPosse(app) {
   viewCleanup = () => { clearInterval(interval); document.removeEventListener("keydown", onKey); posseBank(); };
 }
 
-/* ================= NOVA JORNADA (form) ================= */
-function viewNova(app) {
-  const L = state.data.listas;
-  const nextNum = Math.max(0, ...state.data.jornadas.map((j) => j.numero)) + 1;
-  app.append(el("div", { class: "section-title" }, `Registar Jornada ${nextNum}`));
-
-  if (!ghConfigured()) {
-    app.append(el("div", { class: "note", html: "<strong>App ainda não ligada ao GitHub.</strong> Podes preencher e <em>Exportar Excel</em>, mas para partilhar com os teus amigos tens de configurar o repositório (ver instruções no fim). Enquanto isso, os dados novos ficam guardados só neste browser." }));
-  }
-
-  const form = el("div");
-  // Meta
-  const meta = el("div", { class: "form-grid" });
-  const advSel = selectFrom(L.equipas.filter((e) => e !== state.data.meta.clube), "Adversário");
-  const numInput = el("input", { type: "number", value: nextNum, id: "f_num" });
-  const nrJog = el("input", { type: "number", value: 16, id: "f_nrjog" });
-  const tatica = el("input", { type: "text", value: "5-4-1", id: "f_tatica" });
-  meta.append(
-    field("Jornada nº", numInput),
-    field("Adversário", advSel),
-    field("Nº de jogadores", nrJog),
-    field("Tática inicial", tatica));
-  form.append(meta);
-
-  // Match stats
-  form.append(el("div", { class: "section-title" }, "Estatísticas do jogo"));
-  const statDefs = [["Resultado", "golos"], ["Remates", ""], ["Remates à baliza", ""], ["Cantos", ""], ["Faltas", ""], ["Fora de jogo", ""], ["Posse de bola", "%"], ["Cruzamentos", ""]];
-  const statGrid = el("div", { class: "form-grid" });
-  const statInputs = {};
-  statDefs.forEach(([k, hint]) => {
-    const ti = el("input", { type: "number", step: hint === "%" ? "1" : "1", placeholder: hint === "%" ? "% ex: 55" : state.data.meta.clube });
-    const ci = el("input", { type: "number", step: "1", placeholder: hint === "%" ? "% ex: 45" : "adversário" });
-    statInputs[k] = { ti, ci, isPct: hint === "%" };
-    const wrap = el("div", {},
-      el("label", {}, k + (hint === "%" ? " (%)" : "")),
-      el("div", { style: "display:grid;grid-template-columns:1fr 1fr;gap:8px" }, ti, ci));
-    statGrid.append(wrap);
-  });
-  form.append(statGrid);
-  form.append(el("p", { class: "hint" }, `Esquerda = ${state.data.meta.clube} · Direita = adversário. Posse de bola em % (ex: 55 e 45).`));
-
-  // Players
-  form.append(el("div", { class: "section-title" }, "Jogadores (marca os que jogaram)"));
-  const pcols = [["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["passeFinalizacao", "PF"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"], ["driblesBemSucedidos", "DB"], ["driblesFalhados", "DF"], ["cruzamentosBemSucedidos", "CB"], ["cruzamentosFalhados", "CF"]];
-  const pt = el("table", { class: "pstat-table" });
-  const ph = el("tr", {}, el("th", {}, "Conv."), el("th", {}, "Jogador"), el("th", {}, "Tit."));
-  pcols.forEach((c) => ph.append(el("th", { class: "num" }, c[1])));
-  pt.append(el("thead", {}, ph));
-  const playerRows = [];
-  L.jogadores.forEach((nome) => {
-    const conv = el("input", { type: "checkbox" });
-    const tit = el("input", { type: "checkbox" });
-    const inputs = {};
-    const tr = el("tr", {}, el("td", {}, conv), el("td", {}, nome), el("td", {}, tit));
-    pcols.forEach((c) => {
-      const inp = el("input", { type: "number", min: "0", style: "width:56px" });
-      inputs[c[0]] = inp;
-      tr.append(el("td", { class: "num" }, inp));
-    });
-    pt.append(tr);
-    playerRows.push({ nome, conv, tit, inputs });
-  });
-  form.append(tableScroll(pt));
-  form.append(el("p", { class: "hint" }, "Só os jogadores com 'Conv.' marcado são guardados. Deixa os campos vazios como 0."));
-
-  // Events
-  form.append(el("div", { class: "section-title" }, "Eventos do jogo (opcional)"));
-  const evWrap = el("div");
-  const addEventRow = (acao = "", jogador = "", minuto = "") => {
-    const aSel = selectFrom(L.acontecimentos, "Ação", acao);
-    const jSel = selectFrom(["", ...L.jogadores], "Jogador (opcional)", jogador);
-    const mIn = el("input", { type: "number", min: "0", max: "120", placeholder: "Min.", value: minuto, style: "width:72px", title: "Minuto (obrigatório nos golos)" });
-    const del = el("button", { class: "btn ghost small", type: "button" }, "✕");
-    const row = el("div", { class: "event-row" }, aSel, jSel, mIn, del);
-    del.addEventListener("click", () => row.remove());
-    evWrap.append(row);
-  };
-  form.append(evWrap);
-  const addBtn = el("button", { class: "btn ghost small", type: "button", onclick: () => addEventRow() }, "+ Adicionar evento");
-  form.append(el("div", { class: "btnrow" }, addBtn));
-
-  // Actions
-  const msg = el("p", { class: "hint" });
-  const collect = () => {
-    const numero = +numInput.value;
-    const adversario = advSel.value;
-    if (!adversario) { throw new Error("Escolhe o adversário."); }
-    const matchStats = {};
-    for (const [k, o] of Object.entries(statInputs)) {
-      let t = o.ti.value === "" ? null : +o.ti.value;
-      let c = o.ci.value === "" ? null : +o.ci.value;
-      if (o.isPct) { t = t == null ? null : t / 100; c = c == null ? null : c / 100; }
-      matchStats[k] = { tigres: t, adversario: c };
-    }
-    const players = playerRows.filter((r) => r.conv.checked).map((r) => {
-      const o = { nome: r.nome, titular: r.tit.checked };
-      for (const [k, inp] of Object.entries(r.inputs)) o[k] = inp.value === "" ? 0 : +inp.value;
-      return o;
-    });
-    const eventos = $$(".event-row", evWrap).map((row) => {
-      const [a, j] = $$("select", row);
-      const m = $("input", row).value;
-      if (!a.value) return null;
-      const e = { acao: a.value, jogador: j.value || null };
-      if (m !== "") e.minuto = +m;
-      return e;
-    }).filter(Boolean);
-    return { numero, equipa: state.data.meta.clube, adversario, nrJogadores: +nrJog.value, tatica: tatica.value, matchStats, players, eventos };
-  };
-
-  const saveGh = el("button", { class: "btn", type: "button" }, "Guardar e partilhar");
-  const saveLocal = el("button", { class: "btn ghost", type: "button" }, "Guardar só neste browser");
-  const exp = el("button", { class: "btn ghost", type: "button" }, "Exportar Excel");
-  const settingsBtn = el("button", { class: "btn ghost small", type: "button" }, "⚙ Definições / Token");
-
-  saveGh.addEventListener("click", async () => {
-    try {
-      const j = collect();
-      upsertJornada(j);
-      msg.textContent = "A guardar no GitHub…";
-      await saveToGitHub(state.data, `Jornada ${j.numero} vs ${j.adversario}`);
-      state.source = "github";
-      msg.textContent = "✅ Guardado e partilhado! Os teus amigos já veem a jornada.";
-      state.view = "jornadas"; render();
-    } catch (e) {
-      // reverte se falhou o commit
-      msg.style.color = "var(--loss)"; msg.textContent = "❌ " + e.message;
-    }
-  });
-  saveLocal.addEventListener("click", () => {
-    try {
-      const j = collect(); upsertJornada(j);
-      localStorage.setItem("tigres_cache", JSON.stringify(state.data));
-      state.source = "local";
-      state.view = "jornadas"; render();
-    } catch (e) { msg.style.color = "var(--loss)"; msg.textContent = "❌ " + e.message; }
-  });
-  exp.addEventListener("click", () => { try { collect(); } catch {} exportExcel(); });
-  settingsBtn.addEventListener("click", openSettingsModal);
-
-  form.append(el("div", { class: "btnrow" }, saveGh, saveLocal, exp, settingsBtn), msg);
-  app.append(form);
-}
-
-function upsertJornada(j) {
-  const idx = state.data.jornadas.findIndex((x) => x.numero === j.numero);
-  if (idx >= 0) state.data.jornadas[idx] = j; else state.data.jornadas.push(j);
-  state.data.jornadas.sort((a, b) => a.numero - b.numero);
-  state.data.meta.atualizado = new Date().toISOString();
-}
-
 function openSettingsModal() {
   const b = $("#modalBody"); b.innerHTML = "";
   b.append(el("h2", {}, "Definições"));
@@ -1874,13 +1681,6 @@ function tableScroll(table) {
   return el("div", { class: "table-scroll" }, table);
 }
 function field(label, input) { return el("div", {}, el("label", {}, label), input); }
-function selectFrom(arr, ph, val = "") {
-  const s = el("select");
-  if (ph) s.append(el("option", { value: "" }, ph));
-  arr.forEach((o) => s.append(el("option", { value: o, ...(o === val ? { selected: "selected" } : {}) }, o || "—")));
-  s.value = val;
-  return s;
-}
 function showModal() { $("#modalBackdrop").hidden = false; }
 function closeModal() { $("#modalBackdrop").hidden = true; }
 
