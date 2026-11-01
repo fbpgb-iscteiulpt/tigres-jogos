@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-01T20:12:11.862Z",
+    "atualizado": "2026-11-01T21:01:36.089Z",
     "versao": 13
   },
   "listas": {
@@ -8723,6 +8723,43 @@
       "gm": 8,
       "gs": 14,
       "td": 19
+    }
+  ],
+  "lesoes": [
+    {
+      "jogador": "Tomas M",
+      "lesao": "Ligamento cruzado anterior (ACL)",
+      "ate": "2027-09"
+    },
+    {
+      "jogador": "Miguel Lima",
+      "lesao": "Abdutores",
+      "ate": "2026-11-08"
+    },
+    {
+      "jogador": "Cascais",
+      "lesao": "Coxa",
+      "ate": "2026-11-14"
+    },
+    {
+      "jogador": "Ricardo",
+      "lesao": "Joelho",
+      "ate": "2027-01"
+    },
+    {
+      "jogador": "Sobral",
+      "lesao": "Tornozelo",
+      "ate": null
+    },
+    {
+      "jogador": "Paiva",
+      "lesao": "Joelho",
+      "ate": null
+    },
+    {
+      "jogador": "Tomas S",
+      "lesao": "Cabeça",
+      "ate": null
     }
   ]
 }

@@ -300,7 +300,7 @@ function render() {
   $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.view === state.view));
   const app = $("#app");
   app.innerHTML = "";
-  ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, comparar: viewComparar, equipa: viewEquipa, dicas: viewDicas, posse: viewPosse }[state.view])(app);
+  ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, comparar: viewComparar, equipa: viewEquipa, dicas: viewDicas, posse: viewPosse, lesoes: viewLesoes }[state.view])(app);
   const s = state.source;
   $("#syncStatus").className = "status " + (s === "github" ? "ok" : s === "seed" ? "err" : "local");
   $("#syncStatus").title = s === "github" ? "Ligado ao GitHub (dados partilhados)" : s === "seed" ? "Dados iniciais (não partilhado ainda)" : "Cache local";
@@ -962,6 +962,54 @@ function teamStatCard(m, serie) {
 }
 
 /* ================= DICAS DE TREINO ================= */
+/* ================= LESÕES E DISCIPLINA ================= */
+// data.lesoes: [{ jogador, lesao, ate }] — ate = "AAAA-MM-DD" (dia), "AAAA-MM" (só mês) ou null (indefinido)
+function lesaoRegresso(ate, hoje = new Date()) {
+  if (!ate) return { txt: "Tempo indefinido", sub: "Sem data de regresso", cls: "indef", ord: Infinity };
+  const [a, m, dd] = ate.split("-").map(Number);
+  const fim = dd ? new Date(a, m - 1, dd) : new Date(a, m, 0); // só mês -> fim desse mês
+  const h0 = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+  const dias = Math.round((fim - h0) / 86400000);
+  const txt = dd ? `${dd} ${MESES_PT[m - 1]} ${a}` : `${MESES_PT[m - 1]} ${a}`;
+  if (dias < 0) return { txt, sub: "Já pode regressar", cls: "ok", ord: dias };
+  const sub = dd
+    ? (dias === 0 ? "Regressa hoje" : dias === 1 ? "Falta 1 dia" : dias < 60 ? `Faltam ${dias} dias` : `Faltam ~${Math.round(dias / 30)} meses`)
+    : (dias < 45 ? "Regressa este mês" : `Faltam ~${Math.round(dias / 30)} meses`);
+  return { txt, sub, cls: dias <= 21 ? "breve" : dias <= 120 ? "medio" : "longo", ord: dias };
+}
+function viewLesoes(app) {
+  const lista = (state.data.lesoes || []).map((l) => ({ ...l, r: lesaoRegresso(l.ate) })).sort((a, b) => a.r.ord - b.r.ord || a.jogador.localeCompare(b.jogador));
+  const pos = state.data.listas?.posicoes || {};
+
+  app.append(el("div", { class: "section-title" }, "Lesões"));
+  if (!lista.length) {
+    app.append(el("div", { class: "empty" }, "Sem jogadores lesionados. 💪"));
+  } else {
+    const prox = lista.filter((l) => l.r.cls === "breve" || l.r.cls === "ok").length;
+    app.append(el("div", { class: "les-sum" },
+      el("span", { class: "les-sum-n" }, String(lista.length)),
+      el("span", {}, `jogador${lista.length === 1 ? "" : "es"} lesionado${lista.length === 1 ? "" : "s"}`),
+      prox ? el("span", { class: "les-sum-tag" }, `${prox} a regressar em breve`) : null));
+    const grid = el("div", { class: "les-list" });
+    lista.forEach((l) => grid.append(el("div", { class: "card les-card " + l.r.cls },
+      el("div", { class: "les-ic" }, "🩹"),
+      el("div", { class: "les-main" },
+        el("div", { class: "les-nome" }, l.jogador, pos[l.jogador] ? el("span", { class: "les-pos" }, pos[l.jogador]) : null),
+        el("div", { class: "les-lesao" }, l.lesao)),
+      el("div", { class: "les-ret" },
+        el("span", { class: "les-ret-lbl" }, "Regresso"),
+        el("span", { class: "les-ret-data" }, l.r.txt),
+        el("span", { class: "les-ret-sub" }, l.r.sub)))));
+    app.append(grid);
+    app.append(el("p", { class: "hint" }, "Ordenado por data prevista de regresso. Quando só há o mês, conta-se até ao fim desse mês."));
+  }
+
+  app.append(el("div", { class: "section-title" }, "Disciplina"));
+  app.append(el("div", { class: "card soon" },
+    el("span", { class: "soon-ic" }, "🟨"),
+    el("div", {}, el("strong", {}, "Em breve"), el("span", {}, "Cartões, castigos e suspensões dos jogadores vão aparecer aqui."))));
+}
+
 function viewDicas(app) {
   const js = jornadasComStats(state.data);
   const n = js.length || 1;
