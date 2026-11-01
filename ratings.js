@@ -78,6 +78,9 @@ const POS_OVERRIDE = {
   "3|Dentes": "Lateral Direito",
   "5|Dentes": "Lateral Esquerdo",
   "5|Miguel Cruz": "Medio Defensivo",
+  "7|Dentes": "Lateral Esquerdo",
+  "7|Jacob": "Lateral Esquerdo",
+  "7|Simão": "Lateral Direito",
 };
 
 /* ---------- Jogadores que NÃO sofreram golo em cada jornada ----------
