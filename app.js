@@ -1061,7 +1061,7 @@ function viewLesoes(app) {
 
   // Disponibilidade por posição
   const linhas = porLinha(plantel, pos, fora);
-  const lc = el("div", { class: "card md-card" }, el("div", { class: "md-card-t" }, "🏟️ Disponibilidade por posição"));
+  const lc = el("div", { class: "card md-card" }, el("div", { class: "md-card-t" }, "Disponibilidade por posição"));
   const lg = el("div", { class: "md-lines" });
   linhas.forEach((x) => lg.append(el("div", { class: "md-line" },
     el("span", { class: "md-line-n" }, x.nome),
