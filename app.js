@@ -192,6 +192,10 @@ function resultOf(j) {
   const gf = +r.tigres, ga = +r.adversario;
   return { gf, ga, res: gf > ga ? "w" : gf < ga ? "l" : "d" };
 }
+/* Jornadas com estatísticas do Excel (exclui as que só têm o resultado vindo da CIF) */
+const temStats = (j) => !j.semEstatisticas;
+function jornadasComStats(data) { return [...data.jornadas].filter(temStats).sort((a, b) => a.numero - b.numero); }
+
 function seasonAgg(data) {
   const out = {
     jogos: data.jornadas.length, v: 0, e: 0, d: 0, gf: 0, ga: 0,
@@ -536,7 +540,8 @@ function fsFuture(f) {
 }
 function fsMeta(j) {
   const dataTxt = dataJornada(j.data, j.hora);
-  return el("div", { class: "fs-meta" }, el("span", { class: "fs-j" }, `J${j.numero}`), el("span", { class: "fs-date" }, dataTxt ? dataTxt.replace(/^[^,]*,\s*/, "") : ""));
+  return el("div", { class: "fs-meta" }, el("span", { class: "fs-j" }, `J${j.numero}`), el("span", { class: "fs-date" }, dataTxt ? dataTxt.replace(/^[^,]*,\s*/, "") : ""),
+    j.semEstatisticas ? el("span", { class: "fs-nostats", title: "Ainda sem estatísticas" }, "sem estat.") : null);
 }
 
 /* Últimos N resultados (mais recente em cima) */
@@ -693,8 +698,22 @@ function openJornadaModal(numero) {
     teamTag(j.adversario, true)));
   b.append(el("div", { class: "chips" },
     j.data ? el("span", { class: "chip" }, `Data: ${dataJornada(j.data, j.hora)}${j.hora ? " · " + j.hora : ""}${j.casa === false ? " (fora)" : j.casa === true ? " (casa)" : ""}`) : null,
-    el("span", { class: "chip" }, `Tática: ${fmt(j.tatica)}`),
-    el("span", { class: "chip" }, `Convocados: ${j.players.length}`)));
+    j.semEstatisticas ? null : el("span", { class: "chip" }, `Tática: ${fmt(j.tatica)}`),
+    j.semEstatisticas ? null : el("span", { class: "chip" }, `Convocados: ${j.players.length}`)));
+
+  if (j.semEstatisticas) {
+    if (j.video) {
+      b.append(el("div", { class: "section-title" }, "Vídeo do jogo"));
+      b.append(videoEmbed(j.video));
+    }
+    b.append(el("div", { class: "section-title" }, "Estatísticas do jogo"));
+    b.append(el("div", { class: "no-stats" },
+      el("span", { class: "no-stats-ic" }, "📊"),
+      el("div", {}, el("strong", {}, "Ainda sem estatísticas"),
+        el("span", {}, "O resultado já foi atualizado a partir do site da CIF. As estatísticas do jogo e dos jogadores aparecem quando a jornada for adicionada ao Excel."))));
+    showModal();
+    return;
+  }
 
   if (j.video) {
     b.append(el("div", { class: "section-title" }, "Vídeo do jogo"));
@@ -806,7 +825,7 @@ function ms(j, key) { const v = j.matchStats?.[key]; return v && v.tigres != nul
 function msAdv(j, key) { const v = j.matchStats?.[key]; return v && v.adversario != null ? +v.adversario : null; }
 
 function viewEquipa(app) {
-  const js = [...state.data.jornadas].sort((a, b) => a.numero - b.numero);
+  const js = jornadasComStats(state.data);
   app.append(el("div", { class: "section-title" }, "Estatísticas da equipa"));
   if (!js.length) { app.append(el("div", { class: "empty" }, "Sem jornadas registadas.")); return; }
 
@@ -948,7 +967,7 @@ function teamStatCard(m, serie) {
 
 /* ================= DICAS DE TREINO ================= */
 function viewDicas(app) {
-  const js = [...state.data.jornadas].sort((a, b) => a.numero - b.numero);
+  const js = jornadasComStats(state.data);
   const n = js.length || 1;
   const mean = (fn) => js.reduce((s, j) => s + (fn(j) || 0), 0) / n;
   // médias da época
@@ -1118,7 +1137,7 @@ function playerEvolution(nome) {
   const wrap = el("div", { class: "evo" });
   const R = window.TigresRatings;
   const notas = R ? R.computeRatings(state.data).porJornada : null;
-  const jornadas = [...state.data.jornadas].sort((a, b) => a.numero - b.numero);
+  const jornadas = jornadasComStats(state.data);
   // uma linha por jornada; jogos sem minutos contam como "não jogou"
   const jogos = jornadas.map((j) => {
     const p = j.players.find((x) => x.nome === nome);
@@ -1578,7 +1597,7 @@ function viewPosse(app) {
   // Gravar posse medida numa jornada existente (overwrite)
   const save = el("div", { class: "posse-save" });
   save.append(el("div", { class: "posse-cfg-title" }, "Guardar na jornada"));
-  const jornadas = [...state.data.jornadas].sort((a, b) => a.numero - b.numero);
+  const jornadas = jornadasComStats(state.data);
   if (!jornadas.length) {
     save.append(el("p", { class: "dicas-note" }, "Ainda não há jornadas registadas para gravar."));
   } else {

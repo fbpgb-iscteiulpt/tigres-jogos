@@ -75,6 +75,7 @@ const POS_OVERRIDE = {
   "1|Rodrigo": "Lateral Esquerdo",
   "2|Rodrigo": "Lateral Esquerdo",
   "2|Paulinho": "Defesa Central",
+  "3|Dentes": "Lateral Direito",
   "5|Dentes": "Lateral Esquerdo",
   "5|Miguel Cruz": "Medio Defensivo",
 };

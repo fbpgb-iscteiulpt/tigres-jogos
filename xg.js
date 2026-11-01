@@ -55,6 +55,7 @@ function shotsJornada(j, lado) {
 function calibrateXG(data) {
   let prior = 0, golos = 0, nBal = 0;
   for (const j of data.jornadas || []) {
+    if (j.semEstatisticas) continue; // jornada só com resultado (ainda sem remates registados)
     for (const lado of ["tigres", "adv"]) {
       const c = shotsJornada(j, lado);
       prior += c["baliza-dentro"] * XG_PRIOR.baliza.dentro + c["baliza-fora"] * XG_PRIOR.baliza.fora;
