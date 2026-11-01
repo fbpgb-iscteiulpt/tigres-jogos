@@ -153,7 +153,7 @@ async function loadData() {
 async function saveToGitHub(data, msg) {
   const token = getToken();
   if (!ghConfigured()) throw new Error("GitHub não configurado (edita CONFIG no app.js).");
-  if (!token) throw new Error("Sem token. Abre 'Posse' → ⚙ Definições e cola o teu token.");
+  if (!token) throw new Error("Sem token. Abre 'Cálculo de posse de bola' → ⚙ Definições e cola o teu token.");
   // obter SHA atual
   let sha;
   const head = await fetch(apiUrl() + "?ref=" + CONFIG.githubBranch, {
@@ -978,7 +978,7 @@ function lesaoRegresso(ate, hoje = new Date()) {
     : (dias < 45 ? "Regressa este mês" : `Faltam ~${Math.round(dias / 30)} meses`);
   return { txt, sub, cls: dias <= 21 ? "breve" : dias <= 120 ? "medio" : "longo", ord: dias };
 }
-/* Disponibilidade do plantel: verde = disponível, amarelo = em recuperação (lesão ativa), vermelho = indisponível (disciplina, em breve) */
+/* Disponibilidade do plantel: verde = disponível, amarelo = em recuperação (lesão ativa), vermelho = suspenso (disciplina, em breve) */
 function squadAvailability() {
   const plantel = state.data.listas?.jogadores || [];
   const recup = new Set((state.data.lesoes || []).filter((l) => lesaoRegresso(l.ate).cls !== "ok").map((l) => l.jogador));
@@ -989,44 +989,94 @@ function squadAvailability() {
   const tot = plantel.length || 1;
   const seg = (n, cls, lbl) => n ? el("div", { class: "av-seg " + cls, style: `flex-grow:${n}`, title: `${lbl}: ${n}` }, String(n)) : null;
   const leg = (n, cls, lbl) => el("span", { class: "av-leg" }, el("i", { class: "av-dot " + cls }), `${lbl} `, el("b", {}, String(n)));
-  return el("div", { class: "card av", onclick: () => { state.view = "lesoes"; render(); }, title: "Ver lesões e disciplina" },
+  return el("div", { class: "card av", onclick: () => { state.view = "lesoes"; lesoesFiltro = null; render(); }, title: "Ver lesões e disciplina" },
     el("div", { class: "av-head" },
       el("span", { class: "av-title" }, "Disponibilidade do plantel"),
       el("span", { class: "av-pct" }, `${Math.round((nD / tot) * 100)}% disponível · ${plantel.length} jogadores`)),
-    el("div", { class: "av-bar" }, seg(nD, "ok", "Disponíveis"), seg(nR, "rec", "Em recuperação"), seg(nI, "ind", "Indisponíveis")),
-    el("div", { class: "av-legs" }, leg(nD, "ok", "Disponíveis"), leg(nR, "rec", "Em recuperação"), leg(nI, "ind", "Indisponíveis")));
+    el("div", { class: "av-bar" }, seg(nD, "ok", "Disponíveis"), seg(nR, "rec", "Em recuperação"), seg(nI, "ind", "Suspensos")),
+    el("div", { class: "av-legs" }, leg(nD, "ok", "Disponíveis"), leg(nR, "rec", "Em recuperação"), leg(nI, "ind", "Suspensos")));
 }
 
+// Grupos do painel de lesões (macro) e lista de cada grupo (detalhe)
+let lesoesFiltro = null; // null = painel; senão a chave do grupo aberto
+function lesoesGrupos() {
+  const plantel = state.data.listas?.jogadores || [];
+  const ativas = (state.data.lesoes || []).map((l) => ({ ...l, r: lesaoRegresso(l.ate) })).filter((l) => l.r.cls !== "ok")
+    .sort((a, b) => a.r.ord - b.r.ord || a.jogador.localeCompare(b.jogador));
+  const lesionados = new Set(ativas.map((l) => l.jogador));
+  return [
+    { key: "disp", cls: "g", n: plantel.filter((n) => !lesionados.has(n)).length, titulo: "Disponíveis", sub: "Para seleção", jogadores: plantel.filter((n) => !lesionados.has(n)) },
+    { key: "les", cls: "r", n: ativas.length, titulo: "Lesionados", sub: "Fora de competição", lesoes: ativas },
+    { key: "final", cls: "y", n: ativas.filter((l) => l.r.cls === "breve").length, titulo: "Em recuperação final", sub: "Regresso previsto próximo", lesoes: ativas.filter((l) => l.r.cls === "breve") },
+    { key: "indef", cls: "s", n: ativas.filter((l) => l.r.cls === "indef").length, titulo: "Sem previsão", sub: "Data por confirmar", lesoes: ativas.filter((l) => l.r.cls === "indef") },
+  ];
+}
+function lesCard(l, pos) {
+  return el("div", { class: "card les-card " + l.r.cls },
+    el("div", { class: "les-main" },
+      el("div", { class: "les-nome" }, l.jogador, pos[l.jogador] ? el("span", { class: "les-pos" }, pos[l.jogador]) : null),
+      el("div", { class: "les-lesao" }, l.lesao)),
+    el("div", { class: "les-ret" },
+      el("span", { class: "les-ret-lbl" }, "Regresso"),
+      el("span", { class: "les-ret-data" }, l.r.txt),
+      el("span", { class: "les-ret-sub" }, l.r.sub)));
+}
+const LINHAS = [["GR", "Guarda-redes"], ["DEF", "Defesas"], ["MED", "Médios"], ["ATA", "Avançados"]];
+function linhaDe(posStr) {
+  const r = window.TigresRatings ? window.TigresRatings.roleOf(posStr) : "MC";
+  return r === "GR" ? "GR" : r === "DC" || r === "LD" ? "DEF" : r === "MD" || r === "MC" ? "MED" : "ATA";
+}
 function viewLesoes(app) {
-  const lista = (state.data.lesoes || []).map((l) => ({ ...l, r: lesaoRegresso(l.ate) })).sort((a, b) => a.r.ord - b.r.ord || a.jogador.localeCompare(b.jogador));
+  const grupos = lesoesGrupos();
   const pos = state.data.listas?.posicoes || {};
+  const g = grupos.find((x) => x.key === lesoesFiltro);
 
-  app.append(el("div", { class: "section-title" }, "Lesões"));
-  if (!lista.length) {
-    app.append(el("div", { class: "empty" }, "Sem jogadores lesionados. 💪"));
-  } else {
-    const prox = lista.filter((l) => l.r.cls === "breve" || l.r.cls === "ok").length;
-    app.append(el("div", { class: "les-sum" },
-      el("span", { class: "les-sum-n" }, String(lista.length)),
-      el("span", {}, `jogador${lista.length === 1 ? "" : "es"} lesionado${lista.length === 1 ? "" : "s"}`),
-      prox ? el("span", { class: "les-sum-tag" }, `${prox} a regressar em breve`) : null));
-    const grid = el("div", { class: "les-list" });
-    lista.forEach((l) => grid.append(el("div", { class: "card les-card " + l.r.cls },
-      el("div", { class: "les-main" },
-        el("div", { class: "les-nome" }, l.jogador, pos[l.jogador] ? el("span", { class: "les-pos" }, pos[l.jogador]) : null),
-        el("div", { class: "les-lesao" }, l.lesao)),
-      el("div", { class: "les-ret" },
-        el("span", { class: "les-ret-lbl" }, "Regresso"),
-        el("span", { class: "les-ret-data" }, l.r.txt),
-        el("span", { class: "les-ret-sub" }, l.r.sub)))));
+  if (!g) {
+    // Visão macro
+    app.append(el("div", { class: "section-title" }, "Lesões e disponibilidade"));
+    const grid = el("div", { class: "les-panel" });
+    grupos.forEach((x) => {
+      const box = el("button", { type: "button", class: "les-box " + x.cls, title: "Ver jogadores" },
+        el("span", { class: "les-box-n" }, String(x.n)),
+        el("span", { class: "les-box-t" }, x.titulo),
+        el("span", { class: "les-box-s" }, x.sub));
+      box.addEventListener("click", () => { lesoesFiltro = x.key; render(); window.scrollTo(0, 0); });
+      grid.append(box);
+    });
     app.append(grid);
-    app.append(el("p", { class: "hint" }, "Ordenado por data prevista de regresso. Quando só há o mês, conta-se até ao fim desse mês."));
+    app.append(el("p", { class: "hint" }, "Toca numa caixa para ver os jogadores. \"Em recuperação final\" (regresso nas próximas 3 semanas) e \"Sem previsão\" fazem parte dos lesionados."));
+
+    app.append(el("div", { class: "section-title" }, "Disciplina"));
+    app.append(el("div", { class: "card soon" },
+      el("span", { class: "soon-ic" }, "🟨"),
+      el("div", {}, el("strong", {}, "Em breve"), el("span", {}, "Cartões, castigos e suspensões dos jogadores vão aparecer aqui."))));
+    return;
   }
 
-  app.append(el("div", { class: "section-title" }, "Disciplina"));
-  app.append(el("div", { class: "card soon" },
-    el("span", { class: "soon-ic" }, "🟨"),
-    el("div", {}, el("strong", {}, "Em breve"), el("span", {}, "Cartões, castigos e suspensões dos jogadores vão aparecer aqui."))));
+  // Detalhe de um grupo
+  const back = el("button", { type: "button", class: "les-back" }, "← Voltar");
+  back.addEventListener("click", () => { lesoesFiltro = null; render(); });
+  app.append(el("div", { class: "les-head " + g.cls }, back,
+    el("div", {}, el("span", { class: "les-head-t" }, g.titulo), el("span", { class: "les-head-s" }, `${g.n} jogador${g.n === 1 ? "" : "es"} · ${g.sub}`))));
+
+  if (!g.n) { app.append(el("div", { class: "empty" }, "Nenhum jogador neste grupo.")); return; }
+
+  if (g.lesoes) {
+    const list = el("div", { class: "les-list" });
+    g.lesoes.forEach((l) => list.append(lesCard(l, pos)));
+    app.append(list);
+    app.append(el("p", { class: "hint" }, "Ordenado por data prevista de regresso. Quando só há o mês, conta-se até ao fim desse mês."));
+  } else {
+    // Disponíveis, agrupados por linha
+    LINHAS.forEach(([k, nome]) => {
+      const js = g.jogadores.filter((n) => linhaDe(pos[n]) === k).sort((a, b) => a.localeCompare(b));
+      if (!js.length) return;
+      app.append(el("div", { class: "les-linha" }, `${nome} (${js.length})`));
+      const wrap = el("div", { class: "les-disp" });
+      js.forEach((n) => wrap.append(el("div", { class: "les-chip" }, el("strong", {}, n), pos[n] ? el("span", {}, pos[n]) : null)));
+      app.append(wrap);
+    });
+  }
 }
 
 function viewDicas(app) {
@@ -1590,7 +1640,7 @@ function keyLabel(k) { return k === " " ? "Espaço" : k.length === 1 ? k.toUpper
 
 function viewPosse(app) {
   const clube = state.data.meta.clube || "Tigres";
-  app.append(el("div", { class: "section-title" }, "Posse de bola — cronómetros"));
+  app.append(el("div", { class: "section-title" }, "Cálculo de posse de bola — cronómetros"));
   app.append(el("p", { class: "dicas-intro" }, "Enquanto revês o vídeo do jogo, usa os atalhos de teclado para cronometrar a posse de cada equipa. Arrancar um cronómetro pára automaticamente o outro. No fim tens os tempos e as percentagens."));
 
   const keys = posseKeys();
@@ -1778,7 +1828,7 @@ async function boot() {
     $("#app").innerHTML = `<div class="empty">Erro ao carregar dados: ${e.message}</div>`;
     return;
   }
-  $$(".tab").forEach((t) => t.addEventListener("click", () => { state.view = t.dataset.view; closeNav(); render(); }));
+  $$(".tab").forEach((t) => t.addEventListener("click", () => { state.view = t.dataset.view; lesoesFiltro = null; closeNav(); render(); }));
   $("#modalClose").addEventListener("click", closeModal);
   $("#modalBackdrop").addEventListener("click", (e) => { if (e.target.id === "modalBackdrop") closeModal(); });
   $("#menuBtn").addEventListener("click", openNav);
