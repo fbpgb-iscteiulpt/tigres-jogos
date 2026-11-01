@@ -966,17 +966,17 @@ function teamStatCard(m, serie) {
 /* ================= LESÕES E DISCIPLINA ================= */
 // data.lesoes: [{ jogador, lesao, ate }] — ate = "AAAA-MM-DD" (dia), "AAAA-MM" (só mês) ou null (indefinido)
 function lesaoRegresso(ate, hoje = new Date()) {
-  if (!ate) return { txt: "Tempo indefinido", sub: "Sem data de regresso", cls: "indef", ord: Infinity };
+  if (!ate) return { txt: "Tempo indefinido", sub: "Sem data de regresso", cls: "indef", ord: Infinity, fim: null };
   const [a, m, dd] = ate.split("-").map(Number);
   const fim = dd ? new Date(a, m - 1, dd) : new Date(a, m, 0); // só mês -> fim desse mês
   const h0 = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
   const dias = Math.round((fim - h0) / 86400000);
   const txt = dd ? `${dd} ${MESES_PT[m - 1]} ${a}` : `${MESES_PT[m - 1]} ${a}`;
-  if (dias < 0) return { txt, sub: "Já pode regressar", cls: "ok", ord: dias };
+  if (dias < 0) return { txt, sub: "Já pode regressar", cls: "ok", ord: dias, fim };
   const sub = dd
     ? (dias === 0 ? "Regressa hoje" : dias === 1 ? "Falta 1 dia" : dias < 60 ? `Faltam ${dias} dias` : `Faltam ~${Math.round(dias / 30)} meses`)
     : (dias < 45 ? "Regressa este mês" : `Faltam ~${Math.round(dias / 30)} meses`);
-  return { txt, sub, cls: dias <= 21 ? "breve" : dias <= 120 ? "medio" : "longo", ord: dias };
+  return { txt, sub, cls: dias <= 21 ? "breve" : dias <= 120 ? "medio" : "longo", ord: dias, fim };
 }
 /* Disponibilidade do plantel: verde = disponível, amarelo = em recuperação (lesão ativa), vermelho = suspenso (disciplina, em breve) */
 function squadAvailability() {
@@ -989,7 +989,7 @@ function squadAvailability() {
   const tot = plantel.length || 1;
   const seg = (n, cls, lbl) => n ? el("div", { class: "av-seg " + cls, style: `flex-grow:${n}`, title: `${lbl}: ${n}` }, String(n)) : null;
   const leg = (n, cls, lbl) => el("span", { class: "av-leg" }, el("i", { class: "av-dot " + cls }), `${lbl} `, el("b", {}, String(n)));
-  return el("div", { class: "card av", onclick: () => { state.view = "lesoes"; lesoesFiltro = null; render(); }, title: "Ver lesões e disciplina" },
+  return el("div", { class: "card av", onclick: () => { state.view = "lesoes"; render(); }, title: "Ver lesões e disciplina" },
     el("div", { class: "av-head" },
       el("span", { class: "av-title" }, "Disponibilidade do plantel"),
       el("span", { class: "av-pct" }, `${Math.round((nD / tot) * 100)}% disponível · ${plantel.length} jogadores`)),
@@ -997,86 +997,153 @@ function squadAvailability() {
     el("div", { class: "av-legs" }, leg(nD, "ok", "Disponíveis"), leg(nR, "rec", "Em recuperação"), leg(nI, "ind", "Suspensos")));
 }
 
-// Grupos do painel de lesões (macro) e lista de cada grupo (detalhe)
-let lesoesFiltro = null; // null = painel; senão a chave do grupo aberto
-function lesoesGrupos() {
-  const plantel = state.data.listas?.jogadores || [];
-  const ativas = (state.data.lesoes || []).map((l) => ({ ...l, r: lesaoRegresso(l.ate) })).filter((l) => l.r.cls !== "ok")
-    .sort((a, b) => a.r.ord - b.r.ord || a.jogador.localeCompare(b.jogador));
-  const lesionados = new Set(ativas.map((l) => l.jogador));
-  return [
-    { key: "disp", cls: "g", n: plantel.filter((n) => !lesionados.has(n)).length, titulo: "Disponíveis", sub: "Para seleção", jogadores: plantel.filter((n) => !lesionados.has(n)) },
-    { key: "les", cls: "r", n: ativas.length, titulo: "Lesionados", sub: "Fora de competição", lesoes: ativas },
-    { key: "final", cls: "y", n: ativas.filter((l) => l.r.cls === "breve").length, titulo: "Em recuperação final", sub: "Regresso previsto próximo", lesoes: ativas.filter((l) => l.r.cls === "breve") },
-    { key: "indef", cls: "s", n: ativas.filter((l) => l.r.cls === "indef").length, titulo: "Sem previsão", sub: "Data por confirmar", lesoes: ativas.filter((l) => l.r.cls === "indef") },
-  ];
-}
-function lesCard(l, pos) {
-  return el("div", { class: "card les-card " + l.r.cls },
-    el("div", { class: "les-main" },
-      el("div", { class: "les-nome" }, l.jogador, pos[l.jogador] ? el("span", { class: "les-pos" }, pos[l.jogador]) : null),
-      el("div", { class: "les-lesao" }, l.lesao)),
-    el("div", { class: "les-ret" },
-      el("span", { class: "les-ret-lbl" }, "Regresso"),
-      el("span", { class: "les-ret-data" }, l.r.txt),
-      el("span", { class: "les-ret-sub" }, l.r.sub)));
-}
+// ---- Lesões e disciplina: painel único com toda a informação ----
 const LINHAS = [["GR", "Guarda-redes"], ["DEF", "Defesas"], ["MED", "Médios"], ["ATA", "Avançados"]];
+const LINHA_TIPICA = { GR: 1, DEF: 4, MED: 4, ATA: 2 }; // onze base (4-4-2) — para avaliar risco
 function linhaDe(posStr) {
   const r = window.TigresRatings ? window.TigresRatings.roleOf(posStr) : "MC";
   return r === "GR" ? "GR" : r === "DC" || r === "LD" ? "DEF" : r === "MD" || r === "MC" ? "MED" : "ATA";
 }
+const MES_ABR = ["Jan.", "Fev.", "Mar.", "Abr.", "Mai.", "Jun.", "Jul.", "Ago.", "Set.", "Out.", "Nov.", "Dez."];
+function fmtRegresso(ate) {
+  if (!ate) return "Por confirmar";
+  const [a, m, dd] = ate.split("-").map(Number);
+  return dd ? `${dd} ${MES_ABR[m - 1]} ${a}` : `${MES_ABR[m - 1]} ${a}`;
+}
+const LES_ESTADO = { breve: ["Recuperação final", "g"], medio: ["Lesão prolongada", "y"], longo: ["Lesão grave", "r"], indef: ["Sem previsão", "s"] };
+// Data (domingo) da jornada do calendário "7 / 8 Novembro" — ano = o mais próximo de hoje
+function dataJogo(f) {
+  const parts = String(f?.data || "").split("/");
+  const m = (parts[1] || parts[0] || "").trim().match(/(\d{1,2})\s+([A-Za-zçÇãÃéÉíÍ]+)/);
+  if (!m) return null;
+  const mes = mesIdxPT(m[2]); if (mes < 0) return null;
+  const hoje = new Date(); let ano = hoje.getFullYear();
+  if (mes < hoje.getMonth() - 6) ano++; else if (mes > hoje.getMonth() + 6) ano--;
+  const sab = f.hora === "11:00" || f.hora === "12:40" ? 0 : 1; // jogos de sábado/sexta: 1.º número
+  const d = new Date(ano, mes, +m[1]); d.setDate(d.getDate() - sab);
+  return d;
+}
+function iniciais(n) { const p = n.trim().split(/\s+/); return (p[0][0] + (p[1] ? p[1][0] : p[0][1] || "")).toUpperCase(); }
+function lesoesAtivas(ref = new Date()) {
+  return (state.data.lesoes || []).map((l) => ({ ...l, r: lesaoRegresso(l.ate, ref) })).filter((l) => l.r.cls !== "ok")
+    .sort((a, b) => a.r.ord - b.r.ord || a.jogador.localeCompare(b.jogador));
+}
+function porLinha(plantel, pos, fora) {
+  return LINHAS.map(([k, nome]) => {
+    const js = plantel.filter((n) => linhaDe(pos[n]) === k);
+    const disp = js.filter((n) => !fora.has(n)).length;
+    return { k, nome, total: js.length, disp, pct: js.length ? Math.round((disp / js.length) * 100) : 0 };
+  });
+}
+
 function viewLesoes(app) {
-  const grupos = lesoesGrupos();
+  const plantel = state.data.listas?.jogadores || [];
   const pos = state.data.listas?.posicoes || {};
-  const g = grupos.find((x) => x.key === lesoesFiltro);
+  const ativas = lesoesAtivas();
+  const fora = new Set(ativas.map((l) => l.jogador));
+  const tot = plantel.length || 1;
+  const pct = (n) => `${Math.round((n / tot) * 100)}% do plantel`;
+  const nFinal = ativas.filter((l) => l.r.cls === "breve").length;
+  const nIndef = ativas.filter((l) => l.r.cls === "indef").length;
+  const hoje = new Date();
 
-  if (!g) {
-    // Visão macro
-    app.append(el("div", { class: "section-title" }, "Lesões e disponibilidade"));
-    const grid = el("div", { class: "les-panel" });
-    grupos.forEach((x) => {
-      const box = el("button", { type: "button", class: "les-box " + x.cls, title: "Ver jogadores" },
-        el("span", { class: "les-box-n" }, String(x.n)),
-        el("span", { class: "les-box-t" }, x.titulo),
-        el("span", { class: "les-box-s" }, x.sub));
-      box.addEventListener("click", () => { lesoesFiltro = x.key; render(); window.scrollTo(0, 0); });
-      grid.append(box);
-    });
-    app.append(grid);
-    app.append(el("p", { class: "hint" }, "Toca numa caixa para ver os jogadores. \"Em recuperação final\" (regresso nas próximas 3 semanas) e \"Sem previsão\" fazem parte dos lesionados."));
+  // Cabeçalho
+  app.append(el("div", { class: "md-head" },
+    el("div", {}, el("h2", { class: "md-title" }, "Disponibilidade do plantel"), el("div", { class: "md-sub" }, "Estado atual e impacto das lesões")),
+    el("span", { class: "md-date" }, `📅 ${hoje.getDate()} ${MES_ABR[hoje.getMonth()].replace(".", "")} ${hoje.getFullYear()}`)));
 
-    app.append(el("div", { class: "section-title" }, "Disciplina"));
-    app.append(el("div", { class: "card soon" },
-      el("span", { class: "soon-ic" }, "🟨"),
-      el("div", {}, el("strong", {}, "Em breve"), el("span", {}, "Cartões, castigos e suspensões dos jogadores vão aparecer aqui."))));
-    return;
+  // KPIs
+  const kpi = (n, t, s, c) => el("div", { class: "md-kpi " + c }, el("i", { class: "md-dot" }), el("span", { class: "md-kpi-n" }, String(n)), el("span", { class: "md-kpi-t" }, t), el("span", { class: "md-kpi-s" }, s));
+  app.append(el("div", { class: "md-kpis" },
+    kpi(plantel.length - fora.size, "Disponíveis", pct(plantel.length - fora.size), "g"),
+    kpi(ativas.length, "Lesionados", pct(ativas.length), "r"),
+    kpi(nFinal, "Recuperação final", pct(nFinal), "y"),
+    kpi(nIndef, "Sem previsão", pct(nIndef), "s")));
+
+  // Disponibilidade por posição
+  const linhas = porLinha(plantel, pos, fora);
+  const lc = el("div", { class: "card md-card" }, el("div", { class: "md-card-t" }, "🏟️ Disponibilidade por posição"));
+  const lg = el("div", { class: "md-lines" });
+  linhas.forEach((x) => lg.append(el("div", { class: "md-line" },
+    el("span", { class: "md-line-n" }, x.nome),
+    el("span", { class: "md-line-p" }, `${x.pct}%`),
+    el("div", { class: "md-bar" }, el("div", { class: "md-bar-f " + (x.pct >= 75 ? "g" : x.pct >= 50 ? "y" : "r"), style: `width:${x.pct}%` })),
+    el("span", { class: "md-line-s" }, `${x.disp} de ${x.total} disponíveis`))));
+  lc.append(lg);
+  app.append(lc);
+
+  // Jogadores lesionados
+  const lj = el("div", { class: "card md-card" },
+    el("div", { class: "md-card-t" }, "➕ Jogadores lesionados", el("span", { class: "md-badge" }, `${ativas.length} ativo${ativas.length === 1 ? "" : "s"}`)));
+  if (!ativas.length) lj.append(el("div", { class: "empty" }, "Sem jogadores lesionados. 💪"));
+  ativas.forEach((l) => {
+    const [estado, ec] = LES_ESTADO[l.r.cls];
+    lj.append(el("div", { class: "md-row" },
+      el("span", { class: "md-av " + ec }, iniciais(l.jogador)),
+      el("div", { class: "md-row-b" }, el("strong", {}, l.jogador), el("span", {}, [pos[l.jogador], l.lesao].filter(Boolean).join(" · "))),
+      el("span", { class: "md-pill " + ec }, el("i", {}), estado),
+      el("div", { class: "md-ret" }, el("span", {}, "Regresso estimado"), el("strong", {}, fmtRegresso(l.ate)), el("em", {}, l.r.sub))));
+  });
+  if (ativas.length) lj.append(el("p", { class: "hint" }, "Quando só há o mês, conta-se até ao fim desse mês. Datas atualizadas à mão."));
+  app.append(lj);
+
+  // Impacto no próximo jogo + previsão de regressos
+  const duo = el("div", { class: "md-duo" });
+  const f = nextGame();
+  const ic = el("div", { class: "card md-card" }, el("div", { class: "md-card-t" }, "📅 Impacto no próximo jogo"));
+  if (!f) ic.append(el("div", { class: "empty" }, "Sem próximo jogo no calendário."));
+  else {
+    const dj = dataJogo(f);
+    const foraJogo = new Set(ativas.filter((l) => !dj || !l.r.fim || l.r.fim > dj).map((l) => l.jogador)); // regressa no dia do jogo = disponível
+    const voltam = ativas.filter((l) => !foraJogo.has(l.jogador)).map((l) => l.jogador);
+    const lj2 = porLinha(plantel, pos, foraJogo);
+    // em risco = lesões deixam a linha sem suplente (menos que o onze base + 1); linha mais afetada = mais ausências
+    const risco = lj2.filter((x) => x.disp < x.total && x.disp < LINHA_TIPICA[x.k] + 1);
+    const pior = [...lj2].sort((a, b) => (b.total - b.disp) - (a.total - a.disp) || a.pct - b.pct)[0];
+    ic.append(el("div", { class: "md-sub" }, `J${f.numero} · ${f.casa === false ? "fora, " : ""}vs ${f.adversario} · ${dataJornada(f.data, f.hora)}`));
+    ic.append(risco.length
+      ? el("span", { class: "md-alert r" }, `⚠ ${risco.map((x) => x.nome).join(" e ")} sem margem`)
+      : el("span", { class: "md-alert g" }, "✓ Todas as linhas com alternativas"));
+    ic.append(el("div", { class: "md-stats" },
+      el("div", {}, el("strong", {}, String(plantel.length - foraJogo.size)), el("span", {}, "jogadores disponíveis")),
+      el("div", {}, el("strong", {}, `${pior.disp}/${pior.total}`), el("span", {}, `${pior.nome.toLowerCase()} disponíveis`)),
+      el("div", {}, el("strong", {}, String(voltam.length)), el("span", {}, "regressam a tempo"))));
+    if (voltam.length) ic.append(el("p", { class: "hint" }, `Previsto regressar até ao jogo: ${voltam.join(", ")}.`));
   }
+  duo.append(ic);
 
-  // Detalhe de um grupo
-  const back = el("button", { type: "button", class: "les-back" }, "← Voltar");
-  back.addEventListener("click", () => { lesoesFiltro = null; render(); });
-  app.append(el("div", { class: "les-head " + g.cls }, back,
-    el("div", {}, el("span", { class: "les-head-t" }, g.titulo), el("span", { class: "les-head-s" }, `${g.n} jogador${g.n === 1 ? "" : "es"} · ${g.sub}`))));
-
-  if (!g.n) { app.append(el("div", { class: "empty" }, "Nenhum jogador neste grupo.")); return; }
-
-  if (g.lesoes) {
-    const list = el("div", { class: "les-list" });
-    g.lesoes.forEach((l) => list.append(lesCard(l, pos)));
-    app.append(list);
-    app.append(el("p", { class: "hint" }, "Ordenado por data prevista de regresso. Quando só há o mês, conta-se até ao fim desse mês."));
-  } else {
-    // Disponíveis, agrupados por linha
-    LINHAS.forEach(([k, nome]) => {
-      const js = g.jogadores.filter((n) => linhaDe(pos[n]) === k).sort((a, b) => a.localeCompare(b));
-      if (!js.length) return;
-      app.append(el("div", { class: "les-linha" }, `${nome} (${js.length})`));
-      const wrap = el("div", { class: "les-disp" });
-      js.forEach((n) => wrap.append(el("div", { class: "les-chip" }, el("strong", {}, n), pos[n] ? el("span", {}, pos[n]) : null)));
-      app.append(wrap);
-    });
+  // Previsão de regressos (curva de disponíveis nos próximos meses)
+  const pc = el("div", { class: "card md-card" }, el("div", { class: "md-card-t" }, "📈 Previsão de regressos"));
+  const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+  const esteMes = ativas.filter((l) => l.r.fim && l.r.fim <= fimMes).length;
+  const prox = ativas.find((l) => l.r.fim);
+  pc.append(el("div", { class: "md-big" }, el("strong", {}, `+${esteMes}`), el("span", {}, `regresso${esteMes === 1 ? "" : "s"} até ao fim de ${MESES_PT[hoje.getMonth()]}`)));
+  const pts = [];
+  for (let i = 0; i <= 6; i++) {
+    const ref = i === 0 ? hoje : new Date(hoje.getFullYear(), hoje.getMonth() + i, 0);
+    const out = ativas.filter((l) => !l.r.fim || l.r.fim > ref).length;
+    pts.push({ lbl: i === 0 ? "Hoje" : MES_ABR[ref.getMonth()].replace(".", ""), v: plantel.length - out });
   }
+  const W = 300, H = 110, px = 18, top = 14, bot = 26;
+  const vmin = Math.min(...pts.map((p) => p.v)) - 1, vmax = plantel.length;
+  const X = (i) => px + (i * (W - 2 * px)) / (pts.length - 1);
+  const Y = (v) => top + (1 - (v - vmin) / Math.max(1, vmax - vmin)) * (H - top - bot);
+  const svg = `<svg viewBox="0 0 ${W} ${H}" class="md-chart" role="img" aria-label="Jogadores disponíveis nos próximos meses">
+    <line x1="${px}" x2="${W - px}" y1="${Y(vmax)}" y2="${Y(vmax)}" class="md-ch-max"/>
+    <text x="${W - px}" y="${Y(vmax) - 4}" text-anchor="end" class="md-ch-t">plantel completo (${vmax})</text>
+    <polyline points="${pts.map((p, i) => `${X(i)},${Y(p.v)}`).join(" ")}" class="md-ch-l"/>
+    ${pts.map((p, i) => `<circle cx="${X(i)}" cy="${Y(p.v)}" r="${i === 0 ? 4.5 : 3.5}" class="md-ch-d${i === 0 ? " now" : ""}"/><text x="${X(i)}" y="${Y(p.v) - 8}" text-anchor="middle" class="md-ch-v">${p.v}</text><text x="${X(i)}" y="${H - 8}" text-anchor="middle" class="md-ch-x">${p.lbl}</text>`).join("")}
+  </svg>`;
+  const ch = el("div", { class: "md-chart-w" }); ch.innerHTML = svg;
+  pc.append(ch);
+  pc.append(el("p", { class: "hint" }, `Jogadores disponíveis no fim de cada mês, se as datas se cumprirem.${prox ? ` Próximo regresso: ${prox.jogador} (${fmtRegresso(prox.ate)}).` : ""}${nIndef ? ` ${nIndef} sem data não entram na previsão.` : ""}`));
+  duo.append(pc);
+  app.append(duo);
+
+  app.append(el("div", { class: "section-title" }, "Disciplina"));
+  app.append(el("div", { class: "card soon" },
+    el("span", { class: "soon-ic" }, "🟨"),
+    el("div", {}, el("strong", {}, "Em breve"), el("span", {}, "Cartões, castigos e suspensões dos jogadores vão aparecer aqui."))));
 }
 
 function viewDicas(app) {
@@ -1828,7 +1895,7 @@ async function boot() {
     $("#app").innerHTML = `<div class="empty">Erro ao carregar dados: ${e.message}</div>`;
     return;
   }
-  $$(".tab").forEach((t) => t.addEventListener("click", () => { state.view = t.dataset.view; lesoesFiltro = null; closeNav(); render(); }));
+  $$(".tab").forEach((t) => t.addEventListener("click", () => { state.view = t.dataset.view; closeNav(); render(); }));
   $("#modalClose").addEventListener("click", closeModal);
   $("#modalBackdrop").addEventListener("click", (e) => { if (e.target.id === "modalBackdrop") closeModal(); });
   $("#menuBtn").addEventListener("click", openNav);
