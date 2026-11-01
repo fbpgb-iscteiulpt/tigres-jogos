@@ -1023,7 +1023,6 @@ function dataJogo(f) {
   const d = new Date(ano, mes, +m[1]); d.setDate(d.getDate() - sab);
   return d;
 }
-function iniciais(n) { const p = n.trim().split(/\s+/); return (p[0][0] + (p[1] ? p[1][0] : p[0][1] || "")).toUpperCase(); }
 function lesoesAtivas(ref = new Date()) {
   return (state.data.lesoes || []).map((l) => ({ ...l, r: lesaoRegresso(l.ate, ref) })).filter((l) => l.r.cls !== "ok")
     .sort((a, b) => a.r.ord - b.r.ord || a.jogador.localeCompare(b.jogador));
@@ -1074,12 +1073,11 @@ function viewLesoes(app) {
 
   // Jogadores lesionados
   const lj = el("div", { class: "card md-card" },
-    el("div", { class: "md-card-t" }, "➕ Jogadores lesionados", el("span", { class: "md-badge" }, `${ativas.length} ativo${ativas.length === 1 ? "" : "s"}`)));
+    el("div", { class: "md-card-t" }, "Jogadores lesionados", el("span", { class: "md-badge" }, `${ativas.length} ativo${ativas.length === 1 ? "" : "s"}`)));
   if (!ativas.length) lj.append(el("div", { class: "empty" }, "Sem jogadores lesionados. 💪"));
   ativas.forEach((l) => {
     const [estado, ec] = LES_ESTADO[l.r.cls];
     lj.append(el("div", { class: "md-row" },
-      el("span", { class: "md-av " + ec }, iniciais(l.jogador)),
       el("div", { class: "md-row-b" }, el("strong", {}, l.jogador), el("span", {}, [pos[l.jogador], l.lesao].filter(Boolean).join(" · "))),
       el("span", { class: "md-pill " + ec }, el("i", {}), estado),
       el("div", { class: "md-ret" }, el("span", {}, "Regresso estimado"), el("strong", {}, fmtRegresso(l.ate)), el("em", {}, l.r.sub))));
