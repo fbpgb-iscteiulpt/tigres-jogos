@@ -1,4 +1,4 @@
-name: Atualizar classificação
+name: Atualizar classificação e resultados
 
 on:
   schedule:
@@ -21,12 +21,15 @@ jobs:
         with:
           node-version: 20
       - run: node scripts/update-classificacao.mjs
+      - name: Último resultado e próximo jogo
+        run: node scripts/update-resultados.mjs
+        continue-on-error: true   # se o site mudar, a classificação continua a ser atualizada
       - name: Commit se mudou
         run: |
           if git diff --quiet data.json; then exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          git commit -m "Atualizar classificação (CIF)"
+          git commit -m "Atualizar classificação e resultados (CIF)"
           git pull --rebase
           git push
