@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-01T21:01:36.089Z",
-    "versao": 13
+    "atualizado": "2026-11-01T21:52:29.142Z",
+    "versao": 14
   },
   "listas": {
     "jogadores": [
@@ -6992,7 +6992,7 @@
         {
           "nome": "Simão",
           "titular": true,
-          "minutos": 40,
+          "minutos": 80,
           "remates": 1,
           "desarmes": 15,
           "defesas": 0,
@@ -7100,7 +7100,7 @@
         {
           "nome": "Nuno G",
           "titular": true,
-          "minutos": 40,
+          "minutos": 80,
           "remates": 2,
           "desarmes": 4,
           "defesas": 0,
