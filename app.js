@@ -311,6 +311,7 @@ function viewEpoca(app) {
   const A = seasonAgg(state.data);
   app.append(el("div", { class: "section-title" }, "Resumo da época"));
   app.append(seasonCockpit(A));
+  app.append(squadAvailability());
 
   const prox = nextGame();
   if (prox) {
@@ -977,6 +978,25 @@ function lesaoRegresso(ate, hoje = new Date()) {
     : (dias < 45 ? "Regressa este mês" : `Faltam ~${Math.round(dias / 30)} meses`);
   return { txt, sub, cls: dias <= 21 ? "breve" : dias <= 120 ? "medio" : "longo", ord: dias };
 }
+/* Disponibilidade do plantel: verde = disponível, amarelo = em recuperação (lesão ativa), vermelho = indisponível (disciplina, em breve) */
+function squadAvailability() {
+  const plantel = state.data.listas?.jogadores || [];
+  const recup = new Set((state.data.lesoes || []).filter((l) => lesaoRegresso(l.ate).cls !== "ok").map((l) => l.jogador));
+  const indisp = new Set(); // castigos — preenchido quando a parte da disciplina existir
+  const nR = plantel.filter((n) => recup.has(n) && !indisp.has(n)).length;
+  const nI = plantel.filter((n) => indisp.has(n)).length;
+  const nD = plantel.length - nR - nI;
+  const tot = plantel.length || 1;
+  const seg = (n, cls, lbl) => n ? el("div", { class: "av-seg " + cls, style: `flex-grow:${n}`, title: `${lbl}: ${n}` }, String(n)) : null;
+  const leg = (n, cls, lbl) => el("span", { class: "av-leg" }, el("i", { class: "av-dot " + cls }), `${lbl} `, el("b", {}, String(n)));
+  return el("div", { class: "card av", onclick: () => { state.view = "lesoes"; render(); }, title: "Ver lesões e disciplina" },
+    el("div", { class: "av-head" },
+      el("span", { class: "av-title" }, "Disponibilidade do plantel"),
+      el("span", { class: "av-pct" }, `${Math.round((nD / tot) * 100)}% disponível · ${plantel.length} jogadores`)),
+    el("div", { class: "av-bar" }, seg(nD, "ok", "Disponíveis"), seg(nR, "rec", "Em recuperação"), seg(nI, "ind", "Indisponíveis")),
+    el("div", { class: "av-legs" }, leg(nD, "ok", "Disponíveis"), leg(nR, "rec", "Em recuperação"), leg(nI, "ind", "Indisponíveis")));
+}
+
 function viewLesoes(app) {
   const lista = (state.data.lesoes || []).map((l) => ({ ...l, r: lesaoRegresso(l.ate) })).sort((a, b) => a.r.ord - b.r.ord || a.jogador.localeCompare(b.jogador));
   const pos = state.data.listas?.posicoes || {};
@@ -992,7 +1012,6 @@ function viewLesoes(app) {
       prox ? el("span", { class: "les-sum-tag" }, `${prox} a regressar em breve`) : null));
     const grid = el("div", { class: "les-list" });
     lista.forEach((l) => grid.append(el("div", { class: "card les-card " + l.r.cls },
-      el("div", { class: "les-ic" }, "🩹"),
       el("div", { class: "les-main" },
         el("div", { class: "les-nome" }, l.jogador, pos[l.jogador] ? el("span", { class: "les-pos" }, pos[l.jogador]) : null),
         el("div", { class: "les-lesao" }, l.lesao)),
