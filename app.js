@@ -183,7 +183,7 @@ async function loadData() {
 async function saveToGitHub(data, msg) {
   const token = getToken();
   if (!ghConfigured()) throw new Error("GitHub não configurado (edita CONFIG no app.js).");
-  if (!token) throw new Error("Sem token. Abre 'Cálculo de posse de bola' → Definições e cola o teu token.");
+  if (!token) throw new Error("Sem token. Abre Ferramentas → Definições e cola o teu token.");
   // obter SHA atual
   let sha;
   const head = await fetch(apiUrl() + "?ref=" + CONFIG.githubBranch, {
@@ -323,13 +323,39 @@ function computeKings(data) {
   };
 }
 
+/* ================= NAVEGAÇÃO =================
+   Entradas do menu e respetivos sub-separadores (a primeira é a de defeito). */
+const NAV_GROUPS = {
+  epoca: [["epoca", "Época"]],
+  jogos: [["jornadas", "Jornadas"], ["classificacao", "Classificação"]],
+  plantel: [["jogadores", "Jogadores"], ["comparar", "Comparar"]],
+  equipa: [["equipa", "Estatísticas"], ["dicas", "Dicas de treino"]],
+  lesoes: [["lesoes", "Lesões e disciplina"]],
+  posse: [["posse", "Cálculo de posse de bola"]],
+};
+const navLast = {}; // último sub-separador visto em cada entrada
+function groupOf(view) { return Object.keys(NAV_GROUPS).find((g) => NAV_GROUPS[g].some(([v]) => v === view)); }
+function goGroup(g) { state.view = navLast[g] || NAV_GROUPS[g][0][0]; render(); }
+function subTabs(app) {
+  const g = groupOf(state.view), subs = NAV_GROUPS[g];
+  navLast[g] = state.view;
+  if (subs.length < 2) return;
+  const bar = el("div", { class: "subtabs", role: "tablist" });
+  subs.forEach(([v, lbl]) => bar.append(el("button", { type: "button", role: "tab", class: "subtab" + (v === state.view ? " active" : ""),
+    "aria-selected": v === state.view ? "true" : "false", onclick: () => { if (v !== state.view) { state.view = v; render(); } } }, lbl)));
+  app.append(bar);
+}
+
 /* ================= VIEWS ================= */
 let viewCleanup = null; // função de limpeza da vista atual (listeners/intervalos)
 function render() {
   if (typeof viewCleanup === "function") { viewCleanup(); viewCleanup = null; }
-  $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.view === state.view));
+  const grp = groupOf(state.view);
+  $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.group === grp));
+  $("#tools").classList.toggle("active", grp === "posse");
   const app = $("#app");
   app.innerHTML = "";
+  subTabs(app);
   ({ epoca: viewEpoca, jornadas: viewJornadas, classificacao: viewClassificacao, jogadores: viewJogadores, comparar: viewComparar, equipa: viewEquipa, dicas: viewDicas, posse: viewPosse, lesoes: viewLesoes }[state.view])(app);
   const s = state.source;
   $("#syncStatus").className = "status " + (s === "github" ? "ok" : s === "seed" ? "err" : "local");
@@ -1934,7 +1960,14 @@ async function boot() {
     $("#app").innerHTML = `<div class="empty">Erro ao carregar dados: ${e.message}</div>`;
     return;
   }
-  $$(".tab").forEach((t) => t.addEventListener("click", () => { state.view = t.dataset.view; closeNav(); render(); }));
+  $$(".tab").forEach((t) => t.addEventListener("click", () => { closeNav(); goGroup(t.dataset.group); window.scrollTo(0, 0); }));
+  // Ferramentas (menu discreto): posse de bola e definições
+  const tools = $("#tools");
+  $$(".tool").forEach((t) => t.addEventListener("click", () => {
+    tools.open = false; closeNav();
+    if (t.dataset.tool === "posse") { goGroup("posse"); window.scrollTo(0, 0); } else openSettingsModal();
+  }));
+  document.addEventListener("click", (e) => { if (tools.open && !tools.contains(e.target)) tools.open = false; });
   $("#modalClose").addEventListener("click", closeModal);
   $("#modalBackdrop").addEventListener("click", (e) => { if (e.target.id === "modalBackdrop") closeModal(); });
   $("#menuBtn").addEventListener("click", openNav);

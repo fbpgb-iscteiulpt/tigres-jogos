@@ -32,15 +32,18 @@
       <span>Tigres</span>
       <button class="nav-close" id="navClose" aria-label="Fechar menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <button data-view="epoca" class="tab active">Época</button>
-    <button data-view="jornadas" class="tab">Jornadas</button>
-    <button data-view="classificacao" class="tab">Classificação</button>
-    <button data-view="jogadores" class="tab">Jogadores</button>
-    <button data-view="comparar" class="tab">Comparar jogadores</button>
-    <button data-view="equipa" class="tab">Estatísticas da equipa</button>
-    <button data-view="dicas" class="tab">Dicas de treino</button>
-    <button data-view="lesoes" class="tab">Lesões e disciplina</button>
-    <button data-view="posse" class="tab">Cálculo de posse de bola</button>
+    <button data-group="epoca" class="tab active">Época</button>
+    <button data-group="jogos" class="tab">Jogos</button>
+    <button data-group="plantel" class="tab">Jogadores</button>
+    <button data-group="equipa" class="tab">Equipa</button>
+    <button data-group="lesoes" class="tab">Lesões e disciplina</button>
+    <details class="tools" id="tools">
+      <summary class="tools-btn" aria-label="Ferramentas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg><span>Ferramentas</span><i class="tools-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></i></summary>
+      <div class="tools-menu">
+        <button type="button" class="tool" data-tool="posse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Cálculo de posse de bola</span></button>
+        <button type="button" class="tool" data-tool="definicoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span>Definições</span></button>
+      </div>
+    </details>
   </nav>
   <div class="status" id="syncStatus" title="Estado dos dados"></div>
 </header>

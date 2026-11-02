@@ -19,7 +19,7 @@
 body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:var(--fs-body);line-height:1.5;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
 
 /* Top bar */
-.topbar{display:flex;align-items:center;gap:20px;padding:10px 20px;background:rgba(255,255,255,.96);backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40;flex-wrap:wrap}
+.topbar{display:flex;align-items:center;gap:20px;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40;flex-wrap:wrap}
 .menu-btn{display:none;align-items:center;justify-content:center;background:transparent;border:1px solid var(--line-strong);color:var(--navy);width:40px;height:40px;border-radius:10px;cursor:pointer;flex-shrink:0}
 .menu-btn svg,.nav-close svg,.modal-close svg{width:20px;height:20px}
 .menu-btn:hover{background:var(--surface2)}
@@ -32,6 +32,26 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:var
 .tab{background:transparent;border:1px solid transparent;color:var(--muted);padding:7px 14px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit}
 .tab:hover{background:var(--surface2);color:var(--navy)}
 .tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+/* Ferramentas: botão discreto à direita (desktop) / secção no fim do menu (mobile) */
+.tools{position:relative;margin-left:auto}
+.tools-btn{display:inline-flex;align-items:center;gap:6px;list-style:none;cursor:pointer;color:var(--muted);font-size:13px;font-weight:600;padding:7px 10px;border-radius:999px;user-select:none}
+.tools-btn::-webkit-details-marker{display:none}
+.tools-btn svg{width:16px;height:16px}
+.tools-btn:hover,.tools[open] .tools-btn,.tools.active .tools-btn{background:var(--surface2);color:var(--navy)}
+.tools-chev{display:inline-flex;transition:transform .15s}
+.tools-chev svg{width:14px;height:14px}
+.tools[open] .tools-chev{transform:rotate(180deg)}
+.tools-menu{position:absolute;right:0;top:calc(100% + 6px);min-width:240px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;z-index:45;display:flex;flex-direction:column;gap:2px}
+.tool{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;border-radius:8px;padding:10px 12px;font:inherit;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;text-align:left}
+.tool:hover{background:var(--surface2)}
+.tool svg{width:17px;height:17px;color:var(--muted);flex-shrink:0}
+
+/* Sub-separadores (dentro de Jogos / Jogadores / Equipa) */
+.subtabs{display:flex;gap:4px;padding:4px;margin:0 0 18px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;width:max-content;max-width:100%;overflow-x:auto}
+.subtab{background:transparent;border:none;border-radius:9px;padding:8px 16px;font:inherit;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
+.subtab:hover{color:var(--navy)}
+.subtab.active{background:var(--surface);color:var(--navy);box-shadow:var(--shadow-sm)}
+@media(max-width:640px){.subtabs{width:100%}.subtab{flex:1;padding:9px 10px}}
 .status{width:9px;height:9px;border-radius:50%;background:var(--muted);flex-shrink:0;box-shadow:0 0 0 3px var(--surface2)}
 .status.ok{background:var(--win)} .status.local{background:var(--draw)} .status.err{background:var(--loss)}
 .nav-backdrop{position:fixed;inset:0;background:rgba(18,41,77,.45);z-index:29}
@@ -322,6 +342,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
   .nav-head .crest{width:32px;height:32px}
   .nav-close{margin-left:auto;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:none;color:var(--navy);width:34px;height:34px;border-radius:50%;cursor:pointer}
   .tabs .tab{text-align:left;padding:12px 14px;font-size:15px;border-radius:10px;color:var(--navy)}
+  /* no menu lateral: Ferramentas fica em baixo, separado, em letra mais pequena */
+  .tools{margin:auto 0 0;padding-top:12px;border-top:1px solid var(--line)}
+  .tools-btn{width:100%;padding:8px 14px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;border-radius:10px}
+  .tools-chev{margin-left:auto}
+  .tools-menu{position:static;min-width:0;box-shadow:none;border:none;padding:2px 0 0;background:none}
+  .tool{padding:11px 14px;font-size:14px;color:var(--muted)}
   main{padding:16px 12px 32px}
   .jrow{gap:10px;padding:12px 14px}
   .jrow .jnum{width:80px;font-size:12px}
