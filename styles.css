@@ -342,6 +342,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
   .nav-head .crest{width:32px;height:32px}
   .nav-close{margin-left:auto;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:none;color:var(--navy);width:34px;height:34px;border-radius:50%;cursor:pointer}
   .tabs .tab{text-align:left;padding:12px 14px;font-size:15px;border-radius:10px;color:var(--navy)}
+  .tabs .tab.active{background:var(--navy);color:#fff}
   /* no menu lateral: Ferramentas fica em baixo, separado, em letra mais pequena */
   .tools{margin:auto 0 0;padding-top:12px;border-top:1px solid var(--line)}
   .tools-btn{width:100%;padding:8px 14px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;border-radius:10px}
