@@ -17,20 +17,20 @@
 </head>
 <body>
 <header class="topbar">
-  <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">☰</button>
+  <button class="menu-btn" id="menuBtn" aria-label="Abrir menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   <div class="brand">
     <img class="crest" src="logos/tigres.png" alt="Tigres">
 
     <div>
       <h1>Tigres</h1>
-      <p class="sub">Análise de Jogos</p>
+      <p class="sub" id="brandSub">Análise de Jogos</p>
     </div>
   </div>
   <nav class="tabs" id="nav">
     <div class="nav-head">
       <img class="crest" src="logos/tigres.png" alt="Tigres">
       <span>Tigres</span>
-      <button class="nav-close" id="navClose" aria-label="Fechar menu">✕</button>
+      <button class="nav-close" id="navClose" aria-label="Fechar menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <button data-view="epoca" class="tab active">Época</button>
     <button data-view="jornadas" class="tab">Jornadas</button>
@@ -47,12 +47,19 @@
 <div class="nav-backdrop" id="navBackdrop" hidden></div>
 
 <main id="app">
-  <div class="loading" id="loading">A carregar dados…</div>
+  <div class="skel" id="loading" aria-label="A carregar dados" role="status">
+    <div class="sk sk-title"></div>
+    <div class="sk sk-card"></div>
+    <div class="sk-row"><div class="sk sk-tile"></div><div class="sk sk-tile"></div><div class="sk sk-tile"></div><div class="sk sk-tile"></div></div>
+    <div class="sk sk-title"></div>
+    <div class="sk sk-card short"></div>
+    <div class="sk sk-card short"></div>
+  </div>
 </main>
 
 <div class="modal-backdrop" id="modalBackdrop" hidden>
   <div class="modal" id="modal">
-    <button class="modal-close" id="modalClose">✕</button>
+    <button class="modal-close" id="modalClose" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <div id="modalBody"></div>
   </div>
 </div>

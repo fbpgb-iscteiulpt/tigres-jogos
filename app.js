@@ -39,7 +39,37 @@ const el = (tag, attrs = {}, ...kids) => {
   return n;
 };
 const fmt = (n) => (n === null || n === undefined || n === "" ? "–" : n);
-const pct = (n) => (n === null || n === undefined ? "–" : Math.round(n * 100) + "%");
+/* Números à portuguesa: vírgula decimal, "72 %" com espaço fixo */
+const NBSP = "\u00a0";
+const nf = (v, dec = 1) => (v == null || isNaN(v) ? "–" : (+v).toLocaleString("pt-PT", { minimumFractionDigits: dec, maximumFractionDigits: dec }));
+// Uma casa decimal só quando faz falta (7 / 7,5)
+const nf1 = (v) => (v == null || isNaN(v) ? "–" : Number.isInteger(Math.round(v * 10) / 10) ? String(Math.round(v)) : nf(v, 1));
+const pctTxt = (p) => (p == null || isNaN(p) ? "–" : `${Math.round(p)}${NBSP}%`); // p já em 0–100
+const pct = (n) => (n === null || n === undefined ? "–" : pctTxt(n * 100));
+
+/* Ícones de traço (24×24, cor = texto) */
+const ICON_PATHS = {
+  calendar: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M16 3v3M8 3v3M3 10h18"/>',
+  pin: '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  play: '<path d="M8 5.5v13l11-6.5z"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.8v.2"/>',
+  alert: '<path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17v.2"/>',
+  check: '<circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.7 2.7L16 9.8"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  up: '<path d="m6 15 6-6 6 6"/>',
+  down: '<path d="m6 9 6 6 6-6"/>',
+  flat: '<path d="M5 12h14"/>',
+  chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  trend: '<path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+};
+function ic(name, cls = "") {
+  return el("span", { class: "ic" + (cls ? " " + cls : ""), "aria-hidden": "true",
+    html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON_PATHS[name]}</svg>` });
+}
+/* "ⓘ Como ler": explicação recolhida, abre ao tocar */
+function infoTip(text, label = "Como ler") {
+  return el("details", { class: "info" }, el("summary", {}, ic("info"), label), el("p", {}, text));
+}
 
 /* ---------- Logos das equipas ---------- */
 const LOGO_OVERRIDES = { "Milionários": "mfc" };
@@ -153,7 +183,7 @@ async function loadData() {
 async function saveToGitHub(data, msg) {
   const token = getToken();
   if (!ghConfigured()) throw new Error("GitHub não configurado (edita CONFIG no app.js).");
-  if (!token) throw new Error("Sem token. Abre 'Cálculo de posse de bola' → ⚙ Definições e cola o teu token.");
+  if (!token) throw new Error("Sem token. Abre 'Cálculo de posse de bola' → Definições e cola o teu token.");
   // obter SHA atual
   let sha;
   const head = await fetch(apiUrl() + "?ref=" + CONFIG.githubBranch, {
@@ -304,7 +334,9 @@ function render() {
   const s = state.source;
   $("#syncStatus").className = "status " + (s === "github" ? "ok" : s === "seed" ? "err" : "local");
   $("#syncStatus").title = s === "github" ? "Ligado ao GitHub (dados partilhados)" : s === "seed" ? "Dados iniciais (não partilhado ainda)" : "Cache local";
-  $("#footerInfo").textContent = `${state.data.meta.clube} · ${state.data.jornadas.length} jornadas · atualizado ${new Date(state.data.meta.atualizado).toLocaleDateString("pt-PT")}`;
+  const atual = state.data.meta.atualizado;
+  $("#brandSub").textContent = `Época ${epocaLabel()}${atual ? " · atualizado " + haQuanto(atual) : ""}`;
+  $("#footerInfo").textContent = `${state.data.meta.clube} · Época ${epocaLabel()} · ${state.data.jornadas.length} jornadas${atual ? " · dados de " + fmtDia(new Date(atual)) : ""}`;
 }
 
 function viewEpoca(app) {
@@ -324,26 +356,26 @@ function viewEpoca(app) {
 
   // Highlights da época ("kings")
   const K = computeKings(state.data);
-  app.append(el("div", { class: "section-title" }, "Highlights da Época"));
+  app.append(el("div", { class: "section-title" }, "Highlights"));
   const kings = el("div", { class: "grid kings" });
   kings.append(
-    kingCard("⚽", "Golden Boot", "Mais golos", K.golos),
-    kingCard("🅰️", "Assist King", "Mais assistências", K.assistencias),
-    kingCard("👑", "Consistency King", "Menos passes falhados", K.consistency),
-    kingCard("🎯", "Key Pass King", "Mais passes p/ finalização", K.keyPass),
-    kingCard("🛡️", "Recovery King", "Mais desarmes", K.recovery),
-    kingCard("🥅", "Shooting King", "Mais remates", K.shooting),
-    kingCard("🎯", "Sniper — Precisão de remate", "Melhor % de remates à baliza", K.precisaoRemate, "unidade", "(remates à baliza ÷ remates)", fmtRatio),
-    kingCard("🧱", 'No "X" King', "Mais perdas de bola", K.noX),
-    kingCard("🙈", "The Blind Passer", "Mais passes falhados", K.blindPasser),
-    kingCard("🥊", "The Foul King", "Mais faltas", K.foul),
-    kingCard("⚡", "Drible King", "Mais dribles bem sucedidos", K.drible),
-    kingCard("🎩", "Drible Efficiency King", "Melhor % de dribles conseguidos", K.dribleEfficiency, "unidade", "(dribles bem sucedidos ÷ efetuados)", fmtRatio),
-    kingCard("🎯", "Crossing King", "Melhor % de cruzamentos conseguidos", K.crossing, "unidade", "(cruzamentos bem sucedidos ÷ efetuados)", fmtRatio),
-    kingCard("🧿", "Pés de tijolo", "Pior % de dribles conseguidos", K.peDeTijolo, "unidade", "(mín. 1 drible efetuado)", fmtRatio),
+    kingCard(null, "Golden Boot", "Mais golos", K.golos),
+    kingCard(null, "Assist King", "Mais assistências", K.assistencias),
+    kingCard(null, "Consistency King", "Menos passes falhados", K.consistency),
+    kingCard(null, "Key Pass King", "Mais passes p/ finalização", K.keyPass),
+    kingCard(null, "Recovery King", "Mais desarmes", K.recovery),
+    kingCard(null, "Shooting King", "Mais remates", K.shooting),
+    kingCard(null, "Sniper — Precisão de remate", "Melhor % de remates à baliza", K.precisaoRemate, "unidade", "(remates à baliza ÷ remates)", fmtRatio),
+    kingCard(null, 'No "X" King', "Mais perdas de bola", K.noX),
+    kingCard(null, "The Blind Passer", "Mais passes falhados", K.blindPasser),
+    kingCard(null, "The Foul King", "Mais faltas", K.foul),
+    kingCard(null, "Drible King", "Mais dribles bem sucedidos", K.drible),
+    kingCard(null, "Drible Efficiency King", "Melhor % de dribles conseguidos", K.dribleEfficiency, "unidade", "(dribles bem sucedidos ÷ efetuados)", fmtRatio),
+    kingCard(null, "Crossing King", "Melhor % de cruzamentos conseguidos", K.crossing, "unidade", "(cruzamentos bem sucedidos ÷ efetuados)", fmtRatio),
+    kingCard(null, "Pés de tijolo", "Pior % de dribles conseguidos", K.peDeTijolo, "unidade", "(mín. 1 drible efetuado)", fmtRatio),
   );
   app.append(kings);
-  app.append(el("p", { class: "hint" }, `Total = soma na época. Por 80 min = total ÷ minutos jogados na época × 80 Só entram nos Highlights jogadores com pelo menos ${P80_MIN_EPOCA} min jogados na época.`));
+  app.append(infoTip(`Total = soma na época. Por 80 min = total ÷ minutos jogados na época × 80. Só entram jogadores com pelo menos ${P80_MIN_EPOCA} minutos na época.`));
 }
 
 /* Tendência da forma recente: pontos por jogo dos últimos 3 vs os 3 anteriores (ou vs a época, se houver menos de 6 jogos) */
@@ -391,9 +423,8 @@ function seasonCockpit(A) {
   formBox.append(dots);
   if (t) {
     const txt = { up: "Tendência positiva", down: "Tendência negativa", flat: "Tendência estável" }[t.dir];
-    const arrow = { up: "▲", down: "▼", flat: "▶" }[t.dir];
     formBox.append(el("div", { class: "ck-trend " + t.dir },
-      el("span", { class: "ck-arrow" }, arrow),
+      el("span", { class: "ck-arrow" }, ic(t.dir)),
       el("span", {}, el("strong", {}, txt), el("small", {}, `${t.ptsU} pts nos últimos ${t.n} jogos · ${t.ptsA} nos ${t.nA} anteriores`))));
   }
 
@@ -414,11 +445,11 @@ function ckNum(v, lbl, cls = "") { return el("div", { class: "ck-num " + cls }, 
 // Formatação de valor para os cartões de rácio (percentagem)
 function fmtRatio(r, isLeader) {
   const p = Math.round(r.avg * 100);
-  return `${p}% (${r.bem}/${r.tent})`;
+  return `${pctTxt(p)} (${r.bem}/${r.tent})`;
 }
 // Formatação dos separadores dos cartões de contagem
 function fmtTotal(r) { return `${r.total}`; }
-function fmtP80(r, isLeader) { const v = (Math.round(r.avg * 10) / 10).toFixed(1); return isLeader ? `${v} / 80 min` : v; }
+function fmtP80(r, isLeader) { const v = nf(r.avg, 1); return isLeader ? `${v} / 80 min` : v; }
 // Mínimo de minutos na época para entrar nos rankings "por 80 min"
 const P80_MIN_EPOCA = 80;
 const KING_TABS = [["total", "Total", fmtTotal], ["p80", "Por 80 min", fmtP80]];
@@ -426,7 +457,7 @@ const KING_TABS = [["total", "Total", fmtTotal], ["p80", "Por 80 min", fmtP80]];
 // Cartão de highlight. `data` é uma lista (rácios) ou { total, p80 } (contagens, com separadores).
 function kingCard(icon, title, subtitle, data, unit, note, valFmt) {
   const card = el("div", { class: "card king" });
-  card.append(el("div", { class: "king-title" }, el("span", { class: "king-icon" }, icon), el("span", {}, title)));
+  card.append(el("div", { class: "king-title" }, title));
   card.append(el("div", { class: "king-sub" }, subtitle + (note ? " " + note : "")));
   const dual = data && !Array.isArray(data);
   const body = el("div", { class: "king-body" });
@@ -477,7 +508,7 @@ function kingCard(icon, title, subtitle, data, unit, note, valFmt) {
 // Popup com o ranking completo de um "king"
 function openRankingModal(icon, title, subtitle, note, rows, valFmt, tabLabel) {
   const b = $("#modalBody"); b.innerHTML = "";
-  b.append(el("h2", {}, el("span", {}, icon), el("span", {}, title)));
+  b.append(el("h2", {}, title));
   b.append(el("p", { class: "hint" }, subtitle + (tabLabel ? ` — ${tabLabel}` : "") + (note ? " " + note : "")));
   const isP80 = valFmt === fmtP80;
   const t = el("table", { class: "rank-full" });
@@ -536,8 +567,7 @@ function fsFuture(f) {
     videoLink(f.video) || el("span"));
 }
 function fsMeta(j) {
-  const dataTxt = dataJornada(j.data, j.hora);
-  return el("div", { class: "fs-meta" }, el("span", { class: "fs-j" }, `J${j.numero}`), el("span", { class: "fs-date" }, dataTxt ? dataTxt.replace(/^[^,]*,\s*/, "") : ""),
+  return el("div", { class: "fs-meta" }, el("span", { class: "fs-j" }, `J${j.numero}`), el("span", { class: "fs-date" }, fmtDiaMes(j.data, j.hora)),
     j.semEstatisticas ? el("span", { class: "fs-nostats", title: "Ainda sem estatísticas" }, "sem estat.") : null);
 }
 
@@ -567,10 +597,10 @@ function nextGameCard(f) {
   card.append(el("div", { class: "ng-top" }, el("span", { class: "ng-j" }, `Jornada ${f.numero}`), el("span", { class: "ng-local" }, f.casa === false ? "Fora" : "Casa")));
   card.append(el("div", { class: "ng-match" }, side(casa), el("div", { class: "ng-vs" }, el("span", { class: "ng-hora" }, f.hora || "–"), el("span", {}, "vs")), side(vis)));
   card.append(el("div", { class: "ng-info" },
-    el("div", {}, el("span", { class: "ng-ic" }, "📅"), dataJornada(f.data, f.hora) || f.data || "Data por definir"),
-    el("div", {}, el("span", { class: "ng-ic" }, "🏟️"), ESTADIO)));
+    el("div", {}, ic("calendar", "ng-ic"), fmtJogo(f.data, f.hora, false)),
+    el("div", {}, ic("pin", "ng-ic"), ESTADIO)));
   card.append(f.video
-    ? el("a", { class: "btn ng-live", href: f.video, target: "_blank", rel: "noopener" }, "▶ Ver transmissão")
+    ? el("a", { class: "btn ng-live", href: f.video, target: "_blank", rel: "noopener" }, ic("play"), "Ver transmissão")
     : el("div", { class: "ng-nolive" }, "Link da transmissão ainda não disponível"));
   return card;
 }
@@ -580,29 +610,50 @@ function nextGameCard(f) {
    Sábado (restantes slots) ou Domingo (11:00 / 12:40). */
 const MESES_PT = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 function mesIdxPT(nome) { return MESES_PT.findIndex((x) => x.toLowerCase() === (nome || "").toLowerCase()); }
-function anoDoMes(mesIdx) { return mesIdx >= 8 ? 2025 : 2026; } // Set–Dez → 2025, Jan–Jun → 2026
-function dataJornada(range, hora) {
+/* Época = Agosto→Julho. Ano de início: o da data de hoje (antes de Agosto, a época começou no ano anterior). */
+function epocaInicio(ref = new Date()) { return ref.getMonth() >= 7 ? ref.getFullYear() : ref.getFullYear() - 1; }
+function anoDoMes(mesIdx) { const a = epocaInicio(); return mesIdx >= 7 ? a : a + 1; } // Ago–Dez → 1.º ano, Jan–Jul → 2.º
+function epocaLabel() { const a = epocaInicio(); return `${a}/${String(a + 1).slice(2)}`; }
+const DIAS_ABR = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const MES_ABR = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+/* Data real do jogo a partir do intervalo "Sábado / Domingo" e da hora */
+function jogoDate(range, hora) {
   const parts = String(range || "").split("/");
-  if (parts.length < 2) return range || "";
-  // 2.º número (Domingo) traz sempre o mês; o 1.º (Sábado) pode herdá-lo
+  if (parts.length < 2) return null;
   const mDom = parts[1].trim().match(/(\d{1,2})\s+([A-Za-zçÇãÃéÉíÍ]+)/);
   const mSab = parts[0].trim().match(/(\d{1,2})(?:\s+([A-Za-zçÇãÃéÉíÍ]+))?/);
-  if (!mDom || !mSab) return range || "";
+  if (!mDom || !mSab) return null;
   const mesDom = mesIdxPT(mDom[2]);
-  const mesSab = mSab[2] ? mesIdxPT(mSab[2]) : mesDom; // sem mês no 1.º → usa o do 2.º
-  if (mesSab < 0 || mesDom < 0) return range || "";
-  if (hora === "11:00" || hora === "12:40") {
-    // Domingo — 2.º número
-    return `Domingo, ${+mDom[1]} ${MESES_PT[mesDom]}`;
-  }
-  // Sábado — 1.º número
+  const mesSab = mSab[2] ? mesIdxPT(mSab[2]) : mesDom;
+  if (mesSab < 0 || mesDom < 0) return null;
+  if (hora === "11:00" || hora === "12:40") return new Date(anoDoMes(mesDom), mesDom, +mDom[1]); // Domingo
   const sab = new Date(anoDoMes(mesSab), mesSab, +mSab[1]);
-  if (hora === "21:30") {
-    // Sexta = Sábado − 1 (aritmética trata salto de mês)
-    const sex = new Date(sab); sex.setDate(sex.getDate() - 1);
-    return `Sexta, ${sex.getDate()} ${MESES_PT[sex.getMonth()]}`;
-  }
-  return `Sábado, ${sab.getDate()} ${MESES_PT[sab.getMonth()]}`;
+  if (hora === "21:30") sab.setDate(sab.getDate() - 1); // Sexta
+  return sab;
+}
+/* Formatos únicos: "Dom, 8 Nov" · "Dom, 8 Nov · 11:00" · "8 Nov" · "1 Nov 2026" */
+function fmtJogo(range, hora, comHora = true) {
+  const d = jogoDate(range, hora);
+  if (!d) return range || "Data por definir";
+  return `${DIAS_ABR[d.getDay()]}, ${d.getDate()} ${MES_ABR[d.getMonth()]}${comHora && hora ? " · " + hora : ""}`;
+}
+function fmtDiaMes(range, hora) { const d = jogoDate(range, hora); return d ? `${d.getDate()} ${MES_ABR[d.getMonth()]}` : ""; }
+function fmtDia(d) { return `${d.getDate()} ${MES_ABR[d.getMonth()]} ${d.getFullYear()}`; }
+function haQuanto(iso) {
+  const min = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (!isFinite(min)) return "";
+  if (min < 1) return "agora mesmo";
+  if (min < 60) return `há ${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `há ${h} h`;
+  const d = Math.round(h / 24);
+  return d === 1 ? "ontem" : d < 30 ? `há ${d} dias` : fmtDia(new Date(iso));
+}
+function dataJornada(range, hora) {
+  const d = jogoDate(range, hora);
+  if (!d) return range || "";
+  const DIAS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+  return `${DIAS[d.getDay()]}, ${d.getDate()} ${MESES_PT[d.getMonth()]}`;
 }
 
 function viewJornadas(app) {
@@ -632,7 +683,7 @@ function videoLink(url) {
     class: "jvideo", href: url, target: "_blank", rel: "noopener",
     title: "Ver vídeo do jogo no YouTube",
     onclick: (e) => e.stopPropagation(),
-  }, "▶ Vídeo");
+  }, ic("play"), el("span", { class: "jvideo-t" }, "Vídeo"));
 }
 
 /* Extrai o ID de 11 caracteres de um URL do YouTube (watch?v=, youtu.be/, embed/) */
@@ -680,8 +731,8 @@ function viewClassificacao(app) {
     tb.append(tr);
   });
   t.append(tb);
-  app.append(tableScroll(t));
-  app.append(el("p", { class: "hint" }, "J=jogos, V=vitórias, E=empates, D=derrotas, GM=golos marcados, GS=golos sofridos, DIF=diferença de golos, TD=taça disciplina."));
+  app.append(tableScroll(t, true));
+  app.append(infoTip("J = jogos · V = vitórias · E = empates · D = derrotas · GM = golos marcados · GS = golos sofridos · DIF = diferença de golos · TD = taça disciplina.", "Legenda"));
 }
 
 function openJornadaModal(numero) {
@@ -694,18 +745,18 @@ function openJornadaModal(numero) {
     el("span", {}, ` ${gf ?? "?"}–${ga ?? "?"} `),
     teamTag(j.adversario, true)));
   b.append(el("div", { class: "chips" },
-    j.data ? el("span", { class: "chip" }, `Data: ${dataJornada(j.data, j.hora)}${j.hora ? " · " + j.hora : ""}${j.casa === false ? " (fora)" : j.casa === true ? " (casa)" : ""}`) : null,
+    j.data ? el("span", { class: "chip" }, ic("calendar"), `${fmtJogo(j.data, j.hora)}${j.casa === false ? " · Fora" : j.casa === true ? " · Casa" : ""}`) : null,
     j.semEstatisticas ? null : el("span", { class: "chip" }, `Tática: ${fmt(j.tatica)}`),
     j.semEstatisticas ? null : el("span", { class: "chip" }, `Convocados: ${j.players.length}`)));
 
   if (j.semEstatisticas) {
     if (j.video) {
-      b.append(el("div", { class: "section-title" }, "Vídeo do jogo"));
+      b.append(el("div", { class: "section-title" }, "Vídeo"));
       b.append(videoEmbed(j.video));
     }
-    b.append(el("div", { class: "section-title" }, "Estatísticas do jogo"));
+    b.append(el("div", { class: "section-title" }, "Estatísticas"));
     b.append(el("div", { class: "no-stats" },
-      el("span", { class: "no-stats-ic" }, "📊"),
+      ic("chart", "no-stats-ic"),
       el("div", {}, el("strong", {}, "Ainda sem estatísticas"),
         el("span", {}, "O resultado já foi atualizado a partir do site da CIF. As estatísticas do jogo e dos jogadores aparecem quando a jornada for adicionada ao Excel."))));
     showModal();
@@ -713,12 +764,12 @@ function openJornadaModal(numero) {
   }
 
   if (j.video) {
-    b.append(el("div", { class: "section-title" }, "Vídeo do jogo"));
+    b.append(el("div", { class: "section-title" }, "Vídeo"));
     b.append(videoEmbed(j.video));
   }
 
   // Match stats compare
-  b.append(el("div", { class: "section-title" }, "Estatísticas do jogo"));
+  b.append(el("div", { class: "section-title" }, "Estatísticas"));
   b.append(compareBlock(j.matchStats, j.adversario, TigresXG.xgSeason(state.data).porJornada[j.numero]));
 
   // Player table
@@ -736,19 +787,19 @@ function openJornadaModal(numero) {
       t.append(tr);
     });
   b.append(tableScroll(t));
-  b.append(el("p", { class: "hint" }, "Tit = titular (●) / suplente (○). PF=passe p/ finalização, PE=passes errados, PB=perdas de bola, DB=dribles bem sucedidos, DF=dribles falhados, CB=cruzamentos bem sucedidos, CF=cruzamentos falhados."));
+  b.append(infoTip("Tit = titular (●) ou suplente (○) · PF = passe para finalização · PE = passes errados · PB = perdas de bola · DB / DF = dribles bem sucedidos / falhados · CB / CF = cruzamentos bem sucedidos / falhados.", "Legenda"));
 
   // Events summary
   const evCount = {};
   j.eventos.forEach((e) => { evCount[e.acao] = (evCount[e.acao] || 0) + 1; });
-  b.append(el("div", { class: "section-title" }, `Eventos registados (${j.eventos.length})`));
+  b.append(el("div", { class: "section-title" }, `Eventos (${j.eventos.length})`));
   const chips = el("div", { class: "chips" });
   Object.entries(evCount).sort((a, b) => b[1] - a[1]).forEach(([k, v]) => chips.append(el("span", { class: "chip" }, `${k}: ${v}`)));
   b.append(chips);
   showModal();
 }
 
-function fmtDif(v) { const r = Math.round(v * 10) / 10; return r > 0 ? `+${r.toFixed(1)}` : r < 0 ? r.toFixed(1) : "0.0"; }
+function fmtDif(v) { const r = Math.round(v * 10) / 10; return r > 0 ? `+${nf(r, 1)}` : r < 0 ? `−${nf(-r, 1)}` : nf(0, 1); }
 
 function compareBlock(ms, adversario, xg) {
   const wrap = el("div", { class: "cmp" });
@@ -761,7 +812,7 @@ function compareBlock(ms, adversario, xg) {
   // xG logo a seguir à posse de bola
   const stats = { ...ms };
   if (xg) {
-    const XK = "xG (golos esperados)";
+    const XK = "xG";
     stats[XK] = { tigres: Math.round(xg.tigres.xg * 100) / 100, adversario: Math.round(xg.adv.xg * 100) / 100 };
     const iP = keys.indexOf("Posse de bola");
     keys.splice(iP >= 0 ? iP + 1 : keys.length, 0, XK);
@@ -770,7 +821,7 @@ function compareBlock(ms, adversario, xg) {
     const v = stats[k]; let a = v.tigres, c = v.adversario;
     const isPct = k === "Posse de bola";
     const isXg = k.startsWith("xG");
-    const dispA = isPct ? pct(a) : isXg ? a.toFixed(2) : fmt(a), dispC = isPct ? pct(c) : isXg ? c.toFixed(2) : fmt(c);
+    const dispA = isPct ? pct(a) : isXg ? nf(a, 2) : fmt(a), dispC = isPct ? pct(c) : isXg ? nf(c, 2) : fmt(c);
     const na = +a || 0, nc = +c || 0, tot = na + nc || 1;
     const row = el("div", { class: "cmprow" });
     row.append(el("span", { class: "lbl" }, k));
@@ -788,7 +839,7 @@ function compareBlock(ms, adversario, xg) {
 
 function viewJogadores(app) {
   const A = seasonAgg(state.data);
-  app.append(el("div", { class: "section-title" }, "Jogadores — totais da época"));
+  app.append(el("div", { class: "section-title" }, "Jogadores"));
   const cols = [["jogos", "J"], ["titular", "Tit"], ["minutos", "Min"], ["golos", "G"], ["assistencias", "A"], ["remates", "Rem"], ["desarmes", "Des"], ["defesas", "Def"], ["faltas", "Flt"], ["passesErrados", "PE"], ["perdasBola", "PB"], ["driblesBemSucedidos", "DB"], ["driblesFalhados", "DF"], ["cruzamentosBemSucedidos", "CB"], ["cruzamentosFalhados", "CF"]];
   let sortKey = "golos", desc = true;
   const t = el("table", { class: "pstat-table sticky-first" });
@@ -796,22 +847,22 @@ function viewJogadores(app) {
     t.innerHTML = "";
     const h = el("tr", {}, el("th", {}, "Jogador"));
     cols.forEach((c) => {
-      const th = el("th", { class: "num sortable" }, c[1] + (sortKey === c[0] ? (desc ? " ▾" : " ▴") : ""));
+      const th = el("th", { class: "num sortable" + (sortKey === c[0] ? " sorted" : "") }, c[1], sortKey === c[0] ? ic(desc ? "down" : "up", "sort-ic") : null);
       th.addEventListener("click", () => { if (sortKey === c[0]) desc = !desc; else { sortKey = c[0]; desc = true; } build(); });
       h.append(th);
     });
     t.append(el("thead", {}, h));
     const tb = el("tbody");
     [...A.playersArr].sort((a, b) => desc ? b[sortKey] - a[sortKey] : a[sortKey] - b[sortKey]).forEach((p) => {
-      const tr = el("tr", { onclick: () => openPlayerModal(p.nome) }, el("td", {}, p.nome));
+      const tr = el("tr", { class: "clickable", onclick: () => openPlayerModal(p.nome) }, el("td", {}, p.nome));
       cols.forEach((c) => tr.append(el("td", { class: "num" }, fmt(p[c[0]]))));
       tb.append(tr);
     });
     t.append(tb);
   };
   build();
-  app.append(tableScroll(t));
-  app.append(el("p", { class: "hint" }, "Clica num cabeçalho para ordenar · clica num jogador para detalhe. J=jogos, Tit=titular, PE=passes errados, PB=perdas de bola, DB=dribles bem sucedidos, DF=dribles falhados, CB=cruzamentos bem sucedidos, CF=cruzamentos falhados."));
+  app.append(tableScroll(t, true));
+  app.append(infoTip("Toca num cabeçalho para ordenar e num jogador para ver o perfil. J = jogos · Tit = titular · PE = passes errados · PB = perdas de bola · DB / DF = dribles bem sucedidos / falhados · CB / CF = cruzamentos bem sucedidos / falhados.", "Legenda"));
 }
 
 /* ================= ESTATÍSTICAS DA EQUIPA ================= */
@@ -858,24 +909,24 @@ function viewEquipa(app) {
     grid.append(teamStatCard(m, serie));
   });
   app.append(grid);
-  app.append(el("p", { class: "hint" }, "Cada cartão mostra a média por jornada (número grande) e a evolução jornada a jornada. As setas indicam se variou para melhor (verde) ou pior (vermelho) face à jornada anterior."));
+  app.append(infoTip("O número grande é a média por jornada. As barras mostram cada jornada; a seta indica se melhorou (verde) ou piorou (vermelho) face à jornada anterior."));
 
   // Golos vs golos esperados (época)
   const somaXG = (lado) => js.reduce((s, j) => s + (XG.porJornada[j.numero]?.[lado].xg || 0), 0);
   const gm = js.reduce((s, j) => s + (ms(j, "Resultado") || 0), 0), gs = js.reduce((s, j) => s + (msAdv(j, "Resultado") || 0), 0);
   const xgT = somaXG("tigres"), xgA = somaXG("adv");
-  app.append(el("div", { class: "section-title" }, "Golos vs golos esperados (época)"));
+  app.append(el("div", { class: "section-title" }, "Golos vs xG"));
   const xc = el("div", { class: "grid cards" });
   xc.append(
-    statCard(`${gm} / ${xgT.toFixed(1)}`, "Golos marcados / xG", gm >= xgT ? `${fmtDif(gm - xgT)} — finalização acima do esperado` : `${fmtDif(gm - xgT)} — finalização abaixo do esperado`),
-    statCard(`${gs} / ${xgA.toFixed(1)}`, "Golos sofridos / xG sofrido", gs <= xgA ? `${fmtDif(gs - xgA)} — sofremos menos do que o esperado` : `${fmtDif(gs - xgA)} — sofremos mais do que o esperado`),
+    statCard(`${gm} / ${nf(xgT, 1)}`, "Golos marcados / xG", gm >= xgT ? `${fmtDif(gm - xgT)} · acima do esperado` : `${fmtDif(gm - xgT)} · abaixo do esperado`),
+    statCard(`${gs} / ${nf(xgA, 1)}`, "Golos sofridos / xG sofrido", gs <= xgA ? `${fmtDif(gs - xgA)} · menos do que o esperado` : `${fmtDif(gs - xgA)} · mais do que o esperado`),
     statCard(fmtDif(xgT - xgA), "Diferença de xG", xgT >= xgA ? "criámos mais do que o adversário" : "o adversário criou mais"),
   );
   app.append(xc);
-  app.append(el("p", { class: "hint" }, `xG = soma da probabilidade de golo de cada remate, conforme a zona (dentro/fora da área) e o resultado (à baliza, para fora, bloqueado). Penálti = 0.76. Os remates à baliza estão calibrados com os golos desta liga (×${XG.fator.toFixed(2)}). Abre uma jornada para ver o detalhe.`));
+  app.append(infoTip(`xG (golos esperados) = soma da probabilidade de golo de cada remate, conforme a zona (dentro ou fora da área) e o resultado (à baliza, para fora, bloqueado). Penálti = ${nf(0.76, 2)}. Os remates à baliza estão calibrados com os golos desta liga (×${nf(XG.fator, 2)}).`, "O que é o xG"));
 
   // Quando marcamos e sofremos golos
-  app.append(el("div", { class: "section-title" }, "Quando marcamos e sofremos golos"));
+  app.append(el("div", { class: "section-title" }, "Minutos dos golos"));
   app.append(goalMinutesAnalysis(js));
 }
 
@@ -935,7 +986,7 @@ function teamStatCard(m, serie) {
   if (!serie.length) { card.append(el("div", { class: "empty" }, "Sem dados")); return card; }
   const suf = m.suf || "";
   const avg = serie.reduce((s, x) => s + x.val, 0) / serie.length;
-  const avgTxt = (m.suf === "%" ? Math.round(avg) : m.dec != null ? avg.toFixed(m.dec) : (Math.round(avg * 10) / 10)) + suf;
+  const avgTxt = m.suf === "%" ? pctTxt(avg) : (m.dec != null ? nf(avg, m.dec) : nf1(avg)) + suf;
   card.append(el("div", { class: "ts-avg" }, avgTxt, el("span", { class: "ts-avg-lbl" }, "média/jornada")));
 
   // valores máximos para escala das barras
@@ -947,9 +998,9 @@ function teamStatCard(m, serie) {
     if (prev != null && x.val !== prev) {
       const better = m.dir === "up" ? x.val > prev : x.val < prev;
       trend = better ? "up" : "down";
-      arrow = x.val > prev ? "▲" : "▼";
-    } else if (prev != null) { trend = "eq"; arrow = "="; }
-    const disp = (m.sign && x.val > 0 ? "+" : "") + (m.dec != null ? x.val.toFixed(m.dec) : x.val) + suf;
+      arrow = ic(x.val > prev ? "up" : "down");
+    } else if (prev != null) { trend = "eq"; arrow = ic("flat"); }
+    const disp = m.suf === "%" ? pctTxt(x.val) : (m.sign && x.val > 0 ? "+" : "") + (m.dec != null ? nf(x.val, m.dec) : x.val) + suf;
     const w = Math.round((Math.abs(x.val) / maxV) * 100);
     rows.append(el("div", { class: "ts-row" },
       el("span", { class: "ts-jn" }, "J" + x.numero),
@@ -992,7 +1043,7 @@ function squadAvailability() {
   return el("div", { class: "card av", onclick: () => { state.view = "lesoes"; render(); }, title: "Ver lesões e disciplina" },
     el("div", { class: "av-head" },
       el("span", { class: "av-title" }, "Disponibilidade do plantel"),
-      el("span", { class: "av-pct" }, `${Math.round((nD / tot) * 100)}% disponível · ${plantel.length} jogadores`)),
+      el("span", { class: "av-pct" }, `${pctTxt((nD / tot) * 100)} disponível · ${plantel.length} jogadores`)),
     el("div", { class: "av-bar" }, seg(nD, "ok", "Disponíveis"), seg(nR, "rec", "Em recuperação"), seg(nI, "ind", "Suspensos")),
     el("div", { class: "av-legs" }, leg(nD, "ok", "Disponíveis"), leg(nR, "rec", "Em recuperação"), leg(nI, "ind", "Suspensos")));
 }
@@ -1004,25 +1055,13 @@ function linhaDe(posStr) {
   const r = window.TigresRatings ? window.TigresRatings.roleOf(posStr) : "MC";
   return r === "GR" ? "GR" : r === "DC" || r === "LD" ? "DEF" : r === "MD" || r === "MC" ? "MED" : "ATA";
 }
-const MES_ABR = ["Jan.", "Fev.", "Mar.", "Abr.", "Mai.", "Jun.", "Jul.", "Ago.", "Set.", "Out.", "Nov.", "Dez."];
 function fmtRegresso(ate) {
   if (!ate) return "Por confirmar";
   const [a, m, dd] = ate.split("-").map(Number);
   return dd ? `${dd} ${MES_ABR[m - 1]} ${a}` : `${MES_ABR[m - 1]} ${a}`;
 }
 const LES_ESTADO = { breve: ["Recuperação final", "g"], medio: ["Lesão prolongada", "y"], longo: ["Lesão grave", "r"], indef: ["Sem previsão", "s"] };
-// Data (domingo) da jornada do calendário "7 / 8 Novembro" — ano = o mais próximo de hoje
-function dataJogo(f) {
-  const parts = String(f?.data || "").split("/");
-  const m = (parts[1] || parts[0] || "").trim().match(/(\d{1,2})\s+([A-Za-zçÇãÃéÉíÍ]+)/);
-  if (!m) return null;
-  const mes = mesIdxPT(m[2]); if (mes < 0) return null;
-  const hoje = new Date(); let ano = hoje.getFullYear();
-  if (mes < hoje.getMonth() - 6) ano++; else if (mes > hoje.getMonth() + 6) ano--;
-  const sab = f.hora === "11:00" || f.hora === "12:40" ? 0 : 1; // jogos de sábado/sexta: 1.º número
-  const d = new Date(ano, mes, +m[1]); d.setDate(d.getDate() - sab);
-  return d;
-}
+function dataJogo(f) { return f ? jogoDate(f.data, f.hora) : null; }
 function lesoesAtivas(ref = new Date()) {
   return (state.data.lesoes || []).map((l) => ({ ...l, r: lesaoRegresso(l.ate, ref) })).filter((l) => l.r.cls !== "ok")
     .sort((a, b) => a.r.ord - b.r.ord || a.jogador.localeCompare(b.jogador));
@@ -1041,7 +1080,7 @@ function viewLesoes(app) {
   const ativas = lesoesAtivas();
   const fora = new Set(ativas.map((l) => l.jogador));
   const tot = plantel.length || 1;
-  const pct = (n) => `${Math.round((n / tot) * 100)}% do plantel`;
+  const pct = (n) => `${pctTxt((n / tot) * 100)} do plantel`;
   const nFinal = ativas.filter((l) => l.r.cls === "breve").length;
   const nIndef = ativas.filter((l) => l.r.cls === "indef").length;
   const hoje = new Date();
@@ -1049,7 +1088,7 @@ function viewLesoes(app) {
   // Cabeçalho
   app.append(el("div", { class: "md-head" },
     el("div", {}, el("h2", { class: "md-title" }, "Disponibilidade do plantel"), el("div", { class: "md-sub" }, "Estado atual e impacto das lesões")),
-    el("span", { class: "md-date" }, `📅 ${hoje.getDate()} ${MES_ABR[hoje.getMonth()].replace(".", "")} ${hoje.getFullYear()}`)));
+    el("span", { class: "md-date" }, ic("calendar"), fmtDia(hoje))));
 
   // KPIs
   const kpi = (n, t, s, c) => el("div", { class: "md-kpi " + c }, el("i", { class: "md-dot" }), el("span", { class: "md-kpi-n" }, String(n)), el("span", { class: "md-kpi-t" }, t), el("span", { class: "md-kpi-s" }, s));
@@ -1065,7 +1104,7 @@ function viewLesoes(app) {
   const lg = el("div", { class: "md-lines" });
   linhas.forEach((x) => lg.append(el("div", { class: "md-line" },
     el("span", { class: "md-line-n" }, x.nome),
-    el("span", { class: "md-line-p" }, `${x.pct}%`),
+    el("span", { class: "md-line-p" }, pctTxt(x.pct)),
     el("div", { class: "md-bar" }, el("div", { class: "md-bar-f " + (x.pct >= 75 ? "g" : x.pct >= 50 ? "y" : "r"), style: `width:${x.pct}%` })),
     el("span", { class: "md-line-s" }, `${x.disp} de ${x.total} disponíveis`))));
   lc.append(lg);
@@ -1074,7 +1113,7 @@ function viewLesoes(app) {
   // Jogadores lesionados
   const lj = el("div", { class: "card md-card" },
     el("div", { class: "md-card-t" }, "Jogadores lesionados", el("span", { class: "md-badge" }, `${ativas.length} ativo${ativas.length === 1 ? "" : "s"}`)));
-  if (!ativas.length) lj.append(el("div", { class: "empty" }, "Sem jogadores lesionados. 💪"));
+  if (!ativas.length) lj.append(el("div", { class: "empty" }, "Sem jogadores lesionados."));
   ativas.forEach((l) => {
     const [estado, ec] = LES_ESTADO[l.r.cls];
     lj.append(el("div", { class: "md-row" },
@@ -1082,14 +1121,14 @@ function viewLesoes(app) {
       el("span", { class: "md-pill " + ec }, el("i", {}), estado),
       el("div", { class: "md-ret" }, el("span", {}, "Regresso estimado"), el("strong", {}, fmtRegresso(l.ate)), el("em", {}, l.r.sub))));
   });
-  if (ativas.length) lj.append(el("p", { class: "hint" }, "Quando só há o mês, conta-se até ao fim desse mês. Datas atualizadas à mão."));
+  if (ativas.length) lj.append(infoTip("Quando só há o mês de regresso, conta-se até ao fim desse mês. As datas são atualizadas à mão."));
   app.append(lj);
 
   // Impacto no próximo jogo + previsão de regressos
   const duo = el("div", { class: "md-duo" });
   const f = nextGame();
-  const ic = el("div", { class: "card md-card" }, el("div", { class: "md-card-t" }, "📅 Impacto no próximo jogo"));
-  if (!f) ic.append(el("div", { class: "empty" }, "Sem próximo jogo no calendário."));
+  const icard = el("div", { class: "card md-card" }, el("div", { class: "md-card-t" }, "Impacto no próximo jogo"));
+  if (!f) icard.append(el("div", { class: "empty" }, "Sem próximo jogo no calendário."));
   else {
     const dj = dataJogo(f);
     const foraJogo = new Set(ativas.filter((l) => !dj || !l.r.fim || l.r.fim > dj).map((l) => l.jogador)); // regressa no dia do jogo = disponível
@@ -1098,20 +1137,20 @@ function viewLesoes(app) {
     // em risco = lesões deixam a linha sem suplente (menos que o onze base + 1); linha mais afetada = mais ausências
     const risco = lj2.filter((x) => x.disp < x.total && x.disp < LINHA_TIPICA[x.k] + 1);
     const pior = [...lj2].sort((a, b) => (b.total - b.disp) - (a.total - a.disp) || a.pct - b.pct)[0];
-    ic.append(el("div", { class: "md-sub" }, `J${f.numero} · ${f.casa === false ? "fora, " : ""}vs ${f.adversario} · ${dataJornada(f.data, f.hora)}`));
-    ic.append(risco.length
-      ? el("span", { class: "md-alert r" }, `⚠ ${risco.map((x) => x.nome).join(" e ")} sem margem`)
-      : el("span", { class: "md-alert g" }, "✓ Todas as linhas com alternativas"));
-    ic.append(el("div", { class: "md-stats" },
+    icard.append(el("div", { class: "md-sub" }, `J${f.numero} · ${f.casa === false ? "Fora" : "Casa"} · vs ${f.adversario} · ${fmtJogo(f.data, f.hora)}`));
+    icard.append(risco.length
+      ? el("span", { class: "md-alert r" }, ic("alert"), `${risco.map((x) => x.nome).join(" e ")} sem margem`)
+      : el("span", { class: "md-alert g" }, ic("check"), "Todas as linhas com alternativas"));
+    icard.append(el("div", { class: "md-stats" },
       el("div", {}, el("strong", {}, String(plantel.length - foraJogo.size)), el("span", {}, "jogadores disponíveis")),
       el("div", {}, el("strong", {}, `${pior.disp}/${pior.total}`), el("span", {}, `${pior.nome.toLowerCase()} disponíveis`)),
       el("div", {}, el("strong", {}, String(voltam.length)), el("span", {}, "regressam a tempo"))));
-    if (voltam.length) ic.append(el("p", { class: "hint" }, `Previsto regressar até ao jogo: ${voltam.join(", ")}.`));
+    if (voltam.length) icard.append(el("p", { class: "hint" }, `Previsto regressar até ao jogo: ${voltam.join(", ")}.`));
   }
-  duo.append(ic);
+  duo.append(icard);
 
   // Previsão de regressos (curva de disponíveis nos próximos meses)
-  const pc = el("div", { class: "card md-card" }, el("div", { class: "md-card-t" }, "📈 Previsão de regressos"));
+  const pc = el("div", { class: "card md-card" }, el("div", { class: "md-card-t" }, "Previsão de regressos"));
   const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
   const esteMes = ativas.filter((l) => l.r.fim && l.r.fim <= fimMes).length;
   const prox = ativas.find((l) => l.r.fim);
@@ -1120,7 +1159,7 @@ function viewLesoes(app) {
   for (let i = 0; i <= 6; i++) {
     const ref = i === 0 ? hoje : new Date(hoje.getFullYear(), hoje.getMonth() + i, 0);
     const out = ativas.filter((l) => !l.r.fim || l.r.fim > ref).length;
-    pts.push({ lbl: i === 0 ? "Hoje" : MES_ABR[ref.getMonth()].replace(".", ""), v: plantel.length - out });
+    pts.push({ lbl: i === 0 ? "Hoje" : MES_ABR[ref.getMonth()], v: plantel.length - out });
   }
   const W = 300, H = 110, px = 18, top = 14, bot = 26;
   const vmin = Math.min(...pts.map((p) => p.v)) - 1, vmax = plantel.length;
@@ -1134,13 +1173,14 @@ function viewLesoes(app) {
   </svg>`;
   const ch = el("div", { class: "md-chart-w" }); ch.innerHTML = svg;
   pc.append(ch);
-  pc.append(el("p", { class: "hint" }, `Jogadores disponíveis no fim de cada mês, se as datas se cumprirem.${prox ? ` Próximo regresso: ${prox.jogador} (${fmtRegresso(prox.ate)}).` : ""}${nIndef ? ` ${nIndef} sem data não entram na previsão.` : ""}`));
+  if (prox) pc.append(el("p", { class: "hint" }, `Próximo regresso: ${prox.jogador} (${fmtRegresso(prox.ate)}).`));
+  pc.append(infoTip(`Jogadores disponíveis no fim de cada mês, se as datas de regresso se cumprirem.${nIndef ? ` Os ${nIndef} sem data não entram na previsão.` : ""}`));
   duo.append(pc);
   app.append(duo);
 
   app.append(el("div", { class: "section-title" }, "Disciplina"));
   app.append(el("div", { class: "card soon" },
-    el("span", { class: "soon-ic" }, "🟨"),
+    el("span", { class: "soon-ic" }),
     el("div", {}, el("strong", {}, "Em breve"), el("span", {}, "Cartões, castigos e suspensões dos jogadores vão aparecer aqui."))));
 }
 
@@ -1163,7 +1203,7 @@ function viewDicas(app) {
   const turnovers = pe + pb;
   const precisao = rem ? Math.round((remB / rem) * 100) : 0;
   const cruzPrec = cruzTot ? Math.round((cruzOk / cruzTot) * 100) : 0;
-  const r1 = (x) => Math.round(x * 10) / 10;
+  const r1 = (x) => nf1(x);
 
   app.append(el("div", { class: "section-title" }, "Dicas de treino"));
   app.append(el("p", { class: "dicas-intro" }, "Sugestões de treino baseadas nas estatísticas reais da equipa. Com apenas 1 hora por semana (quinta-feira), o objetivo é treinar com foco, não treinar tudo ao mesmo tempo."));
@@ -1172,10 +1212,10 @@ function viewDicas(app) {
   app.append(el("h3", { class: "dicas-h" }, "O que dizem os números"));
   const sinais = [
     ["Perdas de posse", `~${r1(pe)} passes errados + ~${r1(pb)} perdas = ~${r1(turnovers)} por jogo`, "É o principal problema"],
-    ["Posse de bola", `${Math.round(posse)}%`, "Passamos o jogo a correr atrás da bola"],
+    ["Posse de bola", pctTxt(posse), "Passamos o jogo a correr atrás da bola"],
     ["Desarmes", `~${r1(des)} por jogo`, "Confirma: enorme carga defensiva, sempre sem bola"],
-    ["Produção ofensiva", `${r1(rem)} remates, ${precisao}% à baliza, ${r1(pf)} passes p/ finalização, ${r1(gm)} golos`, "Cria-se pouco e o que se cria falha"],
-    ["Cruzamentos", `${r1(cruzTot)} tentados, ${cruzPrec}% conseguidos`, "Uma tática que ainda não compensa"],
+    ["Produção ofensiva", `${r1(rem)} remates, ${pctTxt(precisao)} à baliza, ${r1(pf)} passes p/ finalização, ${r1(gm)} golos`, "Cria-se pouco e o que se cria falha"],
+    ["Cruzamentos", `${r1(cruzTot)} tentados, ${pctTxt(cruzPrec)} conseguidos`, "Uma tática que ainda não compensa"],
     ["Golos sofridos", `${r1(gs)} por jogo`, "Muitos vêm dessas perdas de bola → contra-ataques"],
   ];
   const st = el("table", { class: "dicas-table" });
@@ -1209,8 +1249,8 @@ function viewDicas(app) {
   app.append(el("h3", { class: "dicas-h" }, "Roda o bloco temático (20 min) de semana para semana"));
   app.append(el("p", {}, "Mantém os rondos + jogo de posse constantes (são a nossa fraqueza central). Varia o foco do bloco de finalização:"));
   const rot = [
-    ["Semana A — Qualidade de finalização", "Repetições de remate: primeiro acertar na baliza, depois potência. A precisão de " + precisao + "% e " + r1(gm) + " golos precisam de volume + técnica."],
-    ["Semana B — Cruzamentos e ataque à área", `Só ${cruzPrec}% dos cruzamentos resultam, por isso treina a entrega (cruzamentos rasteiros e atrasados batem os altos neste escalão) e o timing das desmarcações para os receber.`],
+    ["Semana A — Qualidade de finalização", "Repetições de remate: primeiro acertar na baliza, depois potência. A precisão de " + pctTxt(precisao) + " e " + r1(gm) + " golos precisam de volume + técnica."],
+    ["Semana B — Cruzamentos e ataque à área", `Só ${pctTxt(cruzPrec)} dos cruzamentos resultam, por isso treina a entrega (cruzamentos rasteiros e atrasados batem os altos neste escalão) e o timing das desmarcações para os receber.`],
     ["Semana C — Organização defensiva", `Como sofremos ${r1(gs)} golos por jogo, treina manter o bloco compacto e não entrar de rompante nos desarmes (${r1(des)} desarmes/jogo sugere que nos precipitamos) — temporizar, atrasar, encaminhar para fora.`],
   ];
   const rl = el("div", { class: "dicas-cards" });
@@ -1220,7 +1260,7 @@ function viewDicas(app) {
   // ---- Mentalidade ----
   app.append(el("h3", { class: "dicas-h" }, "Uma ideia para o dia de jogo"));
   app.append(el("div", { class: "dica-highlight" },
-    el("p", {}, el("strong", {}, "A bola é a melhor defesa. "), `Com a diferença de posse (${Math.round(posse)}%), cada passe certo mantido é um desarme que não temos de fazer. Premeia os passes seguros ("aborrecidos") no treino para que isso passe para os jogos.`)));
+    el("p", {}, el("strong", {}, "A bola é a melhor defesa. "), `Com a diferença de posse (${pctTxt(posse)}), cada passe certo mantido é um desarme que não temos de fazer. Premeia os passes seguros ("aborrecidos") no treino para que isso passe para os jogos.`)));
 
   app.append(el("p", { class: "dicas-foot" }, "Estas dicas atualizam-se automaticamente com os números da época. À medida que registas mais jornadas, o separador \u201cEstatísticas da equipa\u201d mostra se as perdas de bola estão mesmo a baixar — esse é o teu marcador de que o treino está a resultar."));
 }
@@ -1281,7 +1321,7 @@ function playerProfile(perJ) {
     rows.append(el("div", { class: "pf-row" },
       el("span", { class: "pf-lbl" }, lbl),
       el("div", { class: "pf-bar" }, el("div", { class: "pf-fill" + (neg ? " neg" : ""), style: `width:${w}%` })),
-      el("span", { class: "pf-val" }, (Math.round(v * 10) / 10).toString()),
+      el("span", { class: "pf-val" }, nf1(v)),
     ));
   });
   wrap.append(rows);
@@ -1369,9 +1409,9 @@ function evoChart(jogos) {
     }
     svg.append(s("text", { x: x(i), y: H - B + 32, class: "evo-axis", "text-anchor": "middle" }, `${g.pos} · ${g.min}'`));
     const dot = s("circle", { cx: x(i), cy: y(g.nota), r: 6, class: "evo-dot" + (g.mediaEquipa != null && g.nota >= g.mediaEquipa ? " up" : " down") });
-    dot.append(s("title", {}, `J${g.numero} vs ${g.adversario}\nNota ${g.nota.toFixed(1)} (média da equipa ${g.mediaEquipa?.toFixed(1) ?? "—"})\n${g.pos} · ${g.min} min`));
+    dot.append(s("title", {}, `J${g.numero} vs ${g.adversario}\nNota ${nf(g.nota, 1)} (média da equipa ${g.mediaEquipa != null ? nf(g.mediaEquipa, 1) : "—"})\n${g.pos} · ${g.min} min`));
     svg.append(dot);
-    svg.append(s("text", { x: x(i), y: y(g.nota) - 11, class: "evo-val", "text-anchor": "middle" }, g.nota.toFixed(1)));
+    svg.append(s("text", { x: x(i), y: y(g.nota) - 11, class: "evo-val", "text-anchor": "middle" }, nf(g.nota, 1)));
   });
   const box = el("div", { class: "evo-chart-wrap" });
   box.append(svg);
@@ -1446,7 +1486,7 @@ function evoTable(jogos) {
   box.append(toggle, holder, note);
   return box;
 }
-function fmtEvo(v) { return Number.isInteger(v) ? String(v) : (Math.round(v * 10) / 10).toString(); }
+function fmtEvo(v) { return nf1(v); }
 
 /* Métricas usadas no perfil e no comparador: [label, chave, máx referência, negativo?] */
 const PERFIL_METRICS = [
@@ -1466,7 +1506,8 @@ const PERFIL_METRICS = [
 /* ================= COMPARAR JOGADORES ================= */
 function viewComparar(app) {
   app.append(el("div", { class: "section-title" }, "Comparar jogadores"));
-  app.append(el("p", { class: "dicas-intro" }, "Escolhe 2 ou 3 jogadores para comparar os perfis por 80 minutos lado a lado: primeiro no radar (ofensivas em cima, defensivas em baixo) e depois indicador a indicador. Nas barras, o melhor valor de cada indicador fica destacado (verde = bom; vermelho = indicador a reduzir)."));
+  app.append(el("p", { class: "dicas-intro" }, "Escolhe 2 ou 3 jogadores para comparar os perfis por 80 minutos."));
+  app.append(infoTip("Primeiro o radar (ofensivas em cima, defensivas em baixo), depois indicador a indicador. Nas barras, o melhor valor de cada indicador fica destacado: verde = bom, vermelho = indicador a reduzir."));
 
   // Jogadores com minutos registados
   const agregados = {};
@@ -1529,12 +1570,12 @@ function viewComparar(app) {
         const isBest = anyNonZero && v === best;
         const cell = el("div", { class: "cmp-cell" },
           el("div", { class: "cmp-bar" }, el("div", { class: "cmp-fill" + (neg ? " neg" : "") + (isBest ? " best" : ""), style: `width:${w}%` })),
-          el("span", { class: "cmp-val" + (isBest ? " best" : "") }, (Math.round(v * 10) / 10).toString()));
+          el("span", { class: "cmp-val" + (isBest ? " best" : "") }, nf1(v)));
         grid.append(cell);
       });
       out.append(grid);
     });
-    out.append(el("p", { class: "pf-note" }, "Valores por 80 min ao longo da época. O destaque assinala o melhor em cada indicador (nos negativos, o mais baixo)."));
+    out.append(infoTip("Valores por 80 min ao longo da época. O destaque assinala o melhor em cada indicador (nos negativos, o mais baixo)."));
   }
   sel.forEach((s) => s.addEventListener("change", build));
   build();
@@ -1585,7 +1626,7 @@ function radarNice(v) {
   for (const s of [1, 2, 2.5, 5, 10]) if (s * m >= v - 1e-9) return s * m;
   return 10 * m;
 }
-function radarFmt(v) { return Number.isInteger(Math.round(v * 100) / 100) ? String(Math.round(v)) : (Math.round(v * 10) / 10).toString(); }
+function radarFmt(v) { return nf1(v); }
 
 function radarChart(players, agg) {
   const NS = "http://www.w3.org/2000/svg";
@@ -1620,7 +1661,7 @@ function radarChart(players, agg) {
     [0.5, 1].forEach((f) => {
       const v = inv ? escala[i] * (1 - f) : escala[i] * f;
       const [tx, ty] = pt(deg, R * f);
-      svg.append(s("text", { x: tx, y: ty + 4, class: "radar-tick", "text-anchor": "middle" }, radarFmt(v) + (tipo === "pct" ? "%" : "")));
+      svg.append(s("text", { x: tx, y: ty + 4, class: "radar-tick", "text-anchor": "middle" }, radarFmt(v) + (tipo === "pct" ? NBSP + "%" : "")));
     });
     // rótulo do eixo
     const [lx, ly] = pt(deg, R + 22);
@@ -1644,7 +1685,7 @@ function radarChart(players, agg) {
     RADAR_AXES.forEach(([lbl, key, tipo], i) => {
       const v = radarValue(a, key, tipo);
       const dot = s("circle", { cx: pts[i][0], cy: pts[i][1], r: 4.5, fill: cor, class: "radar-dot" });
-      dot.append(s("title", {}, `${nome} — ${lbl.join(" ")}: ${radarFmt(v)}${tipo === "pct" ? "%" : " / 80 min"}${v > escala[i] && !RADAR_AXES[i][3] ? " (acima da escala)" : ""}`));
+      dot.append(s("title", {}, `${nome} — ${lbl.join(" ")}: ${radarFmt(v)}${tipo === "pct" ? NBSP + "%" : " / 80 min"}${v > escala[i] && !RADAR_AXES[i][3] ? " (acima da escala)" : ""}`));
       svg.append(dot);
     });
   });
@@ -1662,8 +1703,7 @@ function radarChart(players, agg) {
       el("span", { class: "cmp-sub" }, ` ${a.minutos} min${a.minutos < P80_MIN_EPOCA ? " · poucos minutos" : ""}`)));
   });
   box.append(legend);
-  box.append(el("p", { class: "pf-note" },
-    `Tudo por 80 min, exceto "Remate à baliza %" (remates à baliza ÷ remates). Mais longe do centro = melhor. Em Faltas, Passes errados e Perdas de bola a escala é invertida: a extremidade é 0. A escala de cada eixo vai até ao melhor (ou pior, nos invertidos) valor do plantel entre jogadores com ≥${P80_MIN_EPOCA} min.`));
+  box.append(infoTip(`Tudo por 80 min, exceto "Remate à baliza %" (remates à baliza ÷ remates). Mais longe do centro = melhor. Em Faltas, Passes errados e Perdas de bola a escala é invertida: a extremidade é 0. A escala de cada eixo vai até ao melhor (ou pior, nos invertidos) valor do plantel entre jogadores com pelo menos ${P80_MIN_EPOCA} min.`, "Como ler o radar"));
   return box;
 }
 
@@ -1705,8 +1745,9 @@ function keyLabel(k) { return k === " " ? "Espaço" : k.length === 1 ? k.toUpper
 
 function viewPosse(app) {
   const clube = state.data.meta.clube || "Tigres";
-  app.append(el("div", { class: "section-title" }, "Cálculo de posse de bola — cronómetros"));
-  app.append(el("p", { class: "dicas-intro" }, "Enquanto revês o vídeo do jogo, usa os atalhos de teclado para cronometrar a posse de cada equipa. Arrancar um cronómetro pára automaticamente o outro. No fim tens os tempos e as percentagens."));
+  app.append(el("div", { class: "section-title" }, "Cronómetro de posse"));
+  app.append(el("p", { class: "dicas-intro" }, "Cronometra a posse de cada equipa enquanto revês o vídeo do jogo."));
+  app.append(infoTip("Usa os atalhos de teclado para cronometrar a posse de cada equipa. Arrancar um cronómetro pára automaticamente o outro. No fim tens os tempos e as percentagens."));
 
   const keys = posseKeys();
 
@@ -1785,7 +1826,7 @@ function viewPosse(app) {
     const saveMsg = el("div", { class: "posse-status" }, "");
     const doSave = (toGitHub) => async () => {
       const tT = posseElapsed("tigres"), tA = posseElapsed("adv"), tot = tT + tA;
-      if (tot <= 0) { saveMsg.className = "posse-status"; saveMsg.style.color = "var(--loss)"; saveMsg.textContent = "❌ Sem tempo medido. Cronometra primeiro."; return; }
+      if (tot <= 0) { saveMsg.className = "posse-status"; saveMsg.style.color = "var(--loss)"; saveMsg.textContent = "Sem tempo medido. Cronometra primeiro."; return; }
       const fracT = Math.round((tT / tot) * 100) / 100; // ex. 0.60
       const num = +sel.value;
       const j = state.data.jornadas.find((x) => x.numero === num);
@@ -1800,19 +1841,19 @@ function viewPosse(app) {
           await saveToGitHub(state.data, `Posse de bola — Jornada ${num}`);
           state.source = "github";
           saveMsg.className = "posse-status on";
-          saveMsg.textContent = `✅ Posse guardada e partilhada na Jornada ${num} (${Math.round(fracT * 100)}% / ${Math.round((1 - fracT) * 100)}%).`;
-        } catch (e) { saveMsg.className = "posse-status"; saveMsg.style.color = "var(--loss)"; saveMsg.textContent = "❌ " + e.message; }
+          saveMsg.textContent = `Posse guardada e partilhada na Jornada ${num} (${pctTxt(fracT * 100)} / ${pctTxt((1 - fracT) * 100)}).`;
+        } catch (e) { saveMsg.className = "posse-status"; saveMsg.style.color = "var(--loss)"; saveMsg.textContent = e.message; }
       } else {
         localStorage.setItem("tigres_cache", JSON.stringify(state.data));
         state.source = "local";
         saveMsg.className = "posse-status on";
-        saveMsg.textContent = `✅ Posse guardada localmente na Jornada ${num} (${Math.round(fracT * 100)}% / ${Math.round((1 - fracT) * 100)}%). Lembra-te de a enviar para o GitHub.`;
+        saveMsg.textContent = `Posse guardada localmente na Jornada ${num} (${pctTxt(fracT * 100)} / ${pctTxt((1 - fracT) * 100)}). Lembra-te de a enviar para o GitHub.`;
       }
     };
     const btnGh = el("button", { class: "btn", onclick: doSave(true) }, "Guardar no GitHub");
     const btnLocal = el("button", { class: "btn ghost", onclick: doSave(false) }, "Guardar localmente");
     if (!ghConfigured()) btnGh.disabled = true;
-    const btnCfg = el("button", { class: "btn ghost small", type: "button", onclick: openSettingsModal }, "⚙ Definições / Token");
+    const btnCfg = el("button", { class: "btn ghost small", type: "button", onclick: openSettingsModal }, ic("settings"), "Definições");
     save.append(field("Jornada", sel), info, el("div", { class: "btnrow" }, btnGh, btnLocal, btnCfg), saveMsg);
   }
   app.append(save);
@@ -1823,8 +1864,8 @@ function viewPosse(app) {
     cTigres._clock.textContent = fmtClock(tT);
     cAdv._clock.textContent = fmtClock(tA);
     const pT = tot > 0 ? Math.round((tT / tot) * 100) : 0;
-    cTigres._pct.textContent = tot > 0 ? pT + "%" : "–";
-    cAdv._pct.textContent = tot > 0 ? (100 - pT) + "%" : "–";
+    cTigres._pct.textContent = tot > 0 ? pctTxt(pT) : "–";
+    cAdv._pct.textContent = tot > 0 ? pctTxt(100 - pT) : "–";
     cTigres.classList.toggle("running", posseState.active === "tigres");
     cAdv.classList.toggle("running", posseState.active === "adv");
     status.textContent = posseState.active === "tigres" ? `A contar: ${clube}` : posseState.active === "adv" ? "A contar: Adversário" : "Em pausa";
@@ -1862,7 +1903,7 @@ function viewPosse(app) {
 function openSettingsModal() {
   const b = $("#modalBody"); b.innerHTML = "";
   b.append(el("h2", {}, "Definições"));
-  b.append(el("div", { class: "note", html: `<strong>Repositório:</strong> ${ghConfigured() ? CONFIG.githubOwner + "/" + CONFIG.githubRepo : "❌ não configurado (edita CONFIG no ficheiro app.js)"}` }));
+  b.append(el("div", { class: "note", html: `<strong>Repositório:</strong> ${ghConfigured() ? CONFIG.githubOwner + "/" + CONFIG.githubRepo : "não configurado (edita CONFIG no ficheiro app.js)"}` }));
   b.append(el("label", {}, "Token do GitHub (fica guardado só neste browser)"));
   const tok = el("input", { type: "password", value: getToken(), placeholder: "github_pat_..." });
   b.append(tok);
@@ -1874,8 +1915,8 @@ function openSettingsModal() {
 }
 
 /* ================= helpers UI ================= */
-function tableScroll(table) {
-  return el("div", { class: "table-scroll" }, table);
+function tableScroll(table, tall = false) {
+  return el("div", { class: "table-scroll" + (tall ? " tall" : "") }, table);
 }
 function field(label, input) { return el("div", {}, el("label", {}, label), input); }
 function showModal() { $("#modalBackdrop").hidden = false; }
