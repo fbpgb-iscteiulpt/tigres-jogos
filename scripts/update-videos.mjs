@@ -26,21 +26,30 @@ const videos = [...rss.matchAll(/<entry>[\s\S]*?<\/entry>/g)].map((m) => ({
 }));
 if (!videos.length) throw new Error("Feed RSS sem vídeos — formato mudou?");
 
-// 2) Página /videos e /streams do canal (complemento, para apanhar vídeos mais antigos)
-for (const tab of ["videos", "streams"]) {
+// 2) Páginas /streams e /videos do canal (as ~30 mais recentes de cada). Necessário porque a CIF
+//    publica uma jornada inteira (9 jogos) de uma vez e o RSS só guarda os últimos 15.
+//    Formato atual do YouTube: "lockupViewModel" (contentId + metadata.title.content);
+//    formato antigo: objetos com videoId + title.runs / title.simpleText.
+for (const tab of ["streams", "videos"]) {
   try {
     const html = await (await fetch(`${CHANNEL_URL}/${tab}`, { headers: HEADERS })).text();
     const m = html.match(/var ytInitialData = (\{[\s\S]*?\});<\/script>/);
-    if (!m) continue;
+    if (!m) { console.log(`Aviso: página /${tab} sem dados (formato mudou?).`); continue; }
+    let n = 0;
     const walk = (o) => {
       if (!o || typeof o !== "object") return;
-      if (typeof o.videoId === "string" && o.title) {
+      const lv = o.lockupViewModel;
+      if (lv && typeof lv.contentId === "string") {
+        const t = lv.metadata?.lockupMetadataViewModel?.title?.content;
+        if (t) { videos.push({ id: lv.contentId, titulo: t, data: "" }); n++; }
+      } else if (typeof o.videoId === "string" && o.title) {
         const t = o.title.runs?.[0]?.text || o.title.simpleText;
-        if (t) videos.push({ id: o.videoId, titulo: t, data: "" });
+        if (t) { videos.push({ id: o.videoId, titulo: t, data: "" }); n++; }
       }
       for (const k in o) walk(o[k]);
     };
     walk(JSON.parse(m[1]));
+    if (!n) console.log(`Aviso: página /${tab} lida mas sem vídeos reconhecidos (formato mudou?).`);
   } catch (e) {
     console.log(`Aviso: página /${tab} não lida (${e.message}). Continua só com o RSS.`);
   }
