@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-02T00:19:49.133Z",
+    "atualizado": "2026-11-05T09:22:55.928Z",
     "versao": 14
   },
   "listas": {
@@ -8336,14 +8336,16 @@
       "data": "21 / 22 Novembro",
       "hora": "15:30",
       "adversario": "Canarinhos",
-      "casa": true
+      "casa": true,
+      "video": "https://www.youtube.com/watch?v=WtiOQ8hoodU"
     },
     {
       "numero": 11,
       "data": "28 / 29 Novembro",
       "hora": "13:50",
       "adversario": "Incríveis",
-      "casa": false
+      "casa": false,
+      "video": "https://www.youtube.com/watch?v=T8wE-UkVnL8"
     },
     {
       "numero": 12,
