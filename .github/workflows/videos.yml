@@ -2,7 +2,7 @@ name: Atualizar vídeos (YouTube)
 
 on:
   schedule:
-    - cron: "0 10 * * 4"   # todas as quintas-feiras às 10:00 UTC (os vídeos da jornada saem no início da semana)
+    - cron: "0 10 * * *"   # todos os dias às 10:00 UTC (a CIF publica as transmissões em dias variáveis)
   workflow_dispatch:         # botão "Run workflow" para correr à mão
 
 permissions:
