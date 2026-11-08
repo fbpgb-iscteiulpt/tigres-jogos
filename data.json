@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-07T21:30:10.620Z",
+    "atualizado": "2026-11-08T19:21:09.229Z",
     "versao": 14
   },
   "listas": {
@@ -8258,6 +8258,24 @@
       "hora": "18:50",
       "casa": true,
       "video": "https://www.youtube.com/watch?v=L7goLPba-pQ"
+    },
+    {
+      "numero": 8,
+      "equipa": "Tigres",
+      "adversario": "Madeirinha",
+      "semEstatisticas": true,
+      "matchStats": {
+        "Resultado": {
+          "tigres": 0,
+          "adversario": 1
+        }
+      },
+      "players": [],
+      "eventos": [],
+      "data": "7 / 8 Novembro",
+      "hora": "11:00",
+      "casa": false,
+      "video": "https://www.youtube.com/watch?v=lVN3YX4EK84"
     }
   ],
   "calendario": [
@@ -8582,7 +8600,7 @@
       "dd": 3,
       "gm": 25,
       "gs": 14,
-      "td": 14
+      "td": 20
     },
     {
       "pos": 7,
@@ -8594,7 +8612,7 @@
       "dd": 3,
       "gm": 17,
       "gs": 12,
-      "td": 35
+      "td": 43
     },
     {
       "pos": 8,
@@ -8610,18 +8628,30 @@
     },
     {
       "pos": 9,
-      "equipa": "Tigres",
+      "equipa": "Madeirinha",
       "pts": 10,
       "j": 7,
       "v": 3,
       "e": 1,
       "dd": 3,
-      "gm": 8,
-      "gs": 15,
-      "td": 18
+      "gm": 11,
+      "gs": 11,
+      "td": 15
     },
     {
       "pos": 10,
+      "equipa": "Tigres",
+      "pts": 10,
+      "j": 8,
+      "v": 3,
+      "e": 1,
+      "dd": 4,
+      "gm": 8,
+      "gs": 16,
+      "td": 26
+    },
+    {
+      "pos": 11,
       "equipa": "Incríveis",
       "pts": 9,
       "j": 8,
@@ -8633,19 +8663,19 @@
       "td": 22
     },
     {
-      "pos": 11,
-      "equipa": "Madeirinha",
+      "pos": 12,
+      "equipa": "Purrianos",
       "pts": 7,
-      "j": 6,
+      "j": 7,
       "v": 2,
       "e": 1,
-      "dd": 3,
+      "dd": 4,
       "gm": 10,
-      "gs": 11,
-      "td": 10
+      "gs": 19,
+      "td": 13
     },
     {
-      "pos": 12,
+      "pos": 13,
       "equipa": "VDR",
       "pts": 7,
       "j": 7,
@@ -8657,7 +8687,7 @@
       "td": 16
     },
     {
-      "pos": 13,
+      "pos": 14,
       "equipa": "Laranjada",
       "pts": 7,
       "j": 8,
@@ -8669,7 +8699,7 @@
       "td": 19
     },
     {
-      "pos": 14,
+      "pos": 15,
       "equipa": "Canarinhos",
       "pts": 6,
       "j": 7,
@@ -8681,7 +8711,7 @@
       "td": 16
     },
     {
-      "pos": 15,
+      "pos": 16,
       "equipa": "Briosa",
       "pts": 6,
       "j": 8,
@@ -8693,28 +8723,16 @@
       "td": 31
     },
     {
-      "pos": 16,
+      "pos": 17,
       "equipa": "Milionários",
       "pts": 5,
-      "j": 7,
+      "j": 8,
       "v": 1,
       "e": 2,
-      "dd": 4,
+      "dd": 5,
       "gm": 8,
-      "gs": 13,
-      "td": 25
-    },
-    {
-      "pos": 17,
-      "equipa": "Purrianos",
-      "pts": 4,
-      "j": 6,
-      "v": 1,
-      "e": 1,
-      "dd": 4,
-      "gm": 8,
-      "gs": 19,
-      "td": 10
+      "gs": 15,
+      "td": 27
     },
     {
       "pos": 18,
