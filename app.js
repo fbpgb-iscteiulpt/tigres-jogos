@@ -1055,11 +1055,36 @@ function lesaoRegresso(ate, hoje = new Date()) {
     : (dias < 45 ? "Regressa este mês" : `Faltam ~${Math.round(dias / 30)} meses`);
   return { txt, sub, cls: dias <= 21 ? "breve" : dias <= 120 ? "medio" : "longo", ord: dias, fim };
 }
-/* Disponibilidade do plantel: verde = disponível, amarelo = em recuperação (lesão ativa), vermelho = suspenso (disciplina, em breve) */
+// data.suspensoes: [{ jogador, motivo, jornada, jogos, jogosMax? }]
+//   jornada = jogo em que viu o cartão; jogos = jogos de castigo (mínimo); jogosMax = se o castigo ainda não está decidido.
+//   Os jogos cumpridos contam-se sozinhos: cada jornada com resultado depois do cartão é um jogo cumprido.
+function suspensoesAtivas() {
+  const jogadas = new Set((state.data.jornadas || []).map((j) => j.numero));
+  const cal = [...(state.data.calendario || [])].sort((a, b) => a.numero - b.numero);
+  return (state.data.suspensoes || []).map((x) => {
+    const max = x.jogosMax || x.jogos;
+    const depois = cal.filter((f) => f.numero > x.jornada);
+    const cumpridos = depois.filter((f) => jogadas.has(f.numero)).length;
+    const falta = Math.max(0, x.jogos - cumpridos), faltaMax = Math.max(0, max - cumpridos);
+    const volta = depois[x.jogos] || null, voltaMax = depois[max] || null; // 1.º jogo em que já pode jogar
+    return { ...x, max, cumpridos, falta, faltaMax, porConfirmar: max > x.jogos, volta, voltaMax,
+      fim: voltaMax ? dataJogo(voltaMax) : null }; // pior caso, para a previsão de regressos
+  }).filter((x) => x.faltaMax > 0).sort((a, b) => a.faltaMax - b.faltaMax || a.jogador.localeCompare(b.jogador));
+}
+function fmtVolta(x) {
+  const j = (f) => f ? `J${f.numero}` : "fim da época";
+  return x.porConfirmar && x.voltaMax !== x.volta ? `${j(x.volta)} ou ${j(x.voltaMax)}` : j(x.voltaMax);
+}
+function fmtFalta(x) {
+  const n = x.falta === x.faltaMax ? String(x.falta) : `${x.falta}–${x.faltaMax}`;
+  return x.faltaMax === 1 && x.falta === 1 ? "Falta 1 jogo" : `Faltam ${n} jogos`;
+}
+
+/* Disponibilidade do plantel: verde = disponível, amarelo = em recuperação (lesão ativa), vermelho = suspenso */
 function squadAvailability() {
   const plantel = state.data.listas?.jogadores || [];
   const recup = new Set((state.data.lesoes || []).filter((l) => lesaoRegresso(l.ate).cls !== "ok").map((l) => l.jogador));
-  const indisp = new Set(); // castigos — preenchido quando a parte da disciplina existir
+  const indisp = new Set(suspensoesAtivas().map((x) => x.jogador));
   const nR = plantel.filter((n) => recup.has(n) && !indisp.has(n)).length;
   const nI = plantel.filter((n) => indisp.has(n)).length;
   const nD = plantel.length - nR - nI;
@@ -1104,7 +1129,8 @@ function viewLesoes(app) {
   const plantel = state.data.listas?.jogadores || [];
   const pos = state.data.listas?.posicoes || {};
   const ativas = lesoesAtivas();
-  const fora = new Set(ativas.map((l) => l.jogador));
+  const susp = suspensoesAtivas();
+  const fora = new Set([...ativas.map((l) => l.jogador), ...susp.map((x) => x.jogador)]);
   const tot = plantel.length || 1;
   const pct = (n) => `${pctTxt((n / tot) * 100)} do plantel`;
   const nFinal = ativas.filter((l) => l.r.cls === "breve").length;
@@ -1113,7 +1139,7 @@ function viewLesoes(app) {
 
   // Cabeçalho
   app.append(el("div", { class: "md-head" },
-    el("div", {}, el("h2", { class: "md-title" }, "Disponibilidade do plantel"), el("div", { class: "md-sub" }, "Estado atual e impacto das lesões")),
+    el("div", {}, el("h2", { class: "md-title" }, "Disponibilidade do plantel"), el("div", { class: "md-sub" }, "Estado atual, lesões e castigos")),
     el("span", { class: "md-date" }, ic("calendar"), fmtDia(hoje))));
 
   // KPIs
@@ -1121,6 +1147,7 @@ function viewLesoes(app) {
   app.append(el("div", { class: "md-kpis" },
     kpi(plantel.length - fora.size, "Disponíveis", pct(plantel.length - fora.size), "g"),
     kpi(ativas.length, "Lesionados", pct(ativas.length), "r"),
+    kpi(susp.length, "Suspensos", pct(susp.length), "x"),
     kpi(nFinal, "Recuperação final", pct(nFinal), "y"),
     kpi(nIndef, "Sem previsão", pct(nIndef), "s")));
 
@@ -1134,6 +1161,7 @@ function viewLesoes(app) {
     el("div", { class: "md-bar" }, el("div", { class: "md-bar-f " + (x.pct >= 75 ? "g" : x.pct >= 50 ? "y" : "r"), style: `width:${x.pct}%` })),
     el("span", { class: "md-line-s" }, `${x.disp} de ${x.total} disponíveis`))));
   lc.append(lg);
+  lc.append(infoTip("Contam como indisponíveis os lesionados e os suspensos."));
   app.append(lc);
 
   // Jogadores lesionados
@@ -1150,6 +1178,19 @@ function viewLesoes(app) {
   if (ativas.length) lj.append(infoTip("Quando só há o mês de regresso, conta-se até ao fim desse mês. As datas são atualizadas à mão."));
   app.append(lj);
 
+  // Jogadores suspensos
+  const sj = el("div", { class: "card md-card" },
+    el("div", { class: "md-card-t" }, "Jogadores suspensos", el("span", { class: "md-badge" }, `${susp.length} ativo${susp.length === 1 ? "" : "s"}`)));
+  if (!susp.length) sj.append(el("div", { class: "empty" }, "Sem jogadores suspensos."));
+  susp.forEach((x) => {
+    sj.append(el("div", { class: "md-row" },
+      el("div", { class: "md-row-b" }, el("strong", {}, x.jogador), el("span", {}, [pos[x.jogador], `${x.motivo} na J${x.jornada}`].filter(Boolean).join(" · "))),
+      x.porConfirmar ? el("span", { class: "md-pill y" }, el("i", {}), "Castigo por confirmar") : el("span", { class: "md-pill x" }, el("i", {}), `${x.jogos} jogo${x.jogos === 1 ? "" : "s"} de castigo`),
+      el("div", { class: "md-ret" }, el("span", {}, "Pode jogar a partir de"), el("strong", {}, fmtVolta(x)), el("em", {}, fmtFalta(x)))));
+  });
+  if (susp.length) sj.append(infoTip("Os jogos de castigo descontam-se sozinhos à medida que entram os resultados de cada jornada. Quando o castigo ainda não foi decidido, mostra-se o mínimo e o máximo."));
+  app.append(sj);
+
   // Impacto no próximo jogo + previsão de regressos
   const duo = el("div", { class: "md-duo" });
   const f = nextGame();
@@ -1157,7 +1198,9 @@ function viewLesoes(app) {
   if (!f) icard.append(el("div", { class: "empty" }, "Sem próximo jogo no calendário."));
   else {
     const dj = dataJogo(f);
-    const foraJogo = new Set(ativas.filter((l) => !dj || !l.r.fim || l.r.fim > dj).map((l) => l.jogador)); // regressa no dia do jogo = disponível
+    const foraLes = ativas.filter((l) => !dj || !l.r.fim || l.r.fim > dj).map((l) => l.jogador); // regressa no dia do jogo = disponível
+    const suspJogo = susp.map((x) => x.jogador); // o próximo jogo é sempre o 1.º ainda por cumprir
+    const foraJogo = new Set([...foraLes, ...suspJogo]);
     const voltam = ativas.filter((l) => !foraJogo.has(l.jogador)).map((l) => l.jogador);
     const lj2 = porLinha(plantel, pos, foraJogo);
     // em risco = lesões deixam a linha sem suplente (menos que o onze base + 1); linha mais afetada = mais ausências
@@ -1171,6 +1214,7 @@ function viewLesoes(app) {
       el("div", {}, el("strong", {}, String(plantel.length - foraJogo.size)), el("span", {}, "jogadores disponíveis")),
       el("div", {}, el("strong", {}, `${pior.disp}/${pior.total}`), el("span", {}, `${pior.nome.toLowerCase()} disponíveis`)),
       el("div", {}, el("strong", {}, String(voltam.length)), el("span", {}, "regressam a tempo"))));
+    if (suspJogo.length) icard.append(el("p", { class: "hint" }, `Suspensos: ${susp.map((x) => x.jogador + (x.falta === 0 ? " (por confirmar)" : "")).join(", ")}.`));
     if (voltam.length) icard.append(el("p", { class: "hint" }, `Previsto regressar até ao jogo: ${voltam.join(", ")}.`));
   }
   duo.append(icard);
@@ -1178,13 +1222,15 @@ function viewLesoes(app) {
   // Previsão de regressos (curva de disponíveis nos próximos meses)
   const pc = el("div", { class: "card md-card" }, el("div", { class: "md-card-t" }, "Previsão de regressos"));
   const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
-  const esteMes = ativas.filter((l) => l.r.fim && l.r.fim <= fimMes).length;
-  const prox = ativas.find((l) => l.r.fim);
+  const ausencias = [...ativas.map((l) => ({ jogador: l.jogador, fim: l.r.fim, quando: fmtRegresso(l.ate) })),
+    ...susp.map((x) => ({ jogador: x.jogador, fim: x.fim, quando: fmtVolta(x) }))];
+  const esteMes = ausencias.filter((a) => a.fim && a.fim <= fimMes).length;
+  const prox = [...ausencias].filter((a) => a.fim).sort((a, b) => a.fim - b.fim)[0];
   pc.append(el("div", { class: "md-big" }, el("strong", {}, `+${esteMes}`), el("span", {}, `regresso${esteMes === 1 ? "" : "s"} até ao fim de ${MESES_PT[hoje.getMonth()]}`)));
   const pts = [];
   for (let i = 0; i <= 6; i++) {
     const ref = i === 0 ? hoje : new Date(hoje.getFullYear(), hoje.getMonth() + i, 0);
-    const out = ativas.filter((l) => !l.r.fim || l.r.fim > ref).length;
+    const out = ausencias.filter((a) => !a.fim || a.fim > ref).length;
     pts.push({ lbl: i === 0 ? "Hoje" : MES_ABR[ref.getMonth()], v: plantel.length - out });
   }
   const W = 300, H = 110, px = 18, top = 14, bot = 26;
@@ -1199,15 +1245,11 @@ function viewLesoes(app) {
   </svg>`;
   const ch = el("div", { class: "md-chart-w" }); ch.innerHTML = svg;
   pc.append(ch);
-  if (prox) pc.append(el("p", { class: "hint" }, `Próximo regresso: ${prox.jogador} (${fmtRegresso(prox.ate)}).`));
-  pc.append(infoTip(`Jogadores disponíveis no fim de cada mês, se as datas de regresso se cumprirem.${nIndef ? ` Os ${nIndef} sem data não entram na previsão.` : ""}`));
+  if (prox) pc.append(el("p", { class: "hint" }, `Próximo regresso: ${prox.jogador} (${prox.quando}).`));
+  pc.append(infoTip(`Jogadores disponíveis no fim de cada mês, se as datas de regresso se cumprirem. Nos castigos por confirmar conta-se o máximo.${nIndef ? ` Os ${nIndef} sem data não entram na previsão.` : ""}`));
   duo.append(pc);
   app.append(duo);
 
-  app.append(el("div", { class: "section-title" }, "Disciplina"));
-  app.append(el("div", { class: "card soon" },
-    el("span", { class: "soon-ic" }),
-    el("div", {}, el("strong", {}, "Em breve"), el("span", {}, "Cartões, castigos e suspensões dos jogadores vão aparecer aqui."))));
 }
 
 function viewDicas(app) {

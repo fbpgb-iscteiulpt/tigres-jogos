@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-09T14:35:17.058Z",
-    "versao": 15
+    "atualizado": "2026-11-09T15:23:10.985Z",
+    "versao": 16
   },
   "listas": {
     "jogadores": [
@@ -9960,6 +9960,21 @@
       "jogador": "Tomas S",
       "lesao": "Cabeça",
       "ate": null
+    }
+  ],
+  "suspensoes": [
+    {
+      "jogador": "Paulinho",
+      "motivo": "Vermelho direto",
+      "jornada": 8,
+      "jogos": 2,
+      "jogosMax": 3
+    },
+    {
+      "jogador": "Miguel Cruz",
+      "motivo": "Acumulação de amarelos",
+      "jornada": 8,
+      "jogos": 1
     }
   ]
 }
