@@ -51,6 +51,8 @@ const RATING_CONFIG = {
 
   // Penálti cometido
   penalti: 1.0,
+  // Cartão vermelho (evento "Cartão vermelho Tigres" com o jogador)
+  vermelho: 1.0,
 
   // Clean sheet (0 golos sofridos individuais), × fração de minutos
   cleanSheet: { GR: 1.0, DC: 1.0, LD: 1.0, MD: 0.8, MC: 0.8, EX: 0, PL: 0 },
@@ -81,6 +83,11 @@ const POS_OVERRIDE = {
   "7|Dentes": "Lateral Esquerdo",
   "7|Jacob": "Lateral Esquerdo",
   "7|Simão": "Lateral Direito",
+  "8|Dentes": "Lateral Esquerdo",
+  "8|Branco": "Defesa Central",
+  "8|Fonseca": "Defesa Central",
+  "8|Rodrigo": "Lateral Esquerdo",
+  "8|Jacob": "Lateral Esquerdo",
 };
 
 /* ---------- Jogadores que NÃO sofreram golo em cada jornada ----------
@@ -114,7 +121,7 @@ function hasImpact(p, C) {
 }
 
 /* ---------- Nota de um jogador ----------
-   ctx: { golosSofridos, penaltis:{nome:n}, remBaliza:{nome:n}, posStr, semGolo:bool } */
+   ctx: { golosSofridos, penaltis:{nome:n}, remBaliza:{nome:n}, vermelhos:{nome:n}, posStr, semGolo:bool } */
 function rateOne(p, ctx, C = RATING_CONFIG) {
   const r = roleOf(ctx.posStr);
   let s = C.BASE;
@@ -155,6 +162,9 @@ function rateOne(p, ctx, C = RATING_CONFIG) {
   // Penálti cometido
   s -= (ctx.penaltis?.[p.nome] || 0) * C.penalti;
 
+  // Cartão vermelho
+  s -= (ctx.vermelhos?.[p.nome] || 0) * (C.vermelho ?? 0);
+
   // Clean sheet (quando não sofreu golo — a nível individual)
   if (gsInd === 0) {
     const cs = C.cleanSheet[r] ?? 0;
@@ -175,23 +185,24 @@ function rateOne(p, ctx, C = RATING_CONFIG) {
 
 /* Contadores a partir dos eventos da jornada */
 function eventCounts(jornada) {
-  const penaltis = {}, remBaliza = {};
+  const penaltis = {}, remBaliza = {}, vermelhos = {};
   for (const e of (jornada.eventos || [])) {
     if (e.acao === "Penalti feito" && e.jogador) penaltis[e.jogador] = (penaltis[e.jogador] || 0) + 1;
+    if (e.acao === "Cartão vermelho Tigres" && e.jogador) vermelhos[e.jogador] = (vermelhos[e.jogador] || 0) + 1;
     // remate à baliza em qualquer zona ("Remate à baliza", "... de dentro de area", "... fora de area")
     if (/^remate à baliza/i.test(e.acao || "") && e.jogador) remBaliza[e.jogador] = (remBaliza[e.jogador] || 0) + 1;
   }
-  return { penaltis, remBaliza };
+  return { penaltis, remBaliza, vermelhos };
 }
 
 /* Nota de todos os jogadores de uma jornada (ordenado desc) */
 function rateJornada(data, jornada, C = RATING_CONFIG) {
   const golosSofridos = +(jornada.matchStats?.Resultado?.adversario ?? 0);
-  const { penaltis, remBaliza } = eventCounts(jornada);
+  const { penaltis, remBaliza, vermelhos } = eventCounts(jornada);
   const semGoloSet = new Set(SEM_GOLO_SOFRIDO[jornada.numero] || []);
   return (jornada.players || []).map((p) => {
     const posStr = posOf(data, jornada.numero, p.nome);
-    const ctx = { golosSofridos, penaltis, remBaliza, posStr, semGolo: semGoloSet.has(p.nome) };
+    const ctx = { golosSofridos, penaltis, remBaliza, vermelhos, posStr, semGolo: semGoloSet.has(p.nome) };
     return { nome: p.nome, pos: roleOf(posStr), min: p.minutos || 0, nota: +rateOne(p, ctx, C).toFixed(1) };
   }).sort((a, b) => b.nota - a.nota);
 }
