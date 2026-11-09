@@ -80,7 +80,6 @@ const POS_OVERRIDE = {
   "2|Paulinho": "Defesa Central",
   "3|Dentes": "Lateral Direito",
   "5|Dentes": "Lateral Esquerdo",
-  "5|Miguel Cruz": "Medio Defensivo",
   "7|Dentes": "Lateral Esquerdo",
   "7|Jacob": "Lateral Esquerdo",
   "7|Simão": "Lateral Direito",
@@ -89,6 +88,12 @@ const POS_OVERRIDE = {
   "8|Fonseca": "Defesa Central",
   "8|Rodrigo": "Lateral Esquerdo",
   "8|Jacob": "Lateral Esquerdo",
+};
+
+/* ---------- Posição habitual por jogador (vale para todos os jogos) ----------
+   Sobrepõe-se à posição da folha Listas; um override por jogo acima tem prioridade. */
+const POS_JOGADOR = {
+  "Miguel Cruz": "Medio Defensivo",
 };
 
 /* ---------- Jogadores que NÃO sofreram golo em cada jornada ----------
@@ -114,7 +119,7 @@ function roleOf(posStr) {
 
 /* Posição efetiva de um jogador num jogo (respeita overrides) */
 function posOf(data, numero, nome) {
-  return POS_OVERRIDE[`${numero}|${nome}`] || data?.listas?.posicoes?.[nome] || "";
+  return POS_OVERRIDE[`${numero}|${nome}`] || POS_JOGADOR[nome] || data?.listas?.posicoes?.[nome] || "";
 }
 
 function hasImpact(p, C) {
