@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-09T15:23:10.985Z",
-    "versao": 16
+    "atualizado": "2026-11-09T15:48:16.180Z",
+    "versao": 17
   },
   "listas": {
     "jogadores": [
@@ -8425,7 +8425,7 @@
           "faltas": 2,
           "passesErrados": 2,
           "perdasBola": 0,
-          "driblesBemSucedidos": 1,
+          "driblesBemSucedidos": 0,
           "driblesFalhados": 0,
           "cruzamentosBemSucedidos": 0,
           "cruzamentosFalhados": 0
@@ -8922,10 +8922,6 @@
         },
         {
           "acao": "Desarme",
-          "jogador": "Branco"
-        },
-        {
-          "acao": "Drible bem sucedido",
           "jogador": "Branco"
         },
         {

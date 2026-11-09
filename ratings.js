@@ -18,28 +18,29 @@ const RATING_CONFIG = {
   passeFinalizacao: 0.5,
   dribleOk: 0.35,
   remateFora: 0.20,      // remate não à baliza (fora/bloqueado)
+  remateForaPorPos: { DC: 0.05 }, // exceções por posição ao remateFora
   remateBaliza: 0.40,    // remate à baliza (substitui, NÃO acumula com remateFora)
 
   // Positivos por posição (aplicados às estatísticas relevantes)
   porPosicao: {
     GR: { defesas: 1.2, desarmes: 0.30 },
-    DC: { desarmes: 0.40, cruzamentos: 0.10 },
-    LD: { desarmes: 0.40, cruzamentos: 0.30, dribleOk: 0.10 },
-    MD: { desarmes: 0.40, passeFinalizacao: 0.20 },
-    MC: { desarmes: 0.35, passeFinalizacao: 0.30, cruzamentos: 0.15 },
-    EX: { cruzamentos: 0.30, dribleOk: 0.25, desarmes: 0.35 },
+    DC: { desarmes: 0.26, cruzamentos: 0.10 },
+    LD: { desarmes: 0.28, cruzamentos: 0.30 },
+    MD: { desarmes: 0.30 },
+    MC: { desarmes: 0.35, cruzamentos: 0.15 },
+    EX: { cruzamentos: 0.30, desarmes: 0.35 },
     PL: { desarmes: 0.35 },
   },
 
   // Negativos: passes errados (PE) e perdas de bola (PB) por grupo posicional
   pePorGrupo: {
-    GR: { pe: 0.32, pb: 0.38 },
-    DC: { pe: 0.32, pb: 0.38 },
+    GR: { pe: 0.32, pb: 1.00 },
+    DC: { pe: 0.30, pb: 0.35 },
     LD: { pe: 0.26, pb: 0.30 },
-    MD: { pe: 0.16, pb: 0.18 },
+    MD: { pe: 0.16, pb: 0.20 },
     MC: { pe: 0.16, pb: 0.17 },
-    EX: { pe: 0.12, pb: 0.12 },
-    PL: { pe: 0.12, pb: 0.12 },
+    EX: { pe: 0.12, pb: 0.10 },
+    PL: { pe: 0.12, pb: 0.10 },
   },
   // Falta cometida (por posição): EX/PL mais leve
   faltaPorPos: { GR: 0.10, DC: 0.10, LD: 0.10, MD: 0.10, MC: 0.10, EX: 0.06, PL: 0.06 },
@@ -47,7 +48,7 @@ const RATING_CONFIG = {
   dribleFalhadoPorPos: { GR: 0.12, DC: 0.12, LD: 0.12, MD: 0.12, MC: 0.05, EX: 0.05, PL: 0.05 },
 
   // Golos sofridos (× fração de minutos jogados)
-  golosSofridos: { GR: 0.7, DC: 0.5, LD: 0.5, MD: 0.3, MC: 0.3, EX: 0.2, PL: 0 },
+  golosSofridos: { GR: 0.7, DC: 0.6, LD: 0.5, MD: 0.3, MC: 0.3, EX: 0.2, PL: 0 },
 
   // Penálti cometido
   penalti: 1.0,
@@ -139,7 +140,7 @@ function rateOne(p, ctx, C = RATING_CONFIG) {
 
   // Positivos comuns
   s += g * C.golo + a * C.assistencia + pf * C.passeFinalizacao + db * C.dribleOk;
-  s += fora * C.remateFora + ab * C.remateBaliza;
+  s += fora * (C.remateForaPorPos?.[r] ?? C.remateFora) + ab * C.remateBaliza;
 
   // Positivos por posição
   const pp = C.porPosicao[r] || {};
