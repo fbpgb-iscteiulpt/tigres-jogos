@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-11T16:24:28.311Z",
+    "atualizado": "2026-11-11T21:45:19.365Z",
     "versao": 18
   },
   "listas": {
@@ -9830,18 +9830,6 @@
     },
     {
       "pos": 12,
-      "equipa": "Purrianos",
-      "pts": 7,
-      "j": 7,
-      "v": 2,
-      "e": 1,
-      "dd": 4,
-      "gm": 10,
-      "gs": 19,
-      "td": 13
-    },
-    {
-      "pos": 13,
       "equipa": "VDR",
       "pts": 7,
       "j": 7,
@@ -9853,7 +9841,7 @@
       "td": 18
     },
     {
-      "pos": 14,
+      "pos": 13,
       "equipa": "Laranjada",
       "pts": 7,
       "j": 8,
@@ -9863,6 +9851,18 @@
       "gm": 13,
       "gs": 23,
       "td": 19
+    },
+    {
+      "pos": 14,
+      "equipa": "Purrianos",
+      "pts": 7,
+      "j": 7,
+      "v": 2,
+      "e": 1,
+      "dd": 4,
+      "gm": 10,
+      "gs": 19,
+      "td": 23
     },
     {
       "pos": 15,
