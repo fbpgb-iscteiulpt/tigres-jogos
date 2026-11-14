@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-11T21:45:19.365Z",
+    "atualizado": "2026-11-14T05:15:19.604Z",
     "versao": 18
   },
   "listas": {
@@ -9784,12 +9784,12 @@
       "pos": 8,
       "equipa": "Olímpico",
       "pts": 11,
-      "j": 8,
+      "j": 9,
       "v": 3,
       "e": 2,
-      "dd": 3,
-      "gm": 13,
-      "gs": 9,
+      "dd": 4,
+      "gm": 15,
+      "gs": 15,
       "td": 18
     },
     {
@@ -9830,6 +9830,18 @@
     },
     {
       "pos": 12,
+      "equipa": "Milionários",
+      "pts": 8,
+      "j": 9,
+      "v": 2,
+      "e": 2,
+      "dd": 5,
+      "gm": 14,
+      "gs": 17,
+      "td": 27
+    },
+    {
+      "pos": 13,
       "equipa": "VDR",
       "pts": 7,
       "j": 7,
@@ -9841,7 +9853,7 @@
       "td": 18
     },
     {
-      "pos": 13,
+      "pos": 14,
       "equipa": "Laranjada",
       "pts": 7,
       "j": 8,
@@ -9853,7 +9865,7 @@
       "td": 19
     },
     {
-      "pos": 14,
+      "pos": 15,
       "equipa": "Purrianos",
       "pts": 7,
       "j": 7,
@@ -9865,7 +9877,7 @@
       "td": 23
     },
     {
-      "pos": 15,
+      "pos": 16,
       "equipa": "Canarinhos",
       "pts": 6,
       "j": 7,
@@ -9877,7 +9889,7 @@
       "td": 16
     },
     {
-      "pos": 16,
+      "pos": 17,
       "equipa": "Briosa",
       "pts": 6,
       "j": 8,
@@ -9887,18 +9899,6 @@
       "gm": 9,
       "gs": 21,
       "td": 31
-    },
-    {
-      "pos": 17,
-      "equipa": "Milionários",
-      "pts": 5,
-      "j": 8,
-      "v": 1,
-      "e": 2,
-      "dd": 5,
-      "gm": 8,
-      "gs": 15,
-      "td": 27
     },
     {
       "pos": 18,
