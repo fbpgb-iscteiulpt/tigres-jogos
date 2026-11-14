@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-14T13:03:34.858Z",
+    "atualizado": "2026-11-14T19:44:58.740Z",
     "versao": 18
   },
   "listas": {
@@ -9442,6 +9442,24 @@
       "hora": "11:00",
       "casa": false,
       "video": "https://www.youtube.com/watch?v=lVN3YX4EK84"
+    },
+    {
+      "numero": 9,
+      "equipa": "Tigres",
+      "adversario": "Briosa",
+      "semEstatisticas": true,
+      "matchStats": {
+        "Resultado": {
+          "tigres": 1,
+          "adversario": 3
+        }
+      },
+      "players": [],
+      "eventos": [],
+      "data": "14 / 15 Novembro",
+      "hora": "15:30",
+      "casa": true,
+      "video": "https://www.youtube.com/watch?v=on5-R6zl1UE"
     }
   ],
   "calendario": [
@@ -9700,13 +9718,13 @@
       "pos": 1,
       "equipa": "Leões",
       "pts": 24,
-      "j": 8,
+      "j": 9,
       "v": 8,
       "e": 0,
-      "dd": 0,
-      "gm": 27,
-      "gs": 0,
-      "td": 22
+      "dd": 1,
+      "gm": 28,
+      "gs": 2,
+      "td": 28
     },
     {
       "pos": 2,
@@ -9730,7 +9748,7 @@
       "dd": 1,
       "gm": 19,
       "gs": 9,
-      "td": 20
+      "td": 23
     },
     {
       "pos": 4,
@@ -9754,7 +9772,7 @@
       "dd": 3,
       "gm": 20,
       "gs": 14,
-      "td": 44
+      "td": 47
     },
     {
       "pos": 6,
@@ -9782,6 +9800,18 @@
     },
     {
       "pos": 8,
+      "equipa": "Incríveis",
+      "pts": 12,
+      "j": 9,
+      "v": 3,
+      "e": 3,
+      "dd": 3,
+      "gm": 10,
+      "gs": 13,
+      "td": 27
+    },
+    {
+      "pos": 9,
       "equipa": "Olímpico",
       "pts": 11,
       "j": 9,
@@ -9790,46 +9820,58 @@
       "dd": 4,
       "gm": 16,
       "gs": 15,
-      "td": 18
-    },
-    {
-      "pos": 9,
-      "equipa": "Madeirinha",
-      "pts": 10,
-      "j": 7,
-      "v": 3,
-      "e": 1,
-      "dd": 3,
-      "gm": 11,
-      "gs": 11,
-      "td": 15
+      "td": 19
     },
     {
       "pos": 10,
-      "equipa": "Tigres",
+      "equipa": "Madeirinha",
       "pts": 10,
       "j": 8,
       "v": 3,
       "e": 1,
       "dd": 4,
-      "gm": 8,
-      "gs": 16,
-      "td": 27
+      "gm": 13,
+      "gs": 14,
+      "td": 15
     },
     {
       "pos": 11,
-      "equipa": "Incríveis",
-      "pts": 9,
-      "j": 8,
-      "v": 2,
-      "e": 3,
-      "dd": 3,
-      "gm": 8,
-      "gs": 12,
-      "td": 22
+      "equipa": "Laranjada",
+      "pts": 10,
+      "j": 9,
+      "v": 3,
+      "e": 1,
+      "dd": 5,
+      "gm": 16,
+      "gs": 25,
+      "td": 19
     },
     {
       "pos": 12,
+      "equipa": "Tigres",
+      "pts": 10,
+      "j": 9,
+      "v": 3,
+      "e": 1,
+      "dd": 5,
+      "gm": 9,
+      "gs": 19,
+      "td": 29
+    },
+    {
+      "pos": 13,
+      "equipa": "Briosa",
+      "pts": 9,
+      "j": 9,
+      "v": 3,
+      "e": 0,
+      "dd": 6,
+      "gm": 12,
+      "gs": 22,
+      "td": 32
+    },
+    {
+      "pos": 14,
       "equipa": "Milionários",
       "pts": 8,
       "j": 9,
@@ -9838,10 +9880,10 @@
       "dd": 5,
       "gm": 14,
       "gs": 18,
-      "td": 27
+      "td": 29
     },
     {
-      "pos": 13,
+      "pos": 15,
       "equipa": "VDR",
       "pts": 7,
       "j": 7,
@@ -9853,31 +9895,19 @@
       "td": 18
     },
     {
-      "pos": 14,
-      "equipa": "Laranjada",
+      "pos": 16,
+      "equipa": "Purrianos",
       "pts": 7,
       "j": 8,
       "v": 2,
       "e": 1,
       "dd": 5,
-      "gm": 13,
-      "gs": 23,
-      "td": 19
+      "gm": 11,
+      "gs": 22,
+      "td": 24
     },
     {
-      "pos": 15,
-      "equipa": "Purrianos",
-      "pts": 7,
-      "j": 7,
-      "v": 2,
-      "e": 1,
-      "dd": 4,
-      "gm": 10,
-      "gs": 19,
-      "td": 23
-    },
-    {
-      "pos": 16,
+      "pos": 17,
       "equipa": "Canarinhos",
       "pts": 6,
       "j": 7,
@@ -9889,28 +9919,16 @@
       "td": 16
     },
     {
-      "pos": 17,
-      "equipa": "Briosa",
-      "pts": 6,
-      "j": 8,
-      "v": 2,
-      "e": 0,
-      "dd": 6,
-      "gm": 9,
-      "gs": 21,
-      "td": 31
-    },
-    {
       "pos": 18,
       "equipa": "SD76",
-      "pts": 3,
-      "j": 8,
-      "v": 1,
+      "pts": 6,
+      "j": 9,
+      "v": 2,
       "e": 0,
       "dd": 7,
-      "gm": 9,
-      "gs": 17,
-      "td": 27
+      "gm": 12,
+      "gs": 18,
+      "td": 29
     }
   ],
   "lesoes": [
