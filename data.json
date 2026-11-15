@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-15T22:17:20.680Z",
-    "versao": 20
+    "atualizado": "2026-11-15T22:29:13.414Z",
+    "versao": 21
   },
   "listas": {
     "jogadores": [
@@ -9749,7 +9749,7 @@
           "defesas": 0,
           "golos": 0,
           "assistencias": 0,
-          "passeFinalizacao": 0,
+          "passeFinalizacao": 1,
           "faltas": 2,
           "passesErrados": 3,
           "perdasBola": 0,
@@ -10679,6 +10679,10 @@
         {
           "acao": "Canto ofensivo",
           "jogador": null
+        },
+        {
+          "acao": "Passe para finalização",
+          "jogador": "Miguel Lima"
         }
       ],
       "data": "14 / 15 Novembro",
