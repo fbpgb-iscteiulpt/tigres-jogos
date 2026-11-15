@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-15T22:29:13.414Z",
-    "versao": 21
+    "atualizado": "2026-11-15T23:49:28.781Z",
+    "versao": 22
   },
   "listas": {
     "jogadores": [
@@ -9665,7 +9665,7 @@
           "perdasBola": 2,
           "driblesBemSucedidos": 1,
           "driblesFalhados": 0,
-          "cruzamentosBemSucedidos": 0,
+          "cruzamentosBemSucedidos": 1,
           "cruzamentosFalhados": 1
         },
         {
@@ -10553,7 +10553,7 @@
         },
         {
           "acao": "Cruzamento bem sucedido",
-          "jogador": null
+          "jogador": "Nuno G"
         },
         {
           "acao": "Passe para finalização",

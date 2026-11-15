@@ -23,13 +23,13 @@ const RATING_CONFIG = {
 
   // Positivos por posição (aplicados às estatísticas relevantes)
   porPosicao: {
-    GR: { defesas: 1.2, desarmes: 0.30 },
+    GR: { defesas: 1.2, desarmes: 0.30, cruzamentos: 0.10 },
     DC: { desarmes: 0.26, cruzamentos: 0.10 },
     LD: { desarmes: 0.28, cruzamentos: 0.30 },
-    MD: { desarmes: 0.30 },
+    MD: { desarmes: 0.30, cruzamentos: 0.15 },
     MC: { desarmes: 0.35, cruzamentos: 0.15 },
     EX: { cruzamentos: 0.30, desarmes: 0.35 },
-    PL: { desarmes: 0.35 },
+    PL: { desarmes: 0.35, cruzamentos: 0.15 },
   },
 
   // Negativos: passes errados (PE) e perdas de bola (PB) por grupo posicional
