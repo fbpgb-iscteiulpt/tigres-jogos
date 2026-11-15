@@ -56,7 +56,8 @@ const RATING_CONFIG = {
   vermelho: 1.0,
 
   // Clean sheet (0 golos sofridos individuais), × fração de minutos
-  cleanSheet: { GR: 1.0, DC: 1.0, LD: 1.0, MD: 0.8, MC: 0.8, EX: 0, PL: 0 },
+  // Bónus de baliza a zeros desligado (decisão da equipa): 0 para todas as posições
+  cleanSheet: { GR: 0, DC: 0, LD: 0, MD: 0, MC: 0, EX: 0, PL: 0 },
 
   // Ajuste por minutos: regressa parcialmente à base
   // fator = minutosPesoBase + minutosPesoVar * min(1, min/minutosPlenos)
@@ -88,6 +89,20 @@ const POS_OVERRIDE = {
   "8|Fonseca": "Defesa Central",
   "8|Rodrigo": "Lateral Esquerdo",
   "8|Jacob": "Lateral Esquerdo",
+  "9|Branco": "Medio Defensivo",
+  "9|Tigrão": "Avançado",
+  "9|Fonseca": "Lateral Direito",
+  "9|Jacob": "Extremo Direito",
+  "9|Cascais": "Medio",
+};
+
+/* ---------- Jogadores que mudaram de posição durante o jogo ----------
+   Chave: "<numeroJornada>|<nome>" -> [[posição, minutos, golosSofridos?], ...]
+   A nota é a média das notas em cada posição, pesada pelos minutos.
+   Se cada parte indicar os golos sofridos, cada golo pesa só o valor da posição em que o jogador estava. */
+const POS_DIVIDIDA = {
+  "9|Dentes": [["Lateral Esquerdo", 40, 0], ["Medio", 40, 3]],
+  "9|Afonso": [["Medio", 40, 0], ["Medio Defensivo", 40, 3]],
 };
 
 /* ---------- Posição habitual por jogador (vale para todos os jogos) ----------
@@ -102,6 +117,14 @@ const POS_JOGADOR = {
    Chave: numero da jornada -> lista de nomes. */
 const SEM_GOLO_SOFRIDO = {
   3: ["Dentes", "Luis", "Afonso", "Jacob", "Tigrão"],
+};
+
+/* ---------- Golos sofridos com o jogador em campo (quando se sabe ao certo) ----------
+   Chave: numero da jornada -> { nome: golos }. Quem não estiver na lista sofre todos os golos do jogo.
+   Como a contagem já reflete o tempo em campo, NÃO se multiplica pela fração de minutos.
+   0 golos = não leva penalização e ganha o bónus de clean sheet (este sim × minutos). */
+const GOLOS_SOFRIDOS_JOGADOR = {
+  9: { Branco: 0, Paulinho: 0, Stijn: 2, Rodrigo: 2, "Simão": 2, Leo: 2 },
 };
 
 /* ---------- Posição textual -> papel curto ---------- */
@@ -127,8 +150,9 @@ function hasImpact(p, C) {
 }
 
 /* ---------- Nota de um jogador ----------
-   ctx: { golosSofridos, penaltis:{nome:n}, remBaliza:{nome:n}, vermelhos:{nome:n}, posStr, semGolo:bool } */
-function rateOne(p, ctx, C = RATING_CONFIG) {
+   ctx: { golosSofridos, golosExatos:bool, penaltis:{nome:n}, remBaliza:{nome:n}, vermelhos:{nome:n}, posStr, semGolo:bool }
+   rateRaw devolve a nota antes dos limites 4–10 (para poder fazer médias entre posições). */
+function rateRaw(p, ctx, C = RATING_CONFIG) {
   const r = roleOf(ctx.posStr);
   let s = C.BASE;
   const g = p.golos || 0, a = p.assistencias || 0, pf = p.passeFinalizacao || 0,
@@ -161,9 +185,11 @@ function rateOne(p, ctx, C = RATING_CONFIG) {
   s -= pe * w.pe + pb * w.pb;
   s -= flt * (C.faltaPorPos[r] ?? 0.10) + dfl * (C.dribleFalhadoPorPos[r] ?? 0.12);
 
-  // Golos sofridos (× minutos)
+  // Golos sofridos (× minutos, exceto quando a contagem por jogador é exata).
+  // ctx.ajusteGolos (posição dividida com golos por parte) substitui golos sofridos + clean sheet.
   const wGS = C.golosSofridos[r] ?? 0;
-  s -= gsInd * wGS * Math.min(1, min / 80);
+  if (ctx.ajusteGolos == null) s -= gsInd * wGS * (ctx.golosExatos ? 1 : Math.min(1, min / 80));
+  else s += ctx.ajusteGolos;
 
   // Penálti cometido
   s -= (ctx.penaltis?.[p.nome] || 0) * C.penalti;
@@ -172,7 +198,7 @@ function rateOne(p, ctx, C = RATING_CONFIG) {
   s -= (ctx.vermelhos?.[p.nome] || 0) * (C.vermelho ?? 0);
 
   // Clean sheet (quando não sofreu golo — a nível individual)
-  if (gsInd === 0) {
+  if (ctx.ajusteGolos == null && gsInd === 0) {
     const cs = C.cleanSheet[r] ?? 0;
     s += cs * Math.min(1, min / 80);
   }
@@ -186,7 +212,10 @@ function rateOne(p, ctx, C = RATING_CONFIG) {
     s = C.BASE + (s - C.BASE) * C.poucosMinutosMult;
   }
 
-  return Math.max(C.MIN, Math.min(C.MAX, s));
+  return s;
+}
+function rateOne(p, ctx, C = RATING_CONFIG) {
+  return Math.max(C.MIN, Math.min(C.MAX, rateRaw(p, ctx, C)));
 }
 
 /* Contadores a partir dos eventos da jornada */
@@ -206,20 +235,37 @@ function rateJornada(data, jornada, C = RATING_CONFIG) {
   const golosSofridos = +(jornada.matchStats?.Resultado?.adversario ?? 0);
   const { penaltis, remBaliza, vermelhos } = eventCounts(jornada);
   const semGoloSet = new Set(SEM_GOLO_SOFRIDO[jornada.numero] || []);
+  const gsJog = GOLOS_SOFRIDOS_JOGADOR[jornada.numero] || null;
   return (jornada.players || []).map((p) => {
+    const gs = gsJog ? (gsJog[p.nome] ?? golosSofridos) : golosSofridos;
+    const base = { golosSofridos: gs, golosExatos: !!gsJog, penaltis, remBaliza, vermelhos, semGolo: semGoloSet.has(p.nome) };
+    const div = POS_DIVIDIDA[`${jornada.numero}|${p.nome}`];
+    if (div) {
+      const tot = div.reduce((s, [, m]) => s + m, 0);
+      if (div.every((x) => typeof x[2] === "number")) {
+        const gsTot = div.reduce((s, x) => s + x[2], 0);
+        base.ajusteGolos = gsTot > 0
+          ? -div.reduce((s, [posStr, , g]) => s + g * (C.golosSofridos[roleOf(posStr)] ?? 0), 0)
+          : div.reduce((s, [posStr, m]) => s + (C.cleanSheet[roleOf(posStr)] ?? 0) * (m / 80), 0);
+      }
+      const raw = div.reduce((s, [posStr, m]) => s + rateRaw(p, { ...base, posStr }, C) * m, 0) / tot;
+      const nota = Math.max(C.MIN, Math.min(C.MAX, raw));
+      return { nome: p.nome, pos: div.map(([posStr]) => roleOf(posStr)).join("/"), min: p.minutos || 0, nota: +nota.toFixed(1) };
+    }
     const posStr = posOf(data, jornada.numero, p.nome);
-    const ctx = { golosSofridos, penaltis, remBaliza, vermelhos, posStr, semGolo: semGoloSet.has(p.nome) };
-    return { nome: p.nome, pos: roleOf(posStr), min: p.minutos || 0, nota: +rateOne(p, ctx, C).toFixed(1) };
+    return { nome: p.nome, pos: roleOf(posStr), min: p.minutos || 0, nota: +rateOne(p, { ...base, posStr }, C).toFixed(1) };
   }).sort((a, b) => b.nota - a.nota);
 }
 
-/* Notas de todas as jornadas + média da época por jogador */
+/* Notas de todas as jornadas + média da época por jogador.
+   A média só conta os jogos em que o jogador jogou (convocado com 0 minutos não entra). */
 function computeRatings(data, C = RATING_CONFIG) {
   const porJornada = {}, somas = {};
   for (const j of (data.jornadas || [])) {
     const rows = rateJornada(data, j, C);
     porJornada[j.numero] = rows;
     for (const row of rows) {
+      if (!(row.min > 0)) continue;
       const acc = (somas[row.nome] ||= { nome: row.nome, total: 0, jogos: 0 });
       acc.total += row.nota; acc.jogos++;
     }
@@ -232,8 +278,8 @@ function computeRatings(data, C = RATING_CONFIG) {
 
 /* Export para browser (app.js) e para módulos */
 if (typeof window !== "undefined") {
-  window.TigresRatings = { RATING_CONFIG, POS_OVERRIDE, SEM_GOLO_SOFRIDO, roleOf, rateOne, rateJornada, computeRatings };
+  window.TigresRatings = { RATING_CONFIG, POS_OVERRIDE, POS_DIVIDIDA, SEM_GOLO_SOFRIDO, GOLOS_SOFRIDOS_JOGADOR, roleOf, rateOne, rateJornada, computeRatings };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { RATING_CONFIG, POS_OVERRIDE, SEM_GOLO_SOFRIDO, roleOf, rateOne, rateJornada, computeRatings };
+  module.exports = { RATING_CONFIG, POS_OVERRIDE, POS_DIVIDIDA, SEM_GOLO_SOFRIDO, GOLOS_SOFRIDOS_JOGADOR, roleOf, rateOne, rateRaw, rateJornada, computeRatings };
 }

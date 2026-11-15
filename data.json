@@ -1,8 +1,8 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-15T18:32:53.674Z",
-    "versao": 18
+    "atualizado": "2026-11-15T22:05:24.270Z",
+    "versao": 20
   },
   "listas": {
     "jogadores": [
@@ -9447,15 +9447,1240 @@
       "numero": 9,
       "equipa": "Tigres",
       "adversario": "Briosa",
-      "semEstatisticas": true,
+      "nrJogadores": 17,
+      "tatica": "4-4-2",
       "matchStats": {
         "Resultado": {
           "tigres": 1,
           "adversario": 3
+        },
+        "Remates": {
+          "tigres": 12,
+          "adversario": 14
+        },
+        "Remates à baliza": {
+          "tigres": 6,
+          "adversario": 5
+        },
+        "Cantos": {
+          "tigres": 5,
+          "adversario": 7
+        },
+        "Faltas": {
+          "tigres": 11,
+          "adversario": 15
+        },
+        "Fora de jogo": {
+          "tigres": 1,
+          "adversario": 0
+        },
+        "Posse de bola": {
+          "tigres": 0.43,
+          "adversario": 0.57
+        },
+        "Cruzamentos": {
+          "tigres": 5,
+          "adversario": null
+        },
+        "Cartões Vermelhos": {
+          "tigres": 0,
+          "adversario": 0
         }
       },
-      "players": [],
-      "eventos": [],
+      "players": [
+        {
+          "nome": "Nuno T",
+          "titular": true,
+          "minutos": 80,
+          "remates": 0,
+          "desarmes": 0,
+          "defesas": 2,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 0,
+          "passesErrados": 2,
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Rodrigo",
+          "titular": true,
+          "minutos": 66,
+          "remates": 2,
+          "desarmes": 2,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 1,
+          "passesErrados": 3,
+          "perdasBola": 1,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Francisco",
+          "titular": true,
+          "minutos": 80,
+          "remates": 1,
+          "desarmes": 8,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 0,
+          "passesErrados": 3,
+          "perdasBola": 1,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 1,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 1
+        },
+        {
+          "nome": "Simão",
+          "titular": true,
+          "minutos": 71,
+          "remates": 0,
+          "desarmes": 8,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 0,
+          "passesErrados": 2,
+          "perdasBola": 1,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 1
+        },
+        {
+          "nome": "Stijn",
+          "titular": true,
+          "minutos": 71,
+          "remates": 1,
+          "desarmes": 8,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 1,
+          "passesErrados": 2,
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Afonso",
+          "titular": true,
+          "minutos": 80,
+          "remates": 1,
+          "desarmes": 9,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 1,
+          "faltas": 2,
+          "passesErrados": 6,
+          "perdasBola": 3,
+          "driblesBemSucedidos": 3,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Branco",
+          "titular": true,
+          "minutos": 40,
+          "remates": 1,
+          "desarmes": 6,
+          "defesas": 0,
+          "golos": 1,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 1,
+          "passesErrados": 2,
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Paulinho",
+          "titular": true,
+          "minutos": 40,
+          "remates": 0,
+          "desarmes": 1,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 1,
+          "passeFinalizacao": 1,
+          "faltas": 0,
+          "passesErrados": 1,
+          "perdasBola": 4,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Leo",
+          "titular": true,
+          "minutos": 71,
+          "remates": 1,
+          "desarmes": 5,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 1,
+          "passesErrados": 3,
+          "perdasBola": 2,
+          "driblesBemSucedidos": 1,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Nuno G",
+          "titular": true,
+          "minutos": 80,
+          "remates": 1,
+          "desarmes": 7,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 1,
+          "faltas": 2,
+          "passesErrados": 0,
+          "perdasBola": 2,
+          "driblesBemSucedidos": 1,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 1
+        },
+        {
+          "nome": "Dentes",
+          "titular": true,
+          "minutos": 80,
+          "remates": 0,
+          "desarmes": 10,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 1,
+          "passesErrados": 3,
+          "perdasBola": 3,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Fonseca",
+          "titular": false,
+          "minutos": 9,
+          "remates": 0,
+          "desarmes": 0,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 0,
+          "passesErrados": 1,
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Sergio",
+          "titular": false,
+          "minutos": 40,
+          "remates": 3,
+          "desarmes": 3,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 2,
+          "faltas": 0,
+          "passesErrados": 1,
+          "perdasBola": 4,
+          "driblesBemSucedidos": 2,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Jacob",
+          "titular": false,
+          "minutos": 14,
+          "remates": 0,
+          "desarmes": 1,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 0,
+          "passesErrados": 1,
+          "perdasBola": 1,
+          "driblesBemSucedidos": 1,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Miguel Lima",
+          "titular": false,
+          "minutos": 40,
+          "remates": 0,
+          "desarmes": 6,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 2,
+          "passesErrados": 3,
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 1
+        },
+        {
+          "nome": "Tigrão",
+          "titular": false,
+          "minutos": 9,
+          "remates": 0,
+          "desarmes": 0,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 0,
+          "passesErrados": 0,
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        },
+        {
+          "nome": "Cascais",
+          "titular": false,
+          "minutos": 9,
+          "remates": 1,
+          "desarmes": 0,
+          "defesas": 0,
+          "golos": 0,
+          "assistencias": 0,
+          "passeFinalizacao": 0,
+          "faltas": 0,
+          "passesErrados": 0,
+          "perdasBola": 0,
+          "driblesBemSucedidos": 0,
+          "driblesFalhados": 0,
+          "cruzamentosBemSucedidos": 0,
+          "cruzamentosFalhados": 0
+        }
+      ],
+      "eventos": [
+        {
+          "acao": "Desarme",
+          "jogador": "Branco"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Falta",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Drible falhado",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Branco"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Nuno T"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Remate sofrido dentro de area",
+          "jogador": null
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Falta",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Cruzamento falhado",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Canto ofensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Passe para finalização",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Golo marcado de bola parada",
+          "jogador": "Branco",
+          "minuto": 14
+        },
+        {
+          "acao": "Remate à baliza de dentro de area",
+          "jogador": "Branco"
+        },
+        {
+          "acao": "Assistência",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Falta",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Branco"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Remate sofrido à baliza fora de area",
+          "jogador": null
+        },
+        {
+          "acao": "Defesa",
+          "jogador": "Nuno T"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Fora de jogo ofensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Canto defensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Canto ofensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Falta",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Remate sofrido fora de area",
+          "jogador": null
+        },
+        {
+          "acao": "Canto defensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Branco"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Branco"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Remate sofrido fora de area",
+          "jogador": null
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Canto defensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Falta",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Branco"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Remate sofrido dentro de area",
+          "jogador": null
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Paulinho"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Nuno T"
+        },
+        {
+          "acao": "Falta",
+          "jogador": "Branco"
+        },
+        {
+          "acao": "Falta",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Branco"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Cruzamento falhado",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Branco"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Canto defensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Remate sofrido dentro de area",
+          "jogador": null
+        },
+        {
+          "acao": "Remate sofrido à baliza dentro de area",
+          "jogador": null
+        },
+        {
+          "acao": "Golo sofrido normal",
+          "jogador": null,
+          "minuto": 41
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Passe para finalização",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Remate para fora fora de area",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Cruzamento falhado",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Canto defensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Remate sofrido à baliza dentro de area",
+          "jogador": null
+        },
+        {
+          "acao": "Golo sofrido de bola parada",
+          "jogador": null,
+          "minuto": 43
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Canto defensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Passe para finalização",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Remate à baliza de dentro de area",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Cruzamento falhado",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Remate à baliza fora de area",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Falta",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Remate sofrido dentro de area",
+          "jogador": null
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Remate fora de dentro de area",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Leo"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Rodrigo"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Canto defensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Remate fora de dentro de area",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Canto ofensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Falta",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Passe para finalização",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Remate fora de dentro de area",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Remate sofrido fora de area",
+          "jogador": null
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Falta",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Remate sofrido à baliza dentro de area",
+          "jogador": null
+        },
+        {
+          "acao": "Defesa",
+          "jogador": "Nuno T"
+        },
+        {
+          "acao": "Remate sofrido dentro de area",
+          "jogador": null
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Simão"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Cruzamento bem sucedido",
+          "jogador": null
+        },
+        {
+          "acao": "Passe para finalização",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Remate à baliza de dentro de area",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Stijn"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Remate para fora fora de area",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Remate à baliza fora de area",
+          "jogador": "Cascais"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Jacob"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Falta sofrida",
+          "jogador": null
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Jacob"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Jacob"
+        },
+        {
+          "acao": "Falta",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Dentes"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Nuno G"
+        },
+        {
+          "acao": "Perda de bola",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Desarme",
+          "jogador": "Miguel Lima"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Remate sofrido fora de area",
+          "jogador": null
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Jacob"
+        },
+        {
+          "acao": "Canto ofensivo",
+          "jogador": null
+        },
+        {
+          "acao": "Remate fora de dentro de area",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Fonseca"
+        },
+        {
+          "acao": "Drible bem sucedido",
+          "jogador": "Afonso"
+        },
+        {
+          "acao": "Passe errado",
+          "jogador": "Francisco"
+        },
+        {
+          "acao": "Remate sofrido à baliza fora de area",
+          "jogador": null
+        },
+        {
+          "acao": "Golo sofrido normal",
+          "jogador": null,
+          "minuto": 79
+        },
+        {
+          "acao": "Remate à baliza de dentro de area",
+          "jogador": "Sergio"
+        },
+        {
+          "acao": "Canto ofensivo",
+          "jogador": null
+        }
+      ],
       "data": "14 / 15 Novembro",
       "hora": "15:30",
       "casa": true,
@@ -9718,217 +10943,217 @@
       "pos": 1,
       "equipa": "Leões",
       "pts": 24,
-      "j": 9,
+      "j": 8,
       "v": 8,
       "e": 0,
-      "dd": 1,
-      "gm": 28,
-      "gs": 2,
-      "td": 28
+      "dd": 0,
+      "gm": 27,
+      "gs": 0,
+      "td": 22
     },
     {
       "pos": 2,
       "equipa": "AQA",
       "pts": 20,
-      "j": 9,
+      "j": 8,
       "v": 6,
       "e": 2,
-      "dd": 1,
+      "dd": 0,
       "gm": 27,
-      "gs": 14,
-      "td": 32
+      "gs": 11,
+      "td": 26
     },
     {
       "pos": 3,
       "equipa": "CDUL",
       "pts": 18,
-      "j": 9,
+      "j": 8,
       "v": 5,
       "e": 3,
-      "dd": 1,
-      "gm": 19,
-      "gs": 9,
-      "td": 23
+      "dd": 0,
+      "gm": 17,
+      "gs": 6,
+      "td": 20
     },
     {
       "pos": 4,
-      "equipa": "Madeira",
-      "pts": 17,
-      "j": 9,
-      "v": 5,
-      "e": 2,
-      "dd": 2,
-      "gm": 21,
-      "gs": 10,
-      "td": 15
-    },
-    {
-      "pos": 5,
       "equipa": "Pé Leve",
-      "pts": 17,
-      "j": 9,
-      "v": 5,
-      "e": 2,
-      "dd": 2,
-      "gm": 13,
-      "gs": 12,
-      "td": 21
-    },
-    {
-      "pos": 6,
-      "equipa": "Cosmos",
       "pts": 16,
-      "j": 9,
+      "j": 8,
       "v": 5,
       "e": 1,
-      "dd": 3,
-      "gm": 20,
-      "gs": 14,
-      "td": 47
-    },
-    {
-      "pos": 7,
-      "equipa": "Vips",
-      "pts": 14,
-      "j": 9,
-      "v": 4,
-      "e": 2,
-      "dd": 3,
-      "gm": 27,
-      "gs": 16,
-      "td": 22
-    },
-    {
-      "pos": 8,
-      "equipa": "Incríveis",
-      "pts": 12,
-      "j": 9,
-      "v": 3,
-      "e": 3,
-      "dd": 3,
-      "gm": 10,
-      "gs": 13,
-      "td": 28
-    },
-    {
-      "pos": 9,
-      "equipa": "Olímpico",
-      "pts": 11,
-      "j": 9,
-      "v": 3,
-      "e": 2,
-      "dd": 4,
-      "gm": 16,
-      "gs": 15,
-      "td": 19
-    },
-    {
-      "pos": 10,
-      "equipa": "Madeirinha",
-      "pts": 10,
-      "j": 8,
-      "v": 3,
-      "e": 1,
-      "dd": 4,
-      "gm": 13,
-      "gs": 14,
-      "td": 18
-    },
-    {
-      "pos": 11,
-      "equipa": "Laranjada",
-      "pts": 10,
-      "j": 9,
-      "v": 3,
-      "e": 1,
-      "dd": 5,
-      "gm": 16,
-      "gs": 25,
-      "td": 21
-    },
-    {
-      "pos": 12,
-      "equipa": "Tigres",
-      "pts": 10,
-      "j": 9,
-      "v": 3,
-      "e": 1,
-      "dd": 5,
-      "gm": 9,
-      "gs": 19,
-      "td": 29
-    },
-    {
-      "pos": 13,
-      "equipa": "Canarinhos",
-      "pts": 9,
-      "j": 8,
-      "v": 3,
-      "e": 0,
-      "dd": 5,
+      "dd": 2,
       "gm": 11,
-      "gs": 21,
+      "gs": 10,
       "td": 17
     },
     {
-      "pos": 14,
-      "equipa": "Briosa",
-      "pts": 9,
-      "j": 9,
-      "v": 3,
-      "e": 0,
-      "dd": 6,
-      "gm": 12,
-      "gs": 22,
-      "td": 32
-    },
-    {
-      "pos": 15,
-      "equipa": "Milionários",
-      "pts": 8,
-      "j": 9,
-      "v": 2,
-      "e": 2,
-      "dd": 5,
-      "gm": 14,
-      "gs": 18,
-      "td": 29
-    },
-    {
-      "pos": 16,
-      "equipa": "VDR",
-      "pts": 7,
+      "pos": 5,
+      "equipa": "Madeira",
+      "pts": 14,
       "j": 8,
-      "v": 2,
+      "v": 4,
+      "e": 2,
+      "dd": 2,
+      "gm": 16,
+      "gs": 10,
+      "td": 14
+    },
+    {
+      "pos": 6,
+      "equipa": "Vips",
+      "pts": 13,
+      "j": 8,
+      "v": 4,
       "e": 1,
-      "dd": 5,
-      "gm": 8,
-      "gs": 23,
+      "dd": 3,
+      "gm": 25,
+      "gs": 14,
+      "td": 21
+    },
+    {
+      "pos": 7,
+      "equipa": "Cosmos",
+      "pts": 13,
+      "j": 8,
+      "v": 4,
+      "e": 1,
+      "dd": 3,
+      "gm": 17,
+      "gs": 12,
+      "td": 44
+    },
+    {
+      "pos": 8,
+      "equipa": "Olímpico",
+      "pts": 11,
+      "j": 8,
+      "v": 3,
+      "e": 2,
+      "dd": 3,
+      "gm": 13,
+      "gs": 9,
       "td": 18
     },
     {
-      "pos": 17,
+      "pos": 9,
+      "equipa": "Madeirinha",
+      "pts": 10,
+      "j": 7,
+      "v": 3,
+      "e": 1,
+      "dd": 3,
+      "gm": 11,
+      "gs": 11,
+      "td": 15
+    },
+    {
+      "pos": 10,
+      "equipa": "Tigres",
+      "pts": 10,
+      "j": 8,
+      "v": 3,
+      "e": 1,
+      "dd": 4,
+      "gm": 8,
+      "gs": 16,
+      "td": 27
+    },
+    {
+      "pos": 11,
+      "equipa": "Incríveis",
+      "pts": 9,
+      "j": 8,
+      "v": 2,
+      "e": 3,
+      "dd": 3,
+      "gm": 8,
+      "gs": 12,
+      "td": 22
+    },
+    {
+      "pos": 12,
       "equipa": "Purrianos",
+      "pts": 7,
+      "j": 7,
+      "v": 2,
+      "e": 1,
+      "dd": 4,
+      "gm": 10,
+      "gs": 19,
+      "td": 13
+    },
+    {
+      "pos": 13,
+      "equipa": "VDR",
+      "pts": 7,
+      "j": 7,
+      "v": 2,
+      "e": 1,
+      "dd": 4,
+      "gm": 8,
+      "gs": 18,
+      "td": 18
+    },
+    {
+      "pos": 14,
+      "equipa": "Laranjada",
       "pts": 7,
       "j": 8,
       "v": 2,
       "e": 1,
       "dd": 5,
-      "gm": 11,
-      "gs": 22,
-      "td": 24
+      "gm": 13,
+      "gs": 23,
+      "td": 19
+    },
+    {
+      "pos": 15,
+      "equipa": "Canarinhos",
+      "pts": 6,
+      "j": 7,
+      "v": 2,
+      "e": 0,
+      "dd": 5,
+      "gm": 8,
+      "gs": 21,
+      "td": 16
+    },
+    {
+      "pos": 16,
+      "equipa": "Briosa",
+      "pts": 6,
+      "j": 8,
+      "v": 2,
+      "e": 0,
+      "dd": 6,
+      "gm": 9,
+      "gs": 21,
+      "td": 31
+    },
+    {
+      "pos": 17,
+      "equipa": "Milionários",
+      "pts": 5,
+      "j": 8,
+      "v": 1,
+      "e": 2,
+      "dd": 5,
+      "gm": 8,
+      "gs": 15,
+      "td": 27
     },
     {
       "pos": 18,
       "equipa": "SD76",
-      "pts": 6,
-      "j": 9,
-      "v": 2,
+      "pts": 3,
+      "j": 8,
+      "v": 1,
       "e": 0,
       "dd": 7,
-      "gm": 12,
-      "gs": 18,
-      "td": 30
+      "gm": 9,
+      "gs": 17,
+      "td": 27
     }
   ],
   "lesoes": [
@@ -9955,7 +11180,7 @@
     {
       "jogador": "Sobral",
       "lesao": "Tornozelo",
-      "ate": null
+      "ate": "2026-12-20"
     },
     {
       "jogador": "Paiva",
@@ -9965,6 +11190,11 @@
     {
       "jogador": "Tomas S",
       "lesao": "Cabeça",
+      "ate": null
+    },
+    {
+      "jogador": "Branco",
+      "lesao": "",
       "ate": null
     }
   ],
