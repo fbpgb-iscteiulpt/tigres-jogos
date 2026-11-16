@@ -49,6 +49,8 @@ const RATING_CONFIG = {
 
   // Golos sofridos (× fração de minutos jogados)
   golosSofridos: { GR: 0.7, DC: 0.6, LD: 0.5, MD: 0.3, MC: 0.3, EX: 0.2, PL: 0 },
+  // Cada golo sofrido a mais tira menos que o anterior: 1.º golo × 1, 2.º × 0,75, 3.º × 0,56, ...
+  golosSofridosDecai: 0.75,
 
   // Penálti cometido
   penalti: 1.0,
@@ -145,6 +147,13 @@ function posOf(data, numero, nome) {
   return POS_OVERRIDE[`${numero}|${nome}`] || POS_JOGADOR[nome] || data?.listas?.posicoes?.[nome] || "";
 }
 
+/* Peso total de n golos sofridos com desconto gradual: 1 + d + d² + ... (n termos) */
+function pesoGolos(n, d, inicio = 0) {
+  let s = 0;
+  for (let k = inicio; k < inicio + n; k++) s += Math.pow(d ?? 1, k);
+  return s;
+}
+
 function hasImpact(p, C) {
   return (p.golos > 0) || (p.assistencias > 0) || (p.passeFinalizacao > 0) || ((p.desarmes || 0) >= C.impactoDesarmes);
 }
@@ -188,7 +197,7 @@ function rateRaw(p, ctx, C = RATING_CONFIG) {
   // Golos sofridos (× minutos, exceto quando a contagem por jogador é exata).
   // ctx.ajusteGolos (posição dividida com golos por parte) substitui golos sofridos + clean sheet.
   const wGS = C.golosSofridos[r] ?? 0;
-  if (ctx.ajusteGolos == null) s -= gsInd * wGS * (ctx.golosExatos ? 1 : Math.min(1, min / 80));
+  if (ctx.ajusteGolos == null) s -= wGS * pesoGolos(gsInd, C.golosSofridosDecai) * (ctx.golosExatos ? 1 : Math.min(1, min / 80));
   else s += ctx.ajusteGolos;
 
   // Penálti cometido
@@ -244,8 +253,9 @@ function rateJornada(data, jornada, C = RATING_CONFIG) {
       const tot = div.reduce((s, [, m]) => s + m, 0);
       if (div.every((x) => typeof x[2] === "number")) {
         const gsTot = div.reduce((s, x) => s + x[2], 0);
+        let k = 0;
         base.ajusteGolos = gsTot > 0
-          ? -div.reduce((s, [posStr, , g]) => s + g * (C.golosSofridos[roleOf(posStr)] ?? 0), 0)
+          ? -div.reduce((s, [posStr, , g]) => { const v = (C.golosSofridos[roleOf(posStr)] ?? 0) * pesoGolos(g, C.golosSofridosDecai, k); k += g; return s + v; }, 0)
           : div.reduce((s, [posStr, m]) => s + (C.cleanSheet[roleOf(posStr)] ?? 0) * (m / 80), 0);
       }
       const raw = div.reduce((s, [posStr, m]) => s + rateRaw(p, { ...base, posStr }, C) * m, 0) / tot;
