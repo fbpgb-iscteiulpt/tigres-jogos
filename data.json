@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-21T01:59:23.733Z",
+    "atualizado": "2026-11-21T18:46:10.225Z",
     "versao": 22
   },
   "listas": {
@@ -10689,6 +10689,24 @@
       "hora": "15:30",
       "casa": true,
       "video": "https://www.youtube.com/watch?v=on5-R6zl1UE"
+    },
+    {
+      "numero": 10,
+      "equipa": "Tigres",
+      "adversario": "Canarinhos",
+      "semEstatisticas": true,
+      "matchStats": {
+        "Resultado": {
+          "tigres": 0,
+          "adversario": 4
+        }
+      },
+      "players": [],
+      "eventos": [],
+      "data": "21 / 22 Novembro",
+      "hora": "15:30",
+      "casa": true,
+      "video": "https://www.youtube.com/watch?v=WtiOQ8hoodU"
     }
   ],
   "calendario": [
@@ -10946,14 +10964,14 @@
     {
       "pos": 1,
       "equipa": "Leões",
-      "pts": 24,
-      "j": 9,
-      "v": 8,
+      "pts": 27,
+      "j": 10,
+      "v": 9,
       "e": 0,
       "dd": 1,
-      "gm": 28,
-      "gs": 2,
-      "td": 31
+      "gm": 30,
+      "gs": 3,
+      "td": 40
     },
     {
       "pos": 2,
@@ -10964,8 +10982,8 @@
       "e": 3,
       "dd": 1,
       "gm": 22,
-      "gs": 9,
-      "td": 23
+      "gs": 10,
+      "td": 25
     },
     {
       "pos": 3,
@@ -10999,9 +11017,9 @@
       "v": 5,
       "e": 2,
       "dd": 3,
-      "gm": 13,
+      "gm": 14,
       "gs": 15,
-      "td": 21
+      "td": 24
     },
     {
       "pos": 6,
@@ -11019,16 +11037,40 @@
       "pos": 7,
       "equipa": "Vips",
       "pts": 14,
-      "j": 9,
+      "j": 10,
       "v": 4,
       "e": 2,
-      "dd": 3,
-      "gm": 27,
-      "gs": 16,
-      "td": 22
+      "dd": 4,
+      "gm": 28,
+      "gs": 18,
+      "td": 25
     },
     {
       "pos": 8,
+      "equipa": "Madeirinha",
+      "pts": 13,
+      "j": 9,
+      "v": 4,
+      "e": 1,
+      "dd": 4,
+      "gm": 15,
+      "gs": 14,
+      "td": 24
+    },
+    {
+      "pos": 9,
+      "equipa": "Canarinhos",
+      "pts": 12,
+      "j": 9,
+      "v": 4,
+      "e": 0,
+      "dd": 5,
+      "gm": 15,
+      "gs": 21,
+      "td": 20
+    },
+    {
+      "pos": 10,
       "equipa": "Incríveis",
       "pts": 12,
       "j": 9,
@@ -11040,31 +11082,19 @@
       "td": 28
     },
     {
-      "pos": 9,
+      "pos": 11,
       "equipa": "Olímpico",
       "pts": 11,
-      "j": 9,
+      "j": 10,
       "v": 3,
       "e": 2,
-      "dd": 4,
+      "dd": 5,
       "gm": 16,
-      "gs": 15,
-      "td": 19
+      "gs": 17,
+      "td": 23
     },
     {
-      "pos": 10,
-      "equipa": "Madeirinha",
-      "pts": 10,
-      "j": 8,
-      "v": 3,
-      "e": 1,
-      "dd": 4,
-      "gm": 13,
-      "gs": 14,
-      "td": 18
-    },
-    {
-      "pos": 11,
+      "pos": 12,
       "equipa": "Laranjada",
       "pts": 10,
       "j": 9,
@@ -11076,28 +11106,16 @@
       "td": 21
     },
     {
-      "pos": 12,
+      "pos": 13,
       "equipa": "Tigres",
       "pts": 10,
-      "j": 9,
+      "j": 10,
       "v": 3,
       "e": 1,
-      "dd": 5,
+      "dd": 6,
       "gm": 9,
-      "gs": 19,
-      "td": 30
-    },
-    {
-      "pos": 13,
-      "equipa": "Canarinhos",
-      "pts": 9,
-      "j": 8,
-      "v": 3,
-      "e": 0,
-      "dd": 5,
-      "gm": 11,
-      "gs": 21,
-      "td": 17
+      "gs": 23,
+      "td": 31
     },
     {
       "pos": 14,
