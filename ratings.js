@@ -96,6 +96,11 @@ const POS_OVERRIDE = {
   "9|Fonseca": "Lateral Direito",
   "9|Jacob": "Extremo Direito",
   "9|Cascais": "Medio",
+  "10|Branco": "Defesa Central",
+  "10|Stijn": "Lateral Direito",
+  "10|Jacob": "Extremo Direito",
+  "10|Dentes": "Lateral Esquerdo",
+  "10|Fonseca": "Defesa Central",
 };
 
 /* ---------- Jogadores que mudaram de posição durante o jogo ----------
@@ -127,6 +132,7 @@ const SEM_GOLO_SOFRIDO = {
    0 golos = não leva penalização e ganha o bónus de clean sheet (este sim × minutos). */
 const GOLOS_SOFRIDOS_JOGADOR = {
   9: { Branco: 0, Paulinho: 0, Stijn: 2, Rodrigo: 2, "Simão": 2, Leo: 2 },
+  10: { Sergio: 0, "Miguel Cruz": 2, "Ze Miguel": 2, Paulinho: 2, "Miguel Lima": 2, Fonseca: 1, Jacob: 2, Dentes: 2, Afonso: 2, Cascais: 2 },
 };
 
 /* ---------- Posição textual -> papel curto ---------- */
