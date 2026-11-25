@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-25T16:53:06.540Z",
+    "atualizado": "2026-11-25T19:47:06.114Z",
     "versao": 23
   },
   "listas": {
@@ -11988,21 +11988,24 @@
       "data": "19 / 20 Dezembro",
       "hora": "12:10",
       "adversario": "Leões",
-      "casa": false
+      "casa": false,
+      "video": "https://www.youtube.com/watch?v=qqqR-HaFi14"
     },
     {
       "numero": 15,
       "data": "9 / 10 Janeiro",
       "hora": "12:40",
       "adversario": "AQA",
-      "casa": true
+      "casa": true,
+      "video": "https://www.youtube.com/watch?v=KsYeAgaCIf0"
     },
     {
       "numero": 16,
       "data": "16 / 17 Janeiro",
       "hora": "13:50",
       "adversario": "VDR",
-      "casa": false
+      "casa": false,
+      "video": "https://www.youtube.com/watch?v=y8T8Kbolb4c"
     },
     {
       "numero": 17,
