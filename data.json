@@ -1,7 +1,7 @@
 {
   "meta": {
     "clube": "Tigres",
-    "atualizado": "2026-11-25T19:47:06.114Z",
+    "atualizado": "2026-11-26T19:25:26.490Z",
     "versao": 23
   },
   "listas": {
@@ -12012,7 +12012,8 @@
       "data": "23 / 24 Janeiro",
       "hora": "12:40",
       "adversario": "Vips",
-      "casa": false
+      "casa": false,
+      "video": "https://www.youtube.com/watch?v=ts8czh833Nc"
     },
     {
       "numero": 18,
